@@ -2,13 +2,13 @@
 #include "FWCore/TestProcessor/interface/TestProcessor.h"
 #include "FWCore/Utilities/interface/Exception.h"
 
-static constexpr auto s_tag = "[VertexNTuplizer]";
+static constexpr auto s_tag = "[VertexNtuplizer]";
 
-TEST_CASE("Standard checks of VertexNTuplizer", s_tag) {
+TEST_CASE("Standard checks of VertexNtuplizer", s_tag) {
   const std::string baseConfig{
       R"_(from FWCore.TestProcessor.TestProcess import *
 process = TestProcess()
-process.toTest = cms.EDProducer("VertexNTuplizer"
+process.toTest = cms.EDProducer("VertexNtuplizer"
 #necessary configuration parameters
  )
 process.moduleToTest(process.toTest)

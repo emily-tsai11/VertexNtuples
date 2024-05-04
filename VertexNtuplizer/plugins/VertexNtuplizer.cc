@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
-// Package:    VertexNTuples/VertexNTuplizer
-// Class:      VertexNTuplizer
+// Package:    VertexNtuples/VertexNtuplizer
+// Class:      VertexNtuplizer
 //
-/**\class VertexNTuplizer VertexNTuplizer.cc VertexNTuples/VertexNTuplizer/plugins/VertexNTuplizer.cc
+/**\class VertexNtuplizer VertexNtuplizer.cc VertexNtuples/VertexNtuplizer/plugins/VertexNtuplizer.cc
 
  Description: [one line class summary]
 
@@ -41,10 +41,10 @@
 
 using reco::TrackCollection;
 
-class VertexNTuplizer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
+class VertexNtuplizer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
 public:
-  explicit VertexNTuplizer(const edm::ParameterSet&);
-  ~VertexNTuplizer() override;
+  explicit VertexNtuplizer(const edm::ParameterSet&);
+  ~VertexNtuplizer() override;
 
   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
@@ -71,7 +71,7 @@ private:
 //
 // constructors and destructor
 //
-VertexNTuplizer::VertexNTuplizer(const edm::ParameterSet& iConfig)
+VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig)
     : tracksToken_(consumes<TrackCollection>(iConfig.getUntrackedParameter<edm::InputTag>("tracks"))) {
 #ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
   setupDataToken_ = esConsumes<SetupData, SetupRecord>();
@@ -79,7 +79,7 @@ VertexNTuplizer::VertexNTuplizer(const edm::ParameterSet& iConfig)
   //now do what ever initialization is needed
 }
 
-VertexNTuplizer::~VertexNTuplizer() {
+VertexNtuplizer::~VertexNtuplizer() {
   // do anything here that needs to be done at desctruction time
   // (e.g. close files, deallocate resources etc.)
   //
@@ -91,7 +91,7 @@ VertexNTuplizer::~VertexNTuplizer() {
 //
 
 // ------------ method called for each event  ------------
-void VertexNTuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
+void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
   using namespace edm;
 
   for (const auto& track : iEvent.get(tracksToken_)) {
@@ -108,23 +108,22 @@ void VertexNTuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 }
 
 // ------------ method called once each job just before starting event loop  ------------
-void VertexNTuplizer::beginJob() {
+void VertexNtuplizer::beginJob() {
   // please remove this method if not needed
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
-void VertexNTuplizer::endJob() {
+void VertexNtuplizer::endJob() {
   // please remove this method if not needed
 }
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
-void VertexNTuplizer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+void VertexNtuplizer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   //The following says we do not know what parameters are allowed so do no validation
   // Please change this to state exactly what you do use, even if it is no parameters
   edm::ParameterSetDescription desc;
-  pdesc.add<double>("matchFrac", 0.66);
-  // desc.setUnknown();
-  // descriptions.addDefault(desc);
+  desc.setUnknown();
+  descriptions.addDefault(desc);
 
   //Specify that only 'tracks' is allowed
   //To use, remove the default given above and uncomment below
@@ -134,4 +133,4 @@ void VertexNTuplizer::fillDescriptions(edm::ConfigurationDescriptions& descripti
 }
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(VertexNTuplizer);
+DEFINE_FWK_MODULE(VertexNtuplizer);

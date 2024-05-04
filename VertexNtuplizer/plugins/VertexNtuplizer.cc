@@ -30,6 +30,9 @@
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
+#include "FWCore/ServiceRegistry/interface/Service.h"
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
+#include "TH1.h"
 //
 // class declaration
 //
@@ -58,6 +61,7 @@ private:
 #ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
   edm::ESGetToken<SetupData, SetupRecord> setupToken_;
 #endif
+  TH1I* histo;
 };
 
 //
@@ -77,6 +81,9 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig)
   setupDataToken_ = esConsumes<SetupData, SetupRecord>();
 #endif
   //now do what ever initialization is needed
+  usesResource("TFileService");
+  edm::Service<TFileService> fs;
+  histo = fs->make<TH1I>("charge", "Charges", 2, -1, 1);
 }
 
 VertexNtuplizer::~VertexNtuplizer() {
@@ -97,6 +104,7 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   for (const auto& track : iEvent.get(tracksToken_)) {
     // do something with track parameters, e.g, plot the charge.
     // int charge = track.charge();
+    histo->Fill(track.charge());
   }
 
 #ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE

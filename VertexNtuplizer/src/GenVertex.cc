@@ -1,41 +1,47 @@
-#include "GenVertex.h"
+#include "../interface/GenVertex.h"
 
-GenVertex(const reco::GenParticle* mother, std::vector<const reco::Candidate*>* daughters,
-  edm::SimTrackContainer simTracks, float matchFrac, float drCut, float ptCut) :
-  mother_(mother), daughters_(daughters), isSimMatched_(false) {
 
-  // Mother and daughter pt should already be pre-selected, and there should be >=2 tracks
+GenVertex::GenVertex(const reco::GenParticle* mother, std::vector<const reco::Candidate*>* daughters) :
+  mother_(mother), daughters_(daughters) {}
 
-  daughtersNoNu_ = new std::vector<const reco::Candidate*>;
-  for (const reco::Candidate* dau : *(daughters_)) {
-    if (abs(dau->pdgId()) != 12 && abs(dau->pdgId()) != 14 && abs(dau->pdgId()) != 16)
-    daughtersNoNu_->push_back(dau->clone());
+
+// GenVertex::~GenVertex() {}
+
+
+void GenVertex::print() {
+
+  std::cout << "GenVertex:" << std::endl;
+  std::cout << "    vertex x        = " << x() << std::endl;
+  std::cout << "    vertex y        = " << y() << std::endl;
+  std::cout << "    vertex z        = " << z() << std::endl;
+  std::cout << "    vertex pt       = " << pt() << std::endl;
+  std::cout << "    vertex eta      = " << eta() << std::endl;
+  std::cout << "    vertex phi      = " << phi() << std::endl;
+  std::cout << "    nDaughters      = " << nDaughters() << std::endl;
+  std::cout << "    mother pdg id   = " << motherPdgId() << std::endl;
+
+  std::cout << "    daughter pdgIds = ";
+  for (unsigned int iDau = 0; iDau < nDaughters(); iDau++) {
+    std::cout << daughters_->at(iDau)->pdgId();
+    if (iDau < nDaughters() - 1) std::cout << ", ";
   }
-
-  float nmatch = 0;
-  for (const reco::Candidate* dau : *(daughters_)) {
-  for (const SimTrack& st : simTracks) {
-    if (reco::deltaR(dau->eta(), dau->phi(), st.momentum().Eta(), st.momentum().Phi()) > drCut) continue;
-    if (abs(dau->pt() - st.momentum().Pt()) / (dau->pt() + st.momentum().Pt()) > ptCut) continue;
-      nmatch++;
-      break;
-    }
+  std::cout << std::endl;
+  std::cout << "    daughter pts   = ";
+  for (unsigned int iDau = 0; iDau < nDaughters(); iDau++) {
+    std::cout << daughters_->at(iDau)->pt();
+    if (iDau < nDaughters() - 1) std::cout << ", ";
   }
-  isSimMatched_ = (nmatch/(float)daughters_->size()) >= matchFrac;
-
-  float nmatchNoNu = 0;
-  for (const reco::Candidate* dau : *(daughtersNoNu_)) {
-    for (const SimTrack& st : simTracks) {
-    if (reco::deltaR(dau->eta(), dau->phi(), st.momentum().Eta(), st.momentum().Phi()) > drCut) continue;
-    if (abs(dau->pt() - st.momentum().Pt()) / (dau->pt() + st.momentum().Pt()) > ptCut) continue;
-      nmatchNoNu++;
-      break;
-    }
+  std::cout << std::endl;
+  std::cout << "    daughter etas   = ";
+  for (unsigned int iDau = 0; iDau < nDaughters(); iDau++) {
+    std::cout << daughters_->at(iDau)->eta();
+    if (iDau < nDaughters() - 1) std::cout << ", ";
   }
-  isSimMatchedNoNu_ = (nmatchNoNu/(float)daughtersNoNu_->size()) >= matchFrac;
-}
-
-GenVertex::~GenVertex() {
-  delete daughters_;
-  delete daughtersNoNu_;
+  std::cout << std::endl;
+  std::cout << "    daughter phis   = ";
+  for (unsigned int iDau = 0; iDau < nDaughters(); iDau++) {
+    std::cout << daughters_->at(iDau)->phi();
+    if (iDau < nDaughters() - 1) std::cout << ", ";
+  }
+  std::cout << std::endl;
 }

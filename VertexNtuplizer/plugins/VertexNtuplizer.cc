@@ -33,6 +33,10 @@
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "TH1.h"
+
+#include "../interface/GenVertex.h"
+#include "../interface/GenVertexCollectionBuilder.h"
+
 //
 // class declaration
 //
@@ -45,23 +49,30 @@
 using reco::TrackCollection;
 
 class VertexNtuplizer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
-public:
-  explicit VertexNtuplizer(const edm::ParameterSet&);
-  ~VertexNtuplizer() override;
+  public:
+    explicit VertexNtuplizer(const edm::ParameterSet&);
+    ~VertexNtuplizer() override;
 
-  static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
+    static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
-private:
-  void beginJob() override;
-  void analyze(const edm::Event&, const edm::EventSetup&) override;
-  void endJob() override;
+  private:
+    void beginJob() override;
+    void analyze(const edm::Event&, const edm::EventSetup&) override;
+    void endJob() override;
 
-  // ----------member data ---------------------------
-  edm::EDGetTokenT<TrackCollection> tracksToken_;  //used to select what tracks to read from configuration file
-#ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
-  edm::ESGetToken<SetupData, SetupRecord> setupToken_;
-#endif
-  TH1I* histo;
+    // ----------member data ---------------------------
+    edm::EDGetTokenT<TrackCollection> tracksToken_;  //used to select what tracks to read from configuration file
+
+    edm::EDGetTokenT<reco::GenParticleCollection> genParticlesToken_;
+    edm::EDGetTokenT<edm::SimTrackContainer> simTracksToken_;
+
+  #ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
+    edm::ESGetToken<SetupData, SetupRecord> setupToken_;
+  #endif
+
+    GenVertexCollectionBuilder* gvc;
+
+    TH1I* histo;
 };
 
 //
@@ -75,8 +86,11 @@ private:
 //
 // constructors and destructor
 //
-VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig)
-    : tracksToken_(consumes<TrackCollection>(iConfig.getUntrackedParameter<edm::InputTag>("tracks"))) {
+VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
+    tracksToken_(consumes<TrackCollection>(iConfig.getUntrackedParameter<edm::InputTag>("tracks"))),
+    genParticlesToken_(consumes<reco::GenParticleCollection>(iConfig.getUntrackedParameter<edm::InputTag>("genParticles"))),
+    simTracksToken_(consumes<edm::SimTrackContainer>(iConfig.getUntrackedParameter<edm::InputTag>("simTracks"))) {
+
 #ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
   setupDataToken_ = esConsumes<SetupData, SetupRecord>();
 #endif
@@ -84,6 +98,8 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig)
   usesResource("TFileService");
   edm::Service<TFileService> fs;
   histo = fs->make<TH1I>("charge", "Charges", 2, -1, 1);
+
+  gvc = new GenVertexCollectionBuilder(iConfig);
 }
 
 VertexNtuplizer::~VertexNtuplizer() {
@@ -100,6 +116,13 @@ VertexNtuplizer::~VertexNtuplizer() {
 // ------------ method called for each event  ------------
 void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
   using namespace edm;
+
+  gvc->build(iEvent, genParticlesToken_, simTracksToken_);
+
+  GenVertexCollection genVertices = gvc->getGenVertexCollection();
+  GenVertexCollection genVerticesSimMatch = gvc->getGenVertexSimMatchCollection();
+  GenVertexCollection genVerticesNoNu = gvc->getGenVertexNoNuCollection();
+  GenVertexCollection genVerticesNoNuSimMatch = gvc->getGenVertexNoNuSimMatchCollection();
 
   for (const auto& track : iEvent.get(tracksToken_)) {
     // do something with track parameters, e.g, plot the charge.

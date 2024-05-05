@@ -15,7 +15,9 @@ Or, for debugging with `gdb`, compile with
 ```
 scram b -j USER_CXXFLAGS="-g"
 ```
-Subsequent setup:
+(This is already specified by default in `VertexNtuples/VertexNtuplizer/BuildFile.xml`.)
+
+For subsequent setup:
 ```
 cd CMSSW_14_1_0_pre3/src/
 cmsenv

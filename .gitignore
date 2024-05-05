@@ -1,2 +1,2 @@
 *.pyc
-VertexNtuplizer/test/*.root
+*__pycache__/

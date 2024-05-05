@@ -22,17 +22,21 @@
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/one/EDAnalyzer.h"
-
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
-
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
-#include "DataFormats/TrackReco/interface/Track.h"
-#include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
+
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "TH1.h"
+
+// #include "DataFormats/TrackReco/interface/Track.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "SimDataFormats/Track/interface/SimTrackContainer.h"
+#include "DataFormats/VertexReco/interface/VertexFwd.h"
+#include "DataFormats/TrackReco/interface/TrackFwd.h"
+#include "DataFormats/PatCandidates/interface/Jet.h"
 
 #include "../interface/GenVertex.h"
 #include "../interface/GenVertexCollectionBuilder.h"
@@ -61,14 +65,23 @@ class VertexNtuplizer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
     void endJob() override;
 
     // ----------member data ---------------------------
-    edm::EDGetTokenT<TrackCollection> tracksToken_;  //used to select what tracks to read from configuration file
+    // edm::EDGetTokenT<TrackCollection> tracksToken_;  //used to select what tracks to read from configuration file
 
     edm::EDGetTokenT<reco::GenParticleCollection> genParticlesToken_;
     edm::EDGetTokenT<edm::SimTrackContainer> simTracksToken_;
+    edm::EDGetTokenT<reco::VertexCollection> primaryVerticesToken_;
+    edm::EDGetTokenT<reco::VertexCollection> secondaryVerticesToken_;
+    edm::EDGetTokenT<reco::VertexCollection> secondaryVerticesMTDTimingToken_;
+    edm::EDGetTokenT<unsigned int> IVFclustersToken_;
+    edm::EDGetTokenT<unsigned int> IVFclustersMTDTimingToken_;
+    edm::EDGetTokenT<edm::ValueMap<float>> trackTimeValueMapToken_;
+    edm::EDGetTokenT<edm::ValueMap<float>> trackTimeErrorMapToken_;
+    edm::EDGetTokenT<edm::ValueMap<float>> trackTimeQualityMapToken_;
+    edm::EDGetTokenT<pat::JetCollection> jetsToken_;
 
-  #ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
+#ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
     edm::ESGetToken<SetupData, SetupRecord> setupToken_;
-  #endif
+#endif
 
     GenVertexCollectionBuilder* gvc;
 
@@ -87,9 +100,18 @@ class VertexNtuplizer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
 // constructors and destructor
 //
 VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
-    tracksToken_(consumes<TrackCollection>(iConfig.getUntrackedParameter<edm::InputTag>("tracks"))),
+    // tracksToken_(consumes<TrackCollection>(iConfig.getUntrackedParameter<edm::InputTag>("tracks"))),
     genParticlesToken_(consumes<reco::GenParticleCollection>(iConfig.getUntrackedParameter<edm::InputTag>("genParticles"))),
-    simTracksToken_(consumes<edm::SimTrackContainer>(iConfig.getUntrackedParameter<edm::InputTag>("simTracks"))) {
+    simTracksToken_(consumes<edm::SimTrackContainer>(iConfig.getUntrackedParameter<edm::InputTag>("simTracks"))),
+    primaryVerticesToken_(consumes<reco::VertexCollection>(iConfig.getUntrackedParameter<edm::InputTag>("primaryVertices"))),
+    secondaryVerticesToken_(consumes<reco::VertexCollection>(iConfig.getUntrackedParameter<edm::InputTag>("secondaryVertices"))),
+    secondaryVerticesMTDTimingToken_(consumes<reco::VertexCollection>(iConfig.getUntrackedParameter<edm::InputTag>("secondaryVerticesMTDTiming"))),
+    IVFclustersToken_(consumes<unsigned int>(iConfig.getUntrackedParameter<edm::InputTag>("IVFclusters"))),
+    IVFclustersMTDTimingToken_(consumes<unsigned int>(iConfig.getUntrackedParameter<edm::InputTag>("IVFclustersMTDTiming"))),
+    trackTimeValueMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimeValueMap"))),
+    trackTimeErrorMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimeErrorMap"))),
+    trackTimeQualityMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimeQualityMap"))),
+    jetsToken_(consumes<pat::JetCollection>(iConfig.getUntrackedParameter<edm::InputTag>("jets"))) {
 
 #ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
   setupDataToken_ = esConsumes<SetupData, SetupRecord>();
@@ -117,18 +139,22 @@ VertexNtuplizer::~VertexNtuplizer() {
 void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
   using namespace edm;
 
-  gvc->build(iEvent, genParticlesToken_, simTracksToken_);
+  reco::VertexCollection primaryVertices = iEvent.get(primaryVerticesToken_);
+  // Sorting described here: https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideOfflinePrimaryVertexProduction
+  const reco::Vertex& primaryVertex = primaryVertices.at(0); // Most likely the signal vertex
+
+  gvc->build(iEvent, genParticlesToken_, simTracksToken_, primaryVertex);
 
   GenVertexCollection genVertices = gvc->getGenVertexCollection();
   GenVertexCollection genVerticesSimMatch = gvc->getGenVertexSimMatchCollection();
   GenVertexCollection genVerticesNoNu = gvc->getGenVertexNoNuCollection();
   GenVertexCollection genVerticesNoNuSimMatch = gvc->getGenVertexNoNuSimMatchCollection();
 
-  for (const auto& track : iEvent.get(tracksToken_)) {
-    // do something with track parameters, e.g, plot the charge.
-    // int charge = track.charge();
-    histo->Fill(track.charge());
-  }
+  // for (const auto& track : iEvent.get(tracksToken_)) {
+  //   // do something with track parameters, e.g, plot the charge.
+  //   // int charge = track.charge();
+  //   histo->Fill(track.charge());
+  // }
 
 #ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
   // if the SetupData is always needed

@@ -16,11 +16,12 @@ GenVertexCollectionBuilder::GenVertexCollectionBuilder(const edm::ParameterSet& 
 
 
 void GenVertexCollectionBuilder::build(const edm::Event& iEvent,
-    edm::EDGetTokenT<reco::GenParticleCollection> genParticlesToken_,
-    edm::EDGetTokenT<edm::SimTrackContainer> simTracksToken_) {
+    edm::EDGetTokenT<reco::GenParticleCollection> genParticlesToken,
+    edm::EDGetTokenT<edm::SimTrackContainer> simTracksToken,
+    const reco::Vertex primaryVertex) {
 
-  genParticles_ = iEvent.get(genParticlesToken_);
-  simTracks_ = iEvent.get(simTracksToken_);
+  genParticles_ = iEvent.get(genParticlesToken);
+  simTracks_ = iEvent.get(simTracksToken);
 
   genVertices_.clear();
   genVerticesSimMatch_.clear();
@@ -57,14 +58,14 @@ void GenVertexCollectionBuilder::build(const edm::Event& iEvent,
       }
 
       if (goodDaughters->size() >= 2) {
-        GenVertex newGV(gp, goodDaughters);
+        GenVertex newGV(gp, goodDaughters, primaryVertex);
         genVertices_.push_back(newGV);
         if (matchGenToSimVertex(newGV)) {
           genVerticesSimMatch_.push_back(newGV);
         }
       }
       if (goodDaughtersNoNu->size() >= 2) {
-        GenVertex newGVNoNu(gp, goodDaughtersNoNu);
+        GenVertex newGVNoNu(gp, goodDaughtersNoNu, primaryVertex);
         genVerticesNoNu_.push_back(newGVNoNu);
         if (matchGenToSimVertex(newGVNoNu)) {
           genVerticesNoNuSimMatch_.push_back(newGVNoNu);
@@ -86,11 +87,11 @@ bool GenVertexCollectionBuilder::goodGenParticle(const P* gp, double ptCut) {
 
 
 template <class P>
-bool GenVertexCollectionBuilder::matchGenToSimTrack(const P* gt, const SimTrack& st) {
+bool GenVertexCollectionBuilder::matchGenToSimTrack(const P* gp, const SimTrack& st) {
 
   bool match = true;
-  if (reco::deltaR(gt->eta(), gt->phi(), st.momentum().Eta(), st.momentum().Phi()) > drCut_) match = false;
-  if (abs(gt->pt() - st.momentum().Pt()) / (gt->pt() + st.momentum().Pt()) > ptCut_) match = false;
+  if (reco::deltaR(gp->eta(), gp->phi(), st.momentum().Eta(), st.momentum().Phi()) > drCut_) match = false;
+  if (abs(gp->pt() - st.momentum().Pt()) / (gp->pt() + st.momentum().Pt()) > ptCut_) match = false;
   return match;
 }
 

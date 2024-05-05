@@ -5,9 +5,11 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Utilities/interface/EDGetToken.h"
+
 #include "DataFormats/Math/interface/deltaR.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "SimDataFormats/Track/interface/SimTrackContainer.h"
+#include "DataFormats/VertexReco/interface/Vertex.h"
 
 #include "GenVertex.h"
 
@@ -23,8 +25,9 @@ class GenVertexCollectionBuilder {
     // ~GenVertexCollectionBuilder();
 
     void build(const edm::Event& iEvent,
-        edm::EDGetTokenT<reco::GenParticleCollection> genParticles_,
-        edm::EDGetTokenT<edm::SimTrackContainer> simTracks_);
+        edm::EDGetTokenT<reco::GenParticleCollection> genParticlesToken,
+        edm::EDGetTokenT<edm::SimTrackContainer> simTracksToken,
+        const reco::Vertex primaryVertex);
 
     GenVertexCollection getGenVertexCollection() { return genVertices_; }
     GenVertexCollection getGenVertexSimMatchCollection() { return genVerticesSimMatch_; }

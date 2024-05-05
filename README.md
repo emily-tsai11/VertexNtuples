@@ -15,7 +15,7 @@ Or, for debugging with `gdb`, compile with
 ```
 scram b -j USER_CXXFLAGS="-g"
 ```
-(This is already specified by default in `VertexNtuples/VertexNtuplizer/BuildFile.xml`.)
+(This is already specified by default in `VertexNtuplizer/BuildFile.xml`.)
 
 For subsequent setup:
 ```

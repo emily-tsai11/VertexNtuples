@@ -6,10 +6,10 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Utilities/interface/EDGetToken.h"
 
-#include "DataFormats/Math/interface/deltaR.h"
-#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 #include "SimDataFormats/Track/interface/SimTrackContainer.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/Math/interface/deltaR.h"
 
 #include "GenVertex.h"
 

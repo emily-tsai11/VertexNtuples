@@ -31,7 +31,7 @@
 #include "TH1.h"
 #include "TH2.h"
 
-#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 #include "SimDataFormats/Track/interface/SimTrackContainer.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
@@ -40,7 +40,13 @@
 #include "DataFormats/JetMatching/interface/JetFlavourInfoMatching.h"
 
 #include "../interface/GenVertex.h"
+#include "../interface/SecondaryVertex.h"
+#include "../interface/RecoJet.h"
+#include "../interface/GenJet.h"
 #include "../interface/GenVertexCollectionBuilder.h"
+#include "../interface/SecondaryVertexCollectionBuilder.h"
+#include "../interface/RecoJetCollectionBuilder.h"
+#include "../interface/GenJetCollectionBuilder.h"
 
 
 class VertexNtuplizer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
@@ -101,10 +107,10 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   usesResource("TFileService");
   edm::Service<TFileService> fs;
 
-  histos_["nGV"] = fs->make<TH1F>("nGV", "nGV", 10, 0, 10);
-  histos_["nGVs"] = fs->make<TH1F>("nGVs", "nGVs", 10, 0, 10);
-  histos_["nGVn"] = fs->make<TH1F>("nGVn", "nGVn", 10, 0, 10);
-  histos_["nGVns"] = fs->make<TH1F>("nGVns", "nGVns", 10, 0, 10);
+  histos_["nGV"] = fs->make<TH1F>("nGV", "nGV", 28, 2, 30);
+  histos_["nGVs"] = fs->make<TH1F>("nGVs", "nGVs", 28, 2, 30);
+  histos_["nGVn"] = fs->make<TH1F>("nGVn", "nGVn", 28, 2, 30);
+  histos_["nGVns"] = fs->make<TH1F>("nGVns", "nGVns", 28, 2, 30);
 }
 
 

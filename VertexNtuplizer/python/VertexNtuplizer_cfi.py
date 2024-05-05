@@ -28,4 +28,7 @@ vertexNtuplizer = cms.EDAnalyzer("VertexNtuplizer",
   trkMatchDrCut              = cms.untracked.double(0.05),
   trkMatchPtCut              = cms.untracked.double(0.1),
   vtxMatchFrac               = cms.untracked.double(0.66),
+  trkTimeQualityCut          = cms.untracked.double(0.5), # Recommended by MTD DPG (verbally)
+  vtxMatchDrCut              = cms.untracked.double(0.1),
+  jetMatchDrCut              = cms.untracked.double(0.1),
 )

@@ -2,7 +2,6 @@ import FWCore.ParameterSet.Config as cms
 
 vertexNtuplizer = cms.EDAnalyzer("VertexNtuplizer",
   # Collections
-  # tracks                     = cms.untracked.InputTag("generalTracks",                  "",           "BTV"),
   genParticles               = cms.untracked.InputTag("prunedGenParticles",             "",           "BTV"),
   simTracks                  = cms.untracked.InputTag("g4SimHits",                      "",           "SIM"),
   primaryVertices            = cms.untracked.InputTag("offlinePrimaryVertices",         "",           "BTV"),
@@ -14,6 +13,8 @@ vertexNtuplizer = cms.EDAnalyzer("VertexNtuplizer",
   trackTimeErrorMap          = cms.untracked.InputTag("tofPID",                         "sigmat0",    "BTV"),
   trackTimeQualityMap        = cms.untracked.InputTag("mtdTrackQualityMVA",             "mtdQualMVA", "BTV"),
   jets                       = cms.untracked.InputTag("slimmedJets",                    "",           "BTV"),
+  genJets                    = cms.untracked.InputTag("slimmedGenJets",                 "",           "BTV"),
+  genJetsFlavourInfo         = cms.untracked.InputTag("slimmedGenJetsFlavourInfos",     "",           "BTV"),
 
   # Kinematic cuts
   absEtaMax                  = cms.untracked.double(3.0), # MTD coverage

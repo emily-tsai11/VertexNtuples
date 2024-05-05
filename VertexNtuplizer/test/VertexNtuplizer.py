@@ -38,3 +38,7 @@ if options.run2:
 release = os.environ["CMSSW_VERSION"][6:]
 print("Using release " + release)
 process.p = cms.Path(process.vertexNtuplizer)
+
+
+# Dump process config
+open("dumpVertexNtuplizer.py", "w").write(process.dumpPython())

@@ -38,7 +38,7 @@ class GenVertexCollectionBuilder {
 
     int genPartID(int pdgId);
     template <class P> bool goodGenParticle(const P* gp, double ptCut);
-    template <class P> bool matchGenToSimTrack(const P* gt, const SimTrack& st);
+    template <class P> bool matchGenToSimTrack(const P* gp, const SimTrack& st);
     bool matchGenToSimVertex(const GenVertex& gv);
 
     double absEtaMax_;

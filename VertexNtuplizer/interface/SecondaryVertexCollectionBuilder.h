@@ -40,6 +40,7 @@ class SecondaryVertexCollectionBuilder {
     double absEtaMax_;
     double trkPtMin_;
     double trkTimeQualityCut_;
+    double svChi2dofMax_;
 
     SecondaryVertexCollection secondaryVertices_;
     SecondaryVertexCollection secondaryVerticesMTDTiming_;

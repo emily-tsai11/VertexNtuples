@@ -7,13 +7,17 @@
 #include "FWCore/Utilities/interface/EDGetToken.h"
 
 #include "DataFormats/PatCandidates/interface/Jet.h"
+#include "DataFormats/JetReco/interface/GenJet.h"
+#include "DataFormats/JetMatching/interface/JetFlavourInfoMatching.h"
+#include "DataFormats/Math/interface/deltaR.h"
 
 
 class RecoJet {
 
   public:
 
-    RecoJet(const pat::Jet& jet);
+    RecoJet(const pat::Jet& jet, reco::JetFlavourInfoMatchingCollection& genJetsFlavourInfo,
+        double jetMatchDrCut);
     // ~RecoJet();
 
   private:
@@ -21,7 +25,6 @@ class RecoJet {
     double pt_;
     double eta_;
     double phi_;
-    double radius_;
     double hadFlav_;
 };
 

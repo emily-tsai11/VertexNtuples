@@ -2,7 +2,7 @@
 
 
 GenVertex::GenVertex(const reco::GenParticle* mother, std::vector<const reco::Candidate*>* daughters,
-    const reco::Vertex& primaryVertex) : mother_(mother), daughters_(daughters) {
+    const reco::Vertex& primaryVertex, const int pdgIdBin) : mother_(mother), daughters_(daughters) {
 
   float dx = primaryVertex.x() - daughters->at(0)->vx();
   float dy = primaryVertex.y() - daughters->at(0)->vy();
@@ -14,18 +14,23 @@ GenVertex::GenVertex(const reco::GenParticle* mother, std::vector<const reco::Ca
   float dy2err = 2*dy*dyerr;
   float dxy2 = dx2 + dy2;
   float dxy2err = TMath::Sqrt(dx2err*dx2err + dy2err*dy2err);
-  dxy_ = TMath::Sqrt(dxy2);
-  dxyerr_ = 0.5 * dxy2err / dxy_;
-
-  dz_ = primaryVertex.z() - daughters->at(0)->vz();
-  dzerr_ = primaryVertex.zError();
+  float dxy = TMath::Sqrt(dxy2);
+  float dxyerr = 0.5 * dxy2err / dxy_;
 
   float dz2 = dz_*dz_;
   float dz2err = 2*dz_*dzerr_;
   float d3d2 = dxy2 + dz2;
   float d3d2err = TMath::Sqrt(dxy2err*dxy2err + dz2err*dz2err);
-  d3d_ = TMath::Sqrt(d3d2);
-  d3derr_ = 0.5 * d3d2err / d3d_;
+  float d3d = TMath::Sqrt(d3d2);
+  float d3derr = 0.5 * d3d2err / d3d_;
+
+  dxy_ = dxy;
+  dxyerr_ = dxyerr;
+  dz_ = primaryVertex.z() - daughters->at(0)->vz();
+  dzerr_ = primaryVertex.zError();
+  d3d_ = d3d;
+  d3derr_ = d3derr;
+  pdgIdBin_ = pdgIdBin;
 }
 
 

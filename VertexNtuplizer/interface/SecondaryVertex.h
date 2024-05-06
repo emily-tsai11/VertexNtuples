@@ -8,8 +8,8 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Utilities/interface/EDGetToken.h"
 
-#include "DataFormats/VertexReco/interface/Vertex.h"
 #include "TMath.h"
+#include "DataFormats/VertexReco/interface/Vertex.h"
 #include "RecoVertex/VertexTools/interface/VertexDistanceXY.h"
 #include "RecoVertex/VertexTools/interface/VertexDistance3D.h"
 
@@ -28,8 +28,8 @@ class SecondaryVertex {
 
   private:
 
-    Measurement1D getDxy(reco::Vertex sv, reco::Vertex pv);
-    Measurement1D getD3d(reco::Vertex sv, reco::Vertex pv);
+    Measurement1D getDxy(const reco::Vertex sv, const reco::Vertex pv);
+    Measurement1D getD3d(const reco::Vertex sv, const reco::Vertex pv);
 
     std::vector<float>* trk_tval_;
     std::vector<float>* trk_terr_;

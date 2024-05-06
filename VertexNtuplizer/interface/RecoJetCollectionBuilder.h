@@ -7,9 +7,7 @@
 #include "FWCore/Utilities/interface/EDGetToken.h"
 
 #include "DataFormats/PatCandidates/interface/Jet.h"
-#include "DataFormats/JetReco/interface/GenJet.h"
 #include "DataFormats/JetMatching/interface/JetFlavourInfoMatching.h"
-#include "DataFormats/Math/interface/deltaR.h"
 
 #include "RecoJet.h"
 
@@ -25,16 +23,15 @@ class RecoJetCollectionBuilder {
     // ~RecoJetCollectionBuilder();
 
     void build(const edm::Event& iEvent,
-        edm::EDGetTokenT<pat::JetCollection> jetsToken,
-        edm::EDGetTokenT<reco::JetFlavourInfoMatchingCollection> genJetsFlavourInfoToken);
+        edm::EDGetTokenT<pat::JetCollection>& jetsToken,
+        edm::EDGetTokenT<reco::JetFlavourInfoMatchingCollection>& genJetsFlavourInfoToken);
 
     RecoJetCollection recoJetCollection() { return recoJets_; }
     RecoJetCollection recoJetGenMatchCollection() { return recoJetsGenMatch_; }
 
   private:
 
-    bool goodRecoJet(const pat::Jet& gj);
-    unsigned int getHadronFlavour(const reco::GenJet& gj);
+    template <class J> bool goodJet(const J& j);
 
     double absEtaMax_;
     double jetPtMin_;

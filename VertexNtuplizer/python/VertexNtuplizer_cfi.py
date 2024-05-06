@@ -21,8 +21,12 @@ vertexNtuplizer = cms.EDAnalyzer("VertexNtuplizer",
   genMotherPtMin             = cms.untracked.double(10.0),
   genDaughterPtMin           = cms.untracked.double(1.0),
   trkPtMin                   = cms.untracked.double(0.8),
+  jetRadius                  = cms.untracked.double(0.4),
   jetPtMin                   = cms.untracked.double(20.0),
   jetPtMax                   = cms.untracked.double(1000.0),
+
+  # Fit cuts
+  svChi2dofMax               = cms.untracked.double(10.0),
 
   # Matching cuts
   trkMatchDrCut              = cms.untracked.double(0.05),

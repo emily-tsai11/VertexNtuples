@@ -119,8 +119,17 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   histos_["nGVn"] = fs->make<TH1F>("nGVn", "nGVn", 28, 2, 30);
   histos_["nGVns"] = fs->make<TH1F>("nGVns", "nGVns", 28, 2, 30);
 
+  histos_["nSV"] = fs->make<TH1F>("nSV", "nSV", 28, 2, 30);
+  histos_["nSVt"] = fs->make<TH1F>("nSVt", "nSVt", 28, 2, 30);
+
   histos_["nC"] = fs->make<TH1F>("nC", "nC", 198, 2, 200);
   histos_["nCt"] = fs->make<TH1F>("nCt", "nCt", 198, 2, 200);
+
+  histos_["nRJ"] = fs->make<TH1F>("nRJ", "nRJ", 20, 0, 20);
+  histos_["nRJg"] = fs->make<TH1F>("nRJg", "nRJg", 20, 0, 20);
+
+  histos_["nGJ"] = fs->make<TH1F>("nGJ", "nGJ", 20, 0, 20);
+  histos_["nGJr"] = fs->make<TH1F>("nGJr", "nGJr", 20, 0, 20);
 }
 
 
@@ -139,7 +148,7 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   svc_->build(iEvent, secondaryVerticesToken_, secondaryVerticesMTDTimingToken_, primaryVertex,
       trackTimeValueMapToken_, trackTimeErrorMapToken_, trackTimeQualityMapToken_);
   rjc_->build(iEvent, jetsToken_, genJetsFlavourInfoToken_);
-  gjc_->build(iEvent, genJetsToken_, genJetsFlavourInfoToken_);
+  gjc_->build(iEvent, genJetsToken_, genJetsFlavourInfoToken_, jetsToken_);
 
   GenVertexCollection genVertices = gvc_->getGenVertexCollection();
   GenVertexCollection genVerticesSimMatch = gvc_->getGenVertexSimMatchCollection();
@@ -151,11 +160,29 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   histos_["nGVn"]->Fill(genVerticesNoNu.size());
   histos_["nGVns"]->Fill(genVerticesNoNuSimMatch.size());
 
+  SecondaryVertexCollection secondaryVertices = svc_->getSecondaryVertexCollection();
+  SecondaryVertexCollection secondaryVerticesMTDTiming = svc_->getSecondaryVertexCollectionMTDTiming();
+
+  histos_["nSV"]->Fill(secondaryVertices.size());
+  histos_["nSVt"]->Fill(secondaryVerticesMTDTiming.size());
+
   unsigned int nC = iEvent.get(IVFclustersToken_);
   unsigned int nCt = iEvent.get(IVFclustersMTDTimingToken_);
 
   histos_["nC"]->Fill(nC);
   histos_["nCt"]->Fill(nCt);
+
+  RecoJetCollection recoJets = rjc_->recoJetCollection();
+  RecoJetCollection recoJetsGenMatch = rjc_->recoJetGenMatchCollection();
+
+  histos_["nRJ"]->Fill(recoJets.size());
+  histos_["nRJg"]->Fill(recoJetsGenMatch.size());
+
+  GenJetCollection genJets = gjc_->getGenJetCollection();
+  GenJetCollection genJetsRecoMatch = gjc_->getGenJetRecoMatchCollection();
+
+  histos_["nGJ"]->Fill(genJets.size());
+  histos_["nGJr"]->Fill(genJetsRecoMatch.size());
 }
 
 

@@ -58,14 +58,14 @@ void GenVertexCollectionBuilder::build(const edm::Event& iEvent,
     }
 
     if (goodDaughters->size() >= 2) {
-      GenVertex newGV(gp, goodDaughters, primaryVertex);
+      GenVertex newGV(gp, goodDaughters, primaryVertex, motherPartID);
       genVertices_.push_back(newGV);
       if (matchGenToSimVertex(newGV)) {
         genVerticesSimMatch_.push_back(newGV);
       }
     }
     if (goodDaughtersNoNu->size() >= 2) {
-      GenVertex newGVNoNu(gp, goodDaughtersNoNu, primaryVertex);
+      GenVertex newGVNoNu(gp, goodDaughtersNoNu, primaryVertex, motherPartID);
       genVerticesNoNu_.push_back(newGVNoNu);
       if (matchGenToSimVertex(newGVNoNu)) {
         genVerticesNoNuSimMatch_.push_back(newGVNoNu);

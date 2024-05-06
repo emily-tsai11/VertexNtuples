@@ -6,6 +6,7 @@ SecondaryVertexCollectionBuilder::SecondaryVertexCollectionBuilder(const edm::Pa
   absEtaMax_ = iConfig.getUntrackedParameter<double>("absEtaMax");
   trkPtMin_ = iConfig.getUntrackedParameter<double>("trkPtMin");
   trkTimeQualityCut_ = iConfig.getUntrackedParameter<double>("trkTimeQualityCut");
+  svChi2dofMax_ = iConfig.getUntrackedParameter<double>("svChi2dofMax");
 }
 
 
@@ -36,6 +37,7 @@ void SecondaryVertexCollectionBuilder::build(const edm::Event& iEvent,
       if (goodRecoTrack(trkRef)) goodTracks->push_back(trkRef);
     }
     if (goodTracks->size() < 2) continue; // Not a vertex
+    if (sv.normalizedChi2() > svChi2dofMax_) continue; // Take out poorly fitted vertices
 
     SecondaryVertex newSV(sv, goodTracks, primaryVertex,
         trackTimeValueMap_, trackTimeErrorMap_, trackTimeQualityMap_);
@@ -49,6 +51,7 @@ void SecondaryVertexCollectionBuilder::build(const edm::Event& iEvent,
       if (goodRecoTrack(trkRef)) goodTracks->push_back(trkRef);
     }
     if (goodTracks->size() < 2) continue; // Not a vertex
+    if (sv.normalizedChi2() > svChi2dofMax_) continue; // Take out poorly fitted vertices
 
     SecondaryVertex newSV(sv, goodTracks, primaryVertex,
         trackTimeValueMap_, trackTimeErrorMap_, trackTimeQualityMap_);

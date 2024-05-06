@@ -7,13 +7,16 @@
 #include "FWCore/Utilities/interface/EDGetToken.h"
 
 #include "DataFormats/JetReco/interface/GenJet.h"
+#include "DataFormats/JetMatching/interface/JetFlavourInfoMatching.h"
+#include "DataFormats/Math/interface/deltaR.h"
 
 
 class GenJet {
 
   public:
 
-    GenJet(const reco::GenJet& genJet);
+    GenJet(const reco::GenJet& genJet, reco::JetFlavourInfoMatchingCollection& genJetsFlavourInfo,
+        double jetMatchDrCut);
     // ~GenJet();
 
   private:
@@ -21,7 +24,6 @@ class GenJet {
     double pt_;
     double eta_;
     double phi_;
-    double radius_;
     double hadFlav_;
 };
 

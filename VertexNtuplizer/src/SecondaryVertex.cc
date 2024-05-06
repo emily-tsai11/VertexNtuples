@@ -103,14 +103,14 @@ SecondaryVertex::SecondaryVertex(const reco::Vertex& sv,
 // SecondaryVertex::~SecondaryVertex() {}
 
 
-Measurement1D SecondaryVertex::getDxy(reco::Vertex sv, reco::Vertex pv) {
+Measurement1D SecondaryVertex::getDxy(const reco::Vertex sv, const reco::Vertex pv) {
 
   VertexDistanceXY dist;
   return dist.distance(sv, pv);
 }
 
 
-Measurement1D SecondaryVertex::getD3d(reco::Vertex sv, reco::Vertex pv) {
+Measurement1D SecondaryVertex::getD3d(const reco::Vertex sv, const reco::Vertex pv) {
 
   VertexDistance3D dist;
   return dist.distance(sv, pv);

@@ -16,9 +16,9 @@ GenVertexCollectionBuilder::GenVertexCollectionBuilder(const edm::ParameterSet& 
 
 
 void GenVertexCollectionBuilder::build(const edm::Event& iEvent,
-    edm::EDGetTokenT<reco::GenParticleCollection> genParticlesToken,
-    edm::EDGetTokenT<edm::SimTrackContainer> simTracksToken,
-    const reco::Vertex primaryVertex) {
+    edm::EDGetTokenT<reco::GenParticleCollection>& genParticlesToken,
+    edm::EDGetTokenT<edm::SimTrackContainer>& simTracksToken,
+    const reco::Vertex& primaryVertex) {
 
   genParticles_ = iEvent.get(genParticlesToken);
   simTracks_ = iEvent.get(simTracksToken);
@@ -43,33 +43,32 @@ void GenVertexCollectionBuilder::build(const edm::Event& iEvent,
         break;
       }
     }
+    if (!lastInstance) continue;
 
-    if (lastInstance) {
-      std::vector<const reco::Candidate*>* goodDaughters = new std::vector<const reco::Candidate*>;
-      std::vector<const reco::Candidate*>* goodDaughtersNoNu = new std::vector<const reco::Candidate*>;
-      for (unsigned int iDau = 0; iDau < gp->numberOfDaughters(); iDau++) {
-        const reco::Candidate* dau = gp->daughter(iDau);
-        if (goodGenParticle(dau, genDaughterPtMin_)) {
-          goodDaughters->push_back(dau->clone());
-          if (abs(dau->pdgId()) != 12 && abs(dau->pdgId()) != 14 && abs(dau->pdgId()) != 16) {
-            goodDaughtersNoNu->push_back(dau->clone());
-          }
+    std::vector<const reco::Candidate*>* goodDaughters = new std::vector<const reco::Candidate*>;
+    std::vector<const reco::Candidate*>* goodDaughtersNoNu = new std::vector<const reco::Candidate*>;
+    for (unsigned int iDau = 0; iDau < gp->numberOfDaughters(); iDau++) {
+      const reco::Candidate* dau = gp->daughter(iDau);
+      if (goodGenParticle(dau, genDaughterPtMin_)) {
+        goodDaughters->push_back(dau->clone());
+        if (abs(dau->pdgId()) != 12 && abs(dau->pdgId()) != 14 && abs(dau->pdgId()) != 16) {
+          goodDaughtersNoNu->push_back(dau->clone());
         }
       }
+    }
 
-      if (goodDaughters->size() >= 2) {
-        GenVertex newGV(gp, goodDaughters, primaryVertex);
-        genVertices_.push_back(newGV);
-        if (matchGenToSimVertex(newGV)) {
-          genVerticesSimMatch_.push_back(newGV);
-        }
+    if (goodDaughters->size() >= 2) {
+      GenVertex newGV(gp, goodDaughters, primaryVertex);
+      genVertices_.push_back(newGV);
+      if (matchGenToSimVertex(newGV)) {
+        genVerticesSimMatch_.push_back(newGV);
       }
-      if (goodDaughtersNoNu->size() >= 2) {
-        GenVertex newGVNoNu(gp, goodDaughtersNoNu, primaryVertex);
-        genVerticesNoNu_.push_back(newGVNoNu);
-        if (matchGenToSimVertex(newGVNoNu)) {
-          genVerticesNoNuSimMatch_.push_back(newGVNoNu);
-        }
+    }
+    if (goodDaughtersNoNu->size() >= 2) {
+      GenVertex newGVNoNu(gp, goodDaughtersNoNu, primaryVertex);
+      genVerticesNoNu_.push_back(newGVNoNu);
+      if (matchGenToSimVertex(newGVNoNu)) {
+        genVerticesNoNuSimMatch_.push_back(newGVNoNu);
       }
     }
   } // End loop over all gen particles

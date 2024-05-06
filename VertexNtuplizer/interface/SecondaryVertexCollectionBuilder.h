@@ -6,6 +6,7 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Utilities/interface/EDGetToken.h"
 
+#include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 
 #include "SecondaryVertex.h"
@@ -22,16 +23,22 @@ class SecondaryVertexCollectionBuilder {
     // ~SecondaryVertexCollectionBuilder();
 
     void build(const edm::Event& iEvent,
-        edm::EDGetTokenT<reco::VertexCollection> secondaryVerticesToken,
-        edm::EDGetTokenT<reco::VertexCollection> secondaryVerticesMTDTimingToken);
+        edm::EDGetTokenT<reco::VertexCollection>& secondaryVerticesToken,
+        edm::EDGetTokenT<reco::VertexCollection>& secondaryVerticesMTDTimingToken,
+        const reco::Vertex& primaryVertex,
+        edm::EDGetTokenT<edm::ValueMap<float>>& trackTimeValueMapToken,
+        edm::EDGetTokenT<edm::ValueMap<float>>& trackTimeErrorMapToken,
+        edm::EDGetTokenT<edm::ValueMap<float>>& trackTimeQualityMapToken);
 
     SecondaryVertexCollection getSecondaryVertexCollection() { return secondaryVertices_; }
     SecondaryVertexCollection getSecondaryVertexCollectionMTDTiming() { return secondaryVerticesMTDTiming_; }
 
   private:
 
-    bool goodSecondaryVertex(const reco::Vertex& sv);
+    template <class T> bool goodRecoTrack(const T& trkRef);
 
+    double absEtaMax_;
+    double trkPtMin_;
     double trkTimeQualityCut_;
 
     SecondaryVertexCollection secondaryVertices_;
@@ -39,6 +46,9 @@ class SecondaryVertexCollectionBuilder {
 
     reco::VertexCollection cmsSecondaryVertices_;
     reco::VertexCollection cmsSecondaryVerticesMTDTiming_;
+    edm::ValueMap<float> trackTimeValueMap_;
+    edm::ValueMap<float> trackTimeErrorMap_;
+    edm::ValueMap<float> trackTimeQualityMap_;
 };
 
 

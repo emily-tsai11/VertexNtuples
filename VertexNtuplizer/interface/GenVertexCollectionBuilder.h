@@ -25,9 +25,9 @@ class GenVertexCollectionBuilder {
     // ~GenVertexCollectionBuilder();
 
     void build(const edm::Event& iEvent,
-        edm::EDGetTokenT<reco::GenParticleCollection> genParticlesToken,
-        edm::EDGetTokenT<edm::SimTrackContainer> simTracksToken,
-        const reco::Vertex primaryVertex);
+        edm::EDGetTokenT<reco::GenParticleCollection>& genParticlesToken,
+        edm::EDGetTokenT<edm::SimTrackContainer>& simTracksToken,
+        const reco::Vertex& primaryVertex);
 
     GenVertexCollection getGenVertexCollection() { return genVertices_; }
     GenVertexCollection getGenVertexSimMatchCollection() { return genVerticesSimMatch_; }

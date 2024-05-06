@@ -12,7 +12,7 @@ class GenVertex {
   public:
 
     GenVertex(const reco::GenParticle* mother, std::vector<const reco::Candidate*>* daughters,
-        const reco::Vertex primaryVertex);
+        const reco::Vertex& primaryVertex);
     // ~GenVertex();
 
     const float x()        const { return daughters_->at(0)->vx(); }

@@ -2,7 +2,7 @@
 
 
 GenVertex::GenVertex(const reco::GenParticle* mother, std::vector<const reco::Candidate*>* daughters,
-    const reco::Vertex primaryVertex) : mother_(mother), daughters_(daughters) {
+    const reco::Vertex& primaryVertex) : mother_(mother), daughters_(daughters) {
 
   float dx = primaryVertex.x() - daughters->at(0)->vx();
   float dy = primaryVertex.y() - daughters->at(0)->vy();

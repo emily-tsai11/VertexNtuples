@@ -39,13 +39,11 @@ class GenVertex {
     const int motherPdgId() const { return mother_->pdgId(); }
     const int pdgIdBin() const { return pdgIdBin_; }
     const unsigned int nDaughters() const { return daughters_->size(); }
+
     const reco::GenParticle* mother() const { return mother_; }
     const std::vector<const reco::Candidate*>* daughters() const { return daughters_; }
 
   private:
-
-    const reco::GenParticle* mother_;
-    std::vector<const reco::Candidate*>* daughters_;
 
     float dxy_;
     float dz_;
@@ -57,6 +55,9 @@ class GenVertex {
     float dzsig_;
     float d3dsig_;
     int pdgIdBin_;
+
+    const reco::GenParticle* mother_;
+    std::vector<const reco::Candidate*>* daughters_;
 };
 
 

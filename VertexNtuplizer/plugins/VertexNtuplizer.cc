@@ -84,11 +84,19 @@ class VertexNtuplizer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
     GenJetCollectionBuilder* gjc_;
     VertexMatcher* matcher_;
 
+    std::vector<TString> gv_names_;
+    std::vector<TString> sv_names_;
+    std::vector<TString> rj_names_;
+    std::vector<TString> gj_names_;
+
     std::map<TString, TH1F*> histos_;
 };
 
 
-static unsigned int nbins_ = 80;
+static unsigned int nbins_ = 100;
+static unsigned int nvtx_ = 30;
+static unsigned int nclus_ = 200;
+static unsigned int njet_ = 20;
 
 
 VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
@@ -115,37 +123,31 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   usesResource("TFileService");
   edm::Service<TFileService> fs;
 
-  histos_["nGV"] = fs->make<TH1F>("nGV", "nGV", 28, 2, 30);
-  histos_["nGVs"] = fs->make<TH1F>("nGVs", "nGVs", 28, 2, 30);
-  histos_["nGVn"] = fs->make<TH1F>("nGVn", "nGVn", 28, 2, 30);
-  histos_["nGVns"] = fs->make<TH1F>("nGVns", "nGVns", 28, 2, 30);
+  gv_names_.push_back("gv"); // GenVertex
+  gv_names_.push_back("gvs"); // GenVertex w/SIM match
+  gv_names_.push_back("gvn"); // GenVertex without neutrino daughters
+  gv_names_.push_back("gvns"); // GenVertex without neutrino daughters w/SIM match
 
-  histos_["nSV"] = fs->make<TH1F>("nSV", "nSV", 28, 2, 30);
-  histos_["nSVt"] = fs->make<TH1F>("nSVt", "nSVt", 28, 2, 30);
+  sv_names_.push_back("sv"); // SecondaryVertex
+  sv_names_.push_back("svt"); // SecondaryVertex w/time range cut
 
-  histos_["nC"] = fs->make<TH1F>("nC", "nC", 198, 2, 200);
-  histos_["nCt"] = fs->make<TH1F>("nCt", "nCt", 198, 2, 200);
+  rj_names_.push_back("rj"); // RecoJet
+  rj_names_.push_back("rjg"); // RecoJet w/GEN match
 
-  histos_["nRJ"] = fs->make<TH1F>("nRJ", "nRJ", 20, 0, 20);
-  histos_["nRJg"] = fs->make<TH1F>("nRJg", "nRJg", 20, 0, 20);
+  gj_names_.push_back("gj"); // GenJet
+  gj_names_.push_back("gjr"); // GenJet w/reco match
 
-  histos_["nGJ"] = fs->make<TH1F>("nGJ", "nGJ", 20, 0, 20);
-  histos_["nGJr"] = fs->make<TH1F>("nGJr", "nGJr", 20, 0, 20);
-
-  std::vector<TString> objs_ = {
-    "gv",
-    "gvs",
-    "gvn",
-    "gvns",
-    "sv_trk",
-    "sv",
-    "svt_trk",
-    "svt",
-    "rj",
-    "rjg",
-    "gj",
-    "gjr",
-  };
+  std::vector<TString> objs_;
+  for (TString obj : gv_names_) {
+    objs_.push_back(obj);
+    objs_.push_back(obj + "_trk");
+  }
+  for (TString obj : sv_names_) {
+    objs_.push_back(obj);
+    objs_.push_back(obj + "_trk");
+  }
+  for (TString obj : rj_names_) objs_.push_back(obj);
+  for (TString obj : gj_names_) objs_.push_back(obj);
 
   std::map<TString, std::vector<float>> vars_ = {
     std::make_pair("tval", std::vector<float>{(float) nbins_, -0.8, 0.8}),
@@ -176,6 +178,7 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
     std::make_pair("dxysig", std::vector<float>{(float) nbins_, 0.0, 3000.0}),
     std::make_pair("dzsig", std::vector<float>{(float) nbins_, 0.0, 1000.0}),
     std::make_pair("d3dsig", std::vector<float>{(float) nbins_, 0.0, 1000.0}),
+    std::make_pair("charge", std::vector<float>{(float) 5, -2.0, 3.0}),
     std::make_pair("motherPdgId", std::vector<float>{(float) nbins_, -5560.0, 5560.0}),
     std::make_pair("pdgIdBin", std::vector<float>{4, 0.0, 4.0}),
     std::make_pair("hadFlav", std::vector<float>{7, 0.0, 7.0}),
@@ -185,10 +188,42 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
     std::make_pair("ntrk", std::vector<float>{(float) nbins_, 0.0, 10.0}) // Daughters for GenVertex
   };
 
+  for (TString gv_name : gv_names_) {
+    TString name = "n" + gv_name;
+    histos_[name] = fs->make<TH1F>(name, name, nvtx_, 0, nvtx_);
+  }
+  for (TString sv_name : sv_names_) {
+    TString name = "n" + sv_name;
+    histos_[name] = fs->make<TH1F>(name, name, nvtx_, 0, nvtx_);
+  }
+  histos_["nc"] = fs->make<TH1F>("nc", "nc", nclus_, 0, nclus_);
+  histos_["nct"] = fs->make<TH1F>("nct", "nct", nclus_, 0, nclus_);
+  for (TString rj_name : rj_names_) {
+    TString name = "n" + rj_name;
+    histos_[name] = fs->make<TH1F>(name, name, njet_, 0, njet_);
+  }
+  for (TString gj_name : gj_names_) {
+    TString name = "n" + gj_name;
+    histos_[name] = fs->make<TH1F>(name, name, njet_, 0, njet_);
+  }
+
   for (TString obj : objs_) {
     for (const auto& iter : vars_) {
       TString name = obj + "_" + iter.first;
       histos_[name] = fs->make<TH1F>(name, name, iter.second[0], iter.second[1], iter.second[2]);
+    }
+  }
+
+  for (TString obj1 : objs_) {
+    for (TString obj2 : objs_) {
+      if (obj1.BeginsWith("gv") && obj2.BeginsWith("gv")) continue;
+      if (obj1.BeginsWith("sv") && obj2.BeginsWith("sv")) continue;
+      if (obj1.BeginsWith("rj") && obj2.BeginsWith("rj")) continue;
+      if (obj1.BeginsWith("gj") && obj2.BeginsWith("gj")) continue;
+      for (const auto& iter : vars_) {
+        TString name = obj1 + "_" + obj2 + "_" + iter.first;
+        histos_[name] = fs->make<TH1F>(name, name, iter.second[0], iter.second[1], iter.second[2]);
+      }
     }
   }
 }
@@ -198,8 +233,6 @@ VertexNtuplizer::~VertexNtuplizer() {}
 
 
 void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
-
-  using namespace edm;
 
   const reco::VertexCollection primaryVertices = iEvent.get(primaryVerticesToken_);
   // Sorting described here: https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideOfflinePrimaryVertexProduction
@@ -211,44 +244,59 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   rjc_->build(iEvent, jetsToken_, genJetsFlavourInfoToken_);
   gjc_->build(iEvent, genJetsToken_, genJetsFlavourInfoToken_, jetsToken_);
 
-  GenVertexCollection genVertices = gvc_->getGenVertexCollection();
-  GenVertexCollection genVerticesSimMatch = gvc_->getGenVertexSimMatchCollection();
-  GenVertexCollection genVerticesNoNu = gvc_->getGenVertexNoNuCollection();
-  GenVertexCollection genVerticesNoNuSimMatch = gvc_->getGenVertexNoNuSimMatchCollection();
-  for (GenVertex& gv : genVertices) gv.fill(histos_, "gv");
-  for (GenVertex& gv : genVerticesSimMatch) gv.fill(histos_, "gvs");
-  for (GenVertex& gv : genVerticesNoNu) gv.fill(histos_, "gvn");
-  for (GenVertex& gv : genVerticesNoNuSimMatch) gv.fill(histos_, "gvns");
-  histos_["nGV"]->Fill(genVertices.size());
-  histos_["nGVs"]->Fill(genVerticesSimMatch.size());
-  histos_["nGVn"]->Fill(genVerticesNoNu.size());
-  histos_["nGVns"]->Fill(genVerticesNoNuSimMatch.size());
+  std::vector<GenVertexCollection> GVCollections;
+  GVCollections.push_back(gvc_->getGenVertexCollection());
+  GVCollections.push_back(gvc_->getGenVertexSimMatchCollection());
+  GVCollections.push_back(gvc_->getGenVertexNoNuCollection());
+  GVCollections.push_back(gvc_->getGenVertexNoNuSimMatchCollection());
+  for (unsigned int iColl = 0; iColl < GVCollections.size(); iColl++) {
+    histos_["n" + gv_names_.at(iColl)]->Fill(GVCollections.at(iColl).size());
+    for (GenVertex& gv : GVCollections.at(iColl)) gv.fill(histos_, gv_names_.at(iColl));
+  }
 
-  SecondaryVertexCollection secondaryVertices = svc_->getSecondaryVertexCollection();
-  SecondaryVertexCollection secondaryVerticesMTDTiming = svc_->getSecondaryVertexCollectionMTDTiming();
-  for (SecondaryVertex& sv : secondaryVertices) sv.fill(histos_, "sv");
-  for (SecondaryVertex& sv : secondaryVerticesMTDTiming) sv.fill(histos_, "svt");
-  histos_["nSV"]->Fill(secondaryVertices.size());
-  histos_["nSVt"]->Fill(secondaryVerticesMTDTiming.size());
+  std::vector<SecondaryVertexCollection> SVCollections;
+  SVCollections.push_back(svc_->getSecondaryVertexCollection());
+  SVCollections.push_back(svc_->getSecondaryVertexCollectionMTDTiming());
+  for (unsigned int iColl = 0; iColl < SVCollections.size(); iColl++) {
+    histos_["n" + sv_names_.at(iColl)]->Fill(SVCollections.at(iColl).size());
+    for (SecondaryVertex& sv : SVCollections.at(iColl)) sv.fill(histos_, sv_names_.at(iColl));
+  }
 
   unsigned int nC = iEvent.get(IVFclustersToken_);
   unsigned int nCt = iEvent.get(IVFclustersMTDTimingToken_);
-  histos_["nC"]->Fill(nC);
-  histos_["nCt"]->Fill(nCt);
+  histos_["nc"]->Fill(nC);
+  histos_["nct"]->Fill(nCt);
 
-  RecoJetCollection recoJets = rjc_->recoJetCollection();
-  RecoJetCollection recoJetsGenMatch = rjc_->recoJetGenMatchCollection();
-  for (RecoJet& rj : recoJets) rj.fill(histos_, "rj");
-  for (RecoJet& rj : recoJetsGenMatch) rj.fill(histos_, "rjg");
-  histos_["nRJ"]->Fill(recoJets.size());
-  histos_["nRJg"]->Fill(recoJetsGenMatch.size());
+  std::vector<RecoJetCollection> RJCollections;
+  RJCollections.push_back(rjc_->getRecoJetCollection());
+  RJCollections.push_back(rjc_->getRecoJetGenMatchCollection());
+  for (unsigned int iColl = 0; iColl < RJCollections.size(); iColl++) {
+    histos_["n" + rj_names_.at(iColl)]->Fill(RJCollections.at(iColl).size());
+    for (RecoJet& rj : RJCollections.at(iColl)) rj.fill(histos_, rj_names_.at(iColl));
+  }
 
-  GenJetCollection genJets = gjc_->getGenJetCollection();
-  GenJetCollection genJetsRecoMatch = gjc_->getGenJetRecoMatchCollection();
-  for (GenJet& gj : genJets) gj.fill(histos_, "gj");
-  for (GenJet& gj : genJetsRecoMatch) gj.fill(histos_, "gjr");
-  histos_["nGJ"]->Fill(genJets.size());
-  histos_["nGJr"]->Fill(genJetsRecoMatch.size());
+  std::vector<GenJetCollection> GJCollections;
+  GJCollections.push_back(gjc_->getGenJetCollection());
+  GJCollections.push_back(gjc_->getGenJetRecoMatchCollection());
+  for (unsigned int iColl = 0; iColl < GJCollections.size(); iColl++) {
+    histos_["n" + gj_names_.at(iColl)]->Fill(GJCollections.at(iColl).size());
+    for (GenJet& gj : GJCollections.at(iColl)) gj.fill(histos_, gj_names_.at(iColl));
+  }
+
+  for (unsigned int iGVs = 0; iGVs < GVCollections.size(); iGVs++) {
+    for (unsigned int iSVs = 0; iSVs < SVCollections.size(); iSVs++) {
+      for (GenVertex& gv : GVCollections.at(iGVs)) {
+        for (SecondaryVertex& sv : SVCollections.at(iSVs)) {
+          if (matcher_->match(gv, sv, TRACK)) {
+            TString gv_name = gv_names_.at(iGVs) + "_" + sv_names_.at(iSVs);
+            gv.fill(histos_, gv_name);
+            TString sv_name = sv_names_.at(iSVs) + "_" + gv_names_.at(iGVs);
+            sv.fill(histos_, sv_name);
+          }
+        }
+      }
+    }
+  }
 }
 
 

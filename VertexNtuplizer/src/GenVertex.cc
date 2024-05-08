@@ -41,6 +41,14 @@ GenVertex::GenVertex(const reco::GenParticle* mother, std::vector<const reco::Ca
 
 void GenVertex::fill(std::map<TString, TH1F*>& histos, TString prefix) {
 
+  for (const reco::Candidate* dau : *daughters_) {
+    histos[prefix + "_trk_pt"]->Fill(dau->pt());
+    histos[prefix + "_trk_pt2"]->Fill(dau->pt() * dau->pt());
+    histos[prefix + "_trk_eta"]->Fill(dau->eta());
+    histos[prefix + "_trk_phi"]->Fill(dau->phi());
+    histos[prefix + "_trk_charge"]->Fill(dau->charge());
+  }
+
   histos[prefix + "_x"]->Fill(x());
   histos[prefix + "_y"]->Fill(y());
   histos[prefix + "_z"]->Fill(z());

@@ -25,6 +25,7 @@ SecondaryVertex::SecondaryVertex(const reco::Vertex& sv,
   trk_dxysig_ = new std::vector<float>;
   trk_dzsig_ = new std::vector<float>;
   trk_d3dsig_ = new std::vector<float>;
+  trk_charge_ = new std::vector<float>;
   trk_chi2_ = new std::vector<float>;
   trk_ndof_ = new std::vector<float>;
   trk_chi2dof_ = new std::vector<float>;
@@ -63,6 +64,7 @@ SecondaryVertex::SecondaryVertex(const reco::Vertex& sv,
     trk_dxysig_->push_back(trkRef->dxy() / trkRef->dxyError());
     trk_dzsig_->push_back(trkRef->dz() / trkRef->dzError());
     trk_d3dsig_->push_back(d3d / d3derr);
+    trk_charge_->push_back(trkRef->charge());
     trk_chi2_->push_back(trkRef->chi2());
     trk_ndof_->push_back(trkRef->ndof());
     trk_chi2dof_->push_back(trkRef->normalizedChi2());
@@ -123,6 +125,7 @@ void SecondaryVertex::fill(std::map<TString, TH1F*>& histos, TString prefix) {
     histos[prefix + "_trk_dxysig"]->Fill(trkDxySig()->at(iTrk));
     histos[prefix + "_trk_dzsig"]->Fill(trkDzSig()->at(iTrk));
     histos[prefix + "_trk_d3dsig"]->Fill(trkD3dSig()->at(iTrk));
+    histos[prefix + "_trk_charge"]->Fill(trkCharge()->at(iTrk));
     histos[prefix + "_trk_chi2"]->Fill(trkChi2()->at(iTrk));
     histos[prefix + "_trk_ndof"]->Fill(trkNDOF()->at(iTrk));
     histos[prefix + "_trk_chi2dof"]->Fill(trkChi2DOF()->at(iTrk));

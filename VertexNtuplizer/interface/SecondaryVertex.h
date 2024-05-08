@@ -47,6 +47,7 @@ class SecondaryVertex {
     const std::vector<float>* trkDxySig() const { return trk_dxysig_; }
     const std::vector<float>* trkDzSig() const { return trk_dzsig_; }
     const std::vector<float>* trkD3dSig() const { return trk_d3dsig_; }
+    const std::vector<float>* trkCharge() const { return trk_charge_; }
     const std::vector<float>* trkChi2() const { return trk_chi2_; }
     const std::vector<float>* trkNDOF() const { return trk_ndof_; }
     const std::vector<float>* trkChi2DOF() const { return trk_chi2dof_; }
@@ -99,6 +100,7 @@ class SecondaryVertex {
     std::vector<float>* trk_dxysig_;
     std::vector<float>* trk_dzsig_;
     std::vector<float>* trk_d3dsig_;
+    std::vector<float>* trk_charge_;
     std::vector<float>* trk_chi2_;
     std::vector<float>* trk_ndof_;
     std::vector<float>* trk_chi2dof_;

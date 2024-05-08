@@ -26,8 +26,8 @@ class RecoJetCollectionBuilder {
         edm::EDGetTokenT<pat::JetCollection>& jetsToken,
         edm::EDGetTokenT<reco::JetFlavourInfoMatchingCollection>& genJetsFlavourInfoToken);
 
-    RecoJetCollection recoJetCollection() { return recoJets_; }
-    RecoJetCollection recoJetGenMatchCollection() { return recoJetsGenMatch_; }
+    RecoJetCollection getRecoJetCollection() { return recoJets_; }
+    RecoJetCollection getRecoJetGenMatchCollection() { return recoJetsGenMatch_; }
 
   private:
 

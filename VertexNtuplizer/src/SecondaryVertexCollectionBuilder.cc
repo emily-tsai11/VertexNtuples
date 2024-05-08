@@ -31,13 +31,13 @@ void SecondaryVertexCollectionBuilder::build(const edm::Event& iEvent,
   secondaryVerticesMTDTiming_.clear();
 
   for (const reco::Vertex& sv : cmsSecondaryVertices_) {
+    if (sv.normalizedChi2() > svChi2dofMax_) continue; // Take out poorly fitted vertices
     // Count how many good tracks and check if this is a "real" vertex
     std::vector<reco::TrackBaseRef>* goodTracks = new std::vector<reco::TrackBaseRef>;
     for (const reco::TrackBaseRef& trkRef : sv.tracks()) {
       if (goodRecoTrack(trkRef)) goodTracks->push_back(trkRef);
     }
     if (goodTracks->size() < 2) continue; // Not a vertex
-    if (sv.normalizedChi2() > svChi2dofMax_) continue; // Take out poorly fitted vertices
 
     SecondaryVertex newSV(sv, goodTracks, primaryVertex,
         trackTimeValueMap_, trackTimeErrorMap_, trackTimeQualityMap_);
@@ -45,13 +45,13 @@ void SecondaryVertexCollectionBuilder::build(const edm::Event& iEvent,
   } // End loop over original SV collection
 
   for (const reco::Vertex& sv : cmsSecondaryVerticesMTDTiming_) {
+    if (sv.normalizedChi2() > svChi2dofMax_) continue; // Take out poorly fitted vertices
     // Count how many good tracks and check if this is a "real" vertex
     std::vector<reco::TrackBaseRef>* goodTracks = new std::vector<reco::TrackBaseRef>;
     for (const reco::TrackBaseRef& trkRef : sv.tracks()) {
       if (goodRecoTrack(trkRef)) goodTracks->push_back(trkRef);
     }
     if (goodTracks->size() < 2) continue; // Not a vertex
-    if (sv.normalizedChi2() > svChi2dofMax_) continue; // Take out poorly fitted vertices
 
     SecondaryVertex newSV(sv, goodTracks, primaryVertex,
         trackTimeValueMap_, trackTimeErrorMap_, trackTimeQualityMap_);

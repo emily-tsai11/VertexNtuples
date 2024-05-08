@@ -20,6 +20,11 @@ class RecoJet {
         double jetMatchDrCut);
     // ~RecoJet();
 
+    const float pt() const { return pt_; }
+    const float eta() const { return eta_; }
+    const float phi() const { return phi_; }
+    const float hadFlav() const { return hadFlav_; }
+
   private:
 
     double pt_;

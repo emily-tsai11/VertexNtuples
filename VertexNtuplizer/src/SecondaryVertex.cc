@@ -11,7 +11,7 @@ SecondaryVertex::SecondaryVertex(const reco::Vertex& sv,
   trk_tval_ = new std::vector<float>;
   trk_terr_ = new std::vector<float>;
   trk_tsig_ = new std::vector<float>;
-  trk_tqal_ = new std::vector<float>;
+  trk_tqual_ = new std::vector<float>;
   trk_pt_ = new std::vector<float>;
   trk_pt2_ = new std::vector<float>;
   trk_eta_ = new std::vector<float>;
@@ -49,7 +49,7 @@ SecondaryVertex::SecondaryVertex(const reco::Vertex& sv,
     trk_tval_->push_back(trackTimeValueMap[trkRef]);
     trk_terr_->push_back(trackTimeErrorMap[trkRef]);
     trk_tsig_->push_back(trackTimeValueMap[trkRef] / trackTimeErrorMap[trkRef]);
-    trk_tqal_->push_back(trackTimeQualityMap[trkRef]);
+    trk_tqual_->push_back(trackTimeQualityMap[trkRef]);
     trk_pt_->push_back(trkRef->pt());
     trk_pt2_->push_back(trkRef->pt2());
     trk_eta_->push_back(trkRef->eta());
@@ -68,7 +68,7 @@ SecondaryVertex::SecondaryVertex(const reco::Vertex& sv,
     trk_chi2dof_->push_back(trkRef->normalizedChi2());
   }
   tavg /= (float) tracks->size();
-  float trng = tmax - tmin;
+  float trange = tmax - tmin;
   Measurement1D dxy = getDxy(sv, primaryVertex);
   Measurement1D d3d = getD3d(sv, primaryVertex);
 
@@ -92,7 +92,7 @@ SecondaryVertex::SecondaryVertex(const reco::Vertex& sv,
   eta_ = sv.p4().Eta();
   phi_ = sv.p4().Phi();
   tavg_ = tavg;
-  trng_ = trng;
+  trange_ = trange;
   chi2_ = sv.chi2();
   ndof_ = sv.ndof();
   chi2dof_ = sv.normalizedChi2();

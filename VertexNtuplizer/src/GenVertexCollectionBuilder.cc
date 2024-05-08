@@ -28,8 +28,8 @@ void GenVertexCollectionBuilder::build(const edm::Event& iEvent,
   genVerticesNoNu_.clear();
   genVerticesNoNuSimMatch_.clear();
 
-  for (unsigned int iGP = 0; iGP < genParticles_.size(); iGP++) {
-    const reco::GenParticle* gp = (genParticles_.at(iGP)).clone();
+  for (reco::GenParticle& genPart : genParticles_) {
+    const reco::GenParticle* gp = genPart.clone();
     int motherPartID = genPartID(gp->pdgId());
 
     if (motherPartID < 0) continue; // Mother is not interesting hadron

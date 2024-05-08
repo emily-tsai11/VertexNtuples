@@ -34,8 +34,6 @@
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 #include "SimDataFormats/Track/interface/SimTrackContainer.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
-// #include "DataFormats/TrackReco/interface/Track.h"
-// #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/JetReco/interface/GenJetCollection.h"
 #include "DataFormats/JetMatching/interface/JetFlavourInfoMatching.h"
@@ -48,6 +46,7 @@
 #include "../interface/SecondaryVertexCollectionBuilder.h"
 #include "../interface/RecoJetCollectionBuilder.h"
 #include "../interface/GenJetCollectionBuilder.h"
+#include "../interface/VertexMatcher.h"
 
 
 class VertexNtuplizer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
@@ -83,6 +82,7 @@ class VertexNtuplizer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
     SecondaryVertexCollectionBuilder* svc_;
     RecoJetCollectionBuilder* rjc_;
     GenJetCollectionBuilder* gjc_;
+    VertexMatcher* matcher_;
 
     std::map<TString, TH1F*> histos_;
 };
@@ -110,6 +110,7 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   svc_ = new SecondaryVertexCollectionBuilder(iConfig);
   rjc_ = new RecoJetCollectionBuilder(iConfig);
   gjc_ = new GenJetCollectionBuilder(iConfig);
+  matcher_ = new VertexMatcher(iConfig);
 
   usesResource("TFileService");
   edm::Service<TFileService> fs;

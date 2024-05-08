@@ -5,7 +5,6 @@
 <use name="DataFormats/VertexReco"/>
 <use name="DataFormats/TrackReco"/>
 <use name="DataFormats/PatCandidates"/>
-<use name="DataFormats/Candidates"/>
 <use name="DataFormats/JetReco"/>
 <use name="DataFormats/JetMatching"/>
 <use name="SimDataFormats/Track"/>

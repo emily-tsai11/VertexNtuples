@@ -103,6 +103,59 @@ SecondaryVertex::SecondaryVertex(const reco::Vertex& sv,
 // SecondaryVertex::~SecondaryVertex() {}
 
 
+void SecondaryVertex::fill(std::map<TString, TH1F*>& histos, TString prefix) {
+
+  for (unsigned int iTrk = 0; iTrk < nTracks(); iTrk++) {
+    histos[prefix + "_trk_tval"]->Fill(trkTVal()->at(iTrk));
+    histos[prefix + "_trk_terr"]->Fill(trkTErr()->at(iTrk));
+    histos[prefix + "_trk_tsig"]->Fill(trkTSig()->at(iTrk));
+    histos[prefix + "_trk_tqual"]->Fill(trkTQual()->at(iTrk));
+    histos[prefix + "_trk_pt"]->Fill(trkPt()->at(iTrk));
+    histos[prefix + "_trk_pt2"]->Fill(trkPt2()->at(iTrk));
+    histos[prefix + "_trk_eta"]->Fill(trkEta()->at(iTrk));
+    histos[prefix + "_trk_phi"]->Fill(trkPhi()->at(iTrk));
+    histos[prefix + "_trk_dxy"]->Fill(trkDxy()->at(iTrk));
+    histos[prefix + "_trk_dz"]->Fill(trkDz()->at(iTrk));
+    histos[prefix + "_trk_d3d"]->Fill(trkD3d()->at(iTrk));
+    histos[prefix + "_trk_dxyerr"]->Fill(trkDxyErr()->at(iTrk));
+    histos[prefix + "_trk_dzerr"]->Fill(trkDzErr()->at(iTrk));
+    histos[prefix + "_trk_d3derr"]->Fill(trkD3dErr()->at(iTrk));
+    histos[prefix + "_trk_dxysig"]->Fill(trkDxySig()->at(iTrk));
+    histos[prefix + "_trk_dzsig"]->Fill(trkDzSig()->at(iTrk));
+    histos[prefix + "_trk_d3dsig"]->Fill(trkD3dSig()->at(iTrk));
+    histos[prefix + "_trk_chi2"]->Fill(trkChi2()->at(iTrk));
+    histos[prefix + "_trk_ndof"]->Fill(trkNDOF()->at(iTrk));
+    histos[prefix + "_trk_chi2dof"]->Fill(trkChi2DOF()->at(iTrk));
+  }
+
+  histos[prefix + "_x"]->Fill(x());
+  histos[prefix + "_y"]->Fill(y());
+  histos[prefix + "_z"]->Fill(z());
+  histos[prefix + "_xerr"]->Fill(xErr());
+  histos[prefix + "_yerr"]->Fill(yErr());
+  histos[prefix + "_zerr"]->Fill(zErr());
+  histos[prefix + "_dxy"]->Fill(dxy());
+  histos[prefix + "_dz"]->Fill(dz());
+  histos[prefix + "_d3d"]->Fill(d3d());
+  histos[prefix + "_dxyerr"]->Fill(dxyErr());
+  histos[prefix + "_dzerr"]->Fill(dzErr());
+  histos[prefix + "_d3derr"]->Fill(d3dErr());
+  histos[prefix + "_dxysig"]->Fill(dxySig());
+  histos[prefix + "_dzsig"]->Fill(dzSig());
+  histos[prefix + "_d3dsig"]->Fill(d3dSig());
+  histos[prefix + "_pt"]->Fill(pt());
+  histos[prefix + "_pt2"]->Fill(pt2());
+  histos[prefix + "_eta"]->Fill(eta());
+  histos[prefix + "_phi"]->Fill(phi());
+  histos[prefix + "_tavg"]->Fill(tAvg());
+  histos[prefix + "_trange"]->Fill(tRange());
+  histos[prefix + "_chi2"]->Fill(chi2());
+  histos[prefix + "_ndof"]->Fill(nDOF());
+  histos[prefix + "_chi2dof"]->Fill(chi2DOF());
+  histos[prefix + "_ntrk"]->Fill(nTracks());
+}
+
+
 Measurement1D SecondaryVertex::getDxy(const reco::Vertex sv, const reco::Vertex pv) {
 
   VertexDistanceXY dist;

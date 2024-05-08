@@ -8,10 +8,12 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Utilities/interface/EDGetToken.h"
 
-#include "TMath.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "RecoVertex/VertexTools/interface/VertexDistanceXY.h"
 #include "RecoVertex/VertexTools/interface/VertexDistance3D.h"
+
+#include "TMath.h"
+#include "TH1.h"
 
 
 class SecondaryVertex {
@@ -25,6 +27,8 @@ class SecondaryVertex {
         const edm::ValueMap<float>& trackTimeErrorMap,
         const edm::ValueMap<float>& trackTimeQualityMap);
     // ~SecondaryVertex();
+
+    void fill(std::map<TString, TH1F*>& histos, TString prefix);
 
     const std::vector<float>* trkTVal() const { return trk_tval_; }
     const std::vector<float>* trkTErr() const { return trk_terr_; }

@@ -10,6 +10,8 @@
 #include "DataFormats/JetMatching/interface/JetFlavourInfoMatching.h"
 #include "DataFormats/Math/interface/deltaR.h"
 
+#include "TH1.h"
+
 
 class GenJet {
 
@@ -18,6 +20,8 @@ class GenJet {
     GenJet(const reco::GenJet& genJet, reco::JetFlavourInfoMatchingCollection& genJetsFlavourInfo,
         double jetMatchDrCut);
     // ~GenJet();
+
+    void fill(std::map<TString, TH1F*>& histos, TString prefix);
 
     const float pt() const { return pt_; }
     const float eta() const { return eta_; }

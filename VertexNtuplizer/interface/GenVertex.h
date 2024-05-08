@@ -4,7 +4,9 @@
 
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
+
 #include "TMath.h"
+#include "TH1.h"
 
 
 class GenVertex {
@@ -15,10 +17,14 @@ class GenVertex {
         const reco::Vertex& primaryVertex, const int pdgIdBin);
     // ~GenVertex();
 
+    void fill(std::map<TString, TH1F*>& histos, TString prefix);
+    void print();
+
     const float x() const { return daughters_->at(0)->vx(); }
     const float y() const { return daughters_->at(0)->vy(); }
     const float z() const { return daughters_->at(0)->vz(); }
     const float pt() const { return mother_->pt(); }
+    const float pt2() const { return mother_->pt() * mother_->pt(); }
     const float eta() const { return mother_->eta(); }
     const float phi() const { return mother_->phi(); }
     const float dxy() const { return dxy_; }
@@ -35,8 +41,6 @@ class GenVertex {
     const unsigned int nDaughters() const { return daughters_->size(); }
     const reco::GenParticle* mother() const { return mother_; }
     const std::vector<const reco::Candidate*>* daughters() const { return daughters_; }
-
-    void print();
 
   private:
 

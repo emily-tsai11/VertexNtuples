@@ -4,8 +4,8 @@
 GenVertex::GenVertex(const reco::GenParticle* mother, std::vector<const reco::Candidate*>* daughters,
     const reco::Vertex& primaryVertex, const int pdgIdBin) : mother_(mother), daughters_(daughters) {
 
-  float dx = primaryVertex.x() - daughters->at(0)->vx();
-  float dy = primaryVertex.y() - daughters->at(0)->vy();
+  float dx = abs(primaryVertex.x() - daughters->at(0)->vx());
+  float dy = abs(primaryVertex.y() - daughters->at(0)->vy());
   float dxerr = primaryVertex.xError();
   float dyerr = primaryVertex.yError();
   float dx2 = dx*dx;
@@ -15,19 +15,21 @@ GenVertex::GenVertex(const reco::GenParticle* mother, std::vector<const reco::Ca
   float dxy2 = dx2 + dy2;
   float dxy2err = TMath::Sqrt(dx2err*dx2err + dy2err*dy2err);
   float dxy = TMath::Sqrt(dxy2);
-  float dxyerr = 0.5 * dxy2err / dxy_;
+  float dxyerr = 0.5 * dxy2err / dxy;
 
-  float dz2 = dz_*dz_;
-  float dz2err = 2*dz_*dzerr_;
+  float dz = abs(primaryVertex.z() - daughters->at(0)->vz());
+  float dzerr = primaryVertex.zError();
+  float dz2 = dz*dz;
+  float dz2err = 2*dz*dzerr;
   float d3d2 = dxy2 + dz2;
   float d3d2err = TMath::Sqrt(dxy2err*dxy2err + dz2err*dz2err);
   float d3d = TMath::Sqrt(d3d2);
-  float d3derr = 0.5 * d3d2err / d3d_;
+  float d3derr = 0.5 * d3d2err / d3d;
 
   dxy_ = dxy;
   dxyerr_ = dxyerr;
-  dz_ = primaryVertex.z() - daughters->at(0)->vz();
-  dzerr_ = primaryVertex.zError();
+  dz_ = dz;
+  dzerr_ = dzerr;
   d3d_ = d3d;
   d3derr_ = d3derr;
   pdgIdBin_ = pdgIdBin;
@@ -35,6 +37,30 @@ GenVertex::GenVertex(const reco::GenParticle* mother, std::vector<const reco::Ca
 
 
 // GenVertex::~GenVertex() {}
+
+
+void GenVertex::fill(std::map<TString, TH1F*>& histos, TString prefix) {
+
+  histos[prefix + "_x"]->Fill(x());
+  histos[prefix + "_y"]->Fill(y());
+  histos[prefix + "_z"]->Fill(z());
+  histos[prefix + "_pt"]->Fill(pt());
+  histos[prefix + "_pt2"]->Fill(pt2());
+  histos[prefix + "_eta"]->Fill(eta());
+  histos[prefix + "_phi"]->Fill(phi());
+  histos[prefix + "_dxy"]->Fill(dxy());
+  histos[prefix + "_dz"]->Fill(dz());
+  histos[prefix + "_d3d"]->Fill(d3d());
+  histos[prefix + "_dxyerr"]->Fill(dxyErr());
+  histos[prefix + "_dzerr"]->Fill(dzErr());
+  histos[prefix + "_d3derr"]->Fill(d3dErr());
+  histos[prefix + "_dxysig"]->Fill(dxySig());
+  histos[prefix + "_dzsig"]->Fill(dzSig());
+  histos[prefix + "_d3dsig"]->Fill(d3dSig());
+  histos[prefix + "_motherPdgId"]->Fill(motherPdgId());
+  histos[prefix + "_pdgIdBin"]->Fill(pdgIdBin());
+  histos[prefix + "_ntrk"]->Fill(nDaughters());
+}
 
 
 void GenVertex::print() {

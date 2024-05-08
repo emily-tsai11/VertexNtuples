@@ -20,3 +20,12 @@ GenJet::GenJet(const reco::GenJet& genJet, reco::JetFlavourInfoMatchingCollectio
 
 
 // GenJet::~GenJet() {}
+
+
+void GenJet::fill(std::map<TString, TH1F*>& histos, TString prefix) {
+
+  histos[prefix + "_pt"]->Fill(pt());
+  histos[prefix + "_eta"]->Fill(eta());
+  histos[prefix + "_phi"]->Fill(phi());
+  histos[prefix + "_hadFlav"]->Fill(hadFlav());
+}

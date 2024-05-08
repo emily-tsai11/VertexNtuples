@@ -11,6 +11,8 @@
 #include "DataFormats/JetMatching/interface/JetFlavourInfoMatching.h"
 #include "DataFormats/Math/interface/deltaR.h"
 
+#include "TH1.h"
+
 
 class RecoJet {
 
@@ -19,6 +21,8 @@ class RecoJet {
     RecoJet(const pat::Jet& jet, reco::JetFlavourInfoMatchingCollection& genJetsFlavourInfo,
         double jetMatchDrCut);
     // ~RecoJet();
+
+    void fill(std::map<TString, TH1F*>& histos, TString prefix);
 
     const float pt() const { return pt_; }
     const float eta() const { return eta_; }

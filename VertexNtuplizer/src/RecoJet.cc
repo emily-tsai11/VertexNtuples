@@ -23,3 +23,12 @@ RecoJet::RecoJet(const pat::Jet& jet, reco::JetFlavourInfoMatchingCollection& ge
 
 
 // RecoJet::~RecoJet() {}
+
+
+void RecoJet::fill(std::map<TString, TH1F*>& histos, TString prefix) {
+
+  histos[prefix + "_pt"]->Fill(pt());
+  histos[prefix + "_eta"]->Fill(eta());
+  histos[prefix + "_phi"]->Fill(phi());
+  histos[prefix + "_hadFlav"]->Fill(hadFlav());
+}

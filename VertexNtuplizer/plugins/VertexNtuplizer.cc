@@ -220,6 +220,7 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
       if (obj1.BeginsWith("sv") && obj2.BeginsWith("sv")) continue;
       if (obj1.BeginsWith("rj") && obj2.BeginsWith("rj")) continue;
       if (obj1.BeginsWith("gj") && obj2.BeginsWith("gj")) continue;
+      if (obj1.EndsWith("_trk") && obj2.EndsWith("_trk")) continue;
       for (const auto& iter : vars_) {
         TString name = obj1 + "_" + obj2 + "_" + iter.first;
         histos_[name] = fs->make<TH1F>(name, name, iter.second[0], iter.second[1], iter.second[2]);

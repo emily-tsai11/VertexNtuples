@@ -2,8 +2,8 @@
 import FWCore.ParameterSet.VarParsing as VarParsing
 options = VarParsing.VarParsing()
 options.register("inputFiles",
-  # "file:/eos/user/e/etsai/workspace/TTToHadronic_noPU_CMSSW_13_1_0/src/RecoVertex/AdaptiveVertexFinder/test/TTToHadronic_noPU_slimmed.root",
-  "file:/eos/cms/store/user/etsai/TT_TuneCP5_14TeV-powheg-pythia8/TTToHadronic_noPU/240429_225553/0000/TTToHadronic_noPU_slimmed_1.root",
+  "file:/eos/user/e/etsai/workspace/TTToHadronic_noPU_CMSSW_13_1_0/src/RecoVertex/AdaptiveVertexFinder/test/TTToHadronic_noPU_slimmed.root",
+  # "file:/eos/cms/store/user/etsai/TT_TuneCP5_14TeV-powheg-pythia8/TTToHadronic_noPU/240429_225553/0000/TTToHadronic_noPU_slimmed_1.root",
   # "file:/eos/cms/store/group/phys_btag/etsai/TT_TuneCP5_14TeV-powheg-pythia8/TTToHadronic_PU200/240429_231224/0000/TTToHadronic_PU200_slimmed_1.root",
   VarParsing.VarParsing.multiplicity.list, VarParsing.VarParsing.varType.string, "Input file(s) (default is ttbar no pileup)")
 options.register("outputFile",  "histo", VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.string, "Output file (w/o .root)")

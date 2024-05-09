@@ -89,7 +89,8 @@ class VertexNtuplizer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
     std::vector<TString> rj_names_;
     std::vector<TString> gj_names_;
 
-    std::map<TString, TH1F*> histos_;
+    std::map<TString, TH1F*> histos1_;
+    std::map<TString, TH2F*> histos2_;
 };
 
 
@@ -148,7 +149,7 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   const unsigned int nclus_ = 200;
   const unsigned int njet_ = 20;
 
-  std::map<TString, std::vector<float>> vars_ = {
+  std::map<TString, std::vector<float>> vars1_ = {
     std::make_pair("tval", std::vector<float>{(float) nbins_, -0.8, 0.8}),
     std::make_pair("terr", std::vector<float>{(float) nbins_, 0.0, 0.1}),
     std::make_pair("tsig", std::vector<float>{(float) nbins_, -50.0, 50.0}),
@@ -199,36 +200,53 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
     std::make_pair("matchd3dsig", std::vector<float>{(float) nbins_, -10.0, 10.0})
   };
 
+  std::map<TString, std::vector<float>> vars2_ = {
+    std::make_pair("trange_pt", std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 200.0}),
+    std::make_pair("trange_pt2", std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 200.0}),
+    std::make_pair("trange_dxy", std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 10.0}),
+    std::make_pair("trange_dxysig", std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 3000.0}),
+    std::make_pair("trange_d3d", std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 20.0}),
+    std::make_pair("trange_d3dsig", std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 1000.0})
+  };
+
   for (TString gv_name : gv_names_) {
     TString name = "n" + gv_name;
-    histos_[name] = fs->make<TH1F>(name, name, nvtx_, 0, nvtx_);
-    histos_[name]->Sumw2();
+    histos1_[name] = fs->make<TH1F>(name, name, nvtx_, 0, nvtx_);
+    histos1_[name]->Sumw2();
   }
   for (TString sv_name : sv_names_) {
     TString name = "n" + sv_name;
-    histos_[name] = fs->make<TH1F>(name, name, nvtx_, 0, nvtx_);
-    histos_[name]->Sumw2();
+    histos1_[name] = fs->make<TH1F>(name, name, nvtx_, 0, nvtx_);
+    histos1_[name]->Sumw2();
   }
-  histos_["nc"] = fs->make<TH1F>("nc", "nc", nclus_, 0, nclus_);
-  histos_["nc"]->Sumw2();
-  histos_["nct"] = fs->make<TH1F>("nct", "nct", nclus_, 0, nclus_);
-  histos_["nct"]->Sumw2();
+  histos1_["nc"] = fs->make<TH1F>("nc", "nc", nclus_, 0, nclus_);
+  histos1_["nc"]->Sumw2();
+  histos1_["nct"] = fs->make<TH1F>("nct", "nct", nclus_, 0, nclus_);
+  histos1_["nct"]->Sumw2();
   for (TString rj_name : rj_names_) {
     TString name = "n" + rj_name;
-    histos_[name] = fs->make<TH1F>(name, name, njet_, 0, njet_);
-    histos_[name]->Sumw2();
+    histos1_[name] = fs->make<TH1F>(name, name, njet_, 0, njet_);
+    histos1_[name]->Sumw2();
   }
   for (TString gj_name : gj_names_) {
     TString name = "n" + gj_name;
-    histos_[name] = fs->make<TH1F>(name, name, njet_, 0, njet_);
-    histos_[name]->Sumw2();
+    histos1_[name] = fs->make<TH1F>(name, name, njet_, 0, njet_);
+    histos1_[name]->Sumw2();
   }
 
   for (TString obj : objs_) {
-    for (const auto& iter : vars_) {
+    for (const auto& iter : vars1_) {
       TString name = obj + "_" + iter.first;
-      histos_[name] = fs->make<TH1F>(name, name, iter.second[0], iter.second[1], iter.second[2]);
-      histos_[name]->Sumw2();
+      histos1_[name] = fs->make<TH1F>(name, name, iter.second[0], iter.second[1], iter.second[2]);
+      histos1_[name]->Sumw2();
+    }
+  }
+
+  for (TString obj : sv_names_) {
+    for (const auto& iter : vars2_) {
+      TString name = obj + "_" + iter.first;
+      histos2_[name] = fs->make<TH2F>(name, name, iter.second[0], iter.second[1], iter.second[2], iter.second[3], iter.second[4], iter.second[5]);
+      histos2_[name]->Sumw2();
     }
   }
 
@@ -240,10 +258,17 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
       if (obj1.BeginsWith("gj") && obj2.BeginsWith("gj")) continue;
       if (obj1.EndsWith("_trk")) continue;
       if (obj1.EndsWith("_trk") && obj2.EndsWith("_trk")) continue;
-      for (const auto& iter : vars_) {
+      for (const auto& iter : vars1_) {
         TString name = obj1 + "_" + obj2 + "_" + iter.first;
-        histos_[name] = fs->make<TH1F>(name, name, iter.second[0], iter.second[1], iter.second[2]);
-        histos_[name]->Sumw2();
+        histos1_[name] = fs->make<TH1F>(name, name, iter.second[0], iter.second[1], iter.second[2]);
+        histos1_[name]->Sumw2();
+      }
+
+      if (!obj1.BeginsWith("sv")) continue;
+      for (const auto& iter : vars2_) {
+        TString name = obj1 + "_" + obj2 + "_" + iter.first;
+        histos2_[name] = fs->make<TH2F>(name, name, iter.second[0], iter.second[1], iter.second[2], iter.second[3], iter.second[4], iter.second[5]);
+        histos2_[name]->Sumw2();
       }
     }
   }
@@ -271,37 +296,37 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   GVCollections.push_back(gvc_->getGenVertexNoNuCollection());
   GVCollections.push_back(gvc_->getGenVertexNoNuSimMatchCollection());
   for (unsigned int iColl = 0; iColl < GVCollections.size(); iColl++) {
-    histos_["n" + gv_names_.at(iColl)]->Fill(GVCollections.at(iColl).size());
-    for (GenVertex& gv : GVCollections.at(iColl)) gv.fill(histos_, gv_names_.at(iColl));
+    histos1_["n" + gv_names_.at(iColl)]->Fill(GVCollections.at(iColl).size());
+    for (GenVertex& gv : GVCollections.at(iColl)) gv.fill(histos1_, gv_names_.at(iColl));
   }
 
   std::vector<SecondaryVertexCollection> SVCollections;
   SVCollections.push_back(svc_->getSecondaryVertexCollection());
   SVCollections.push_back(svc_->getSecondaryVertexCollectionMTDTiming());
   for (unsigned int iColl = 0; iColl < SVCollections.size(); iColl++) {
-    histos_["n" + sv_names_.at(iColl)]->Fill(SVCollections.at(iColl).size());
-    for (SecondaryVertex& sv : SVCollections.at(iColl)) sv.fill(histos_, sv_names_.at(iColl));
+    histos1_["n" + sv_names_.at(iColl)]->Fill(SVCollections.at(iColl).size());
+    for (SecondaryVertex& sv : SVCollections.at(iColl)) sv.fill(histos1_, histos2_, sv_names_.at(iColl));
   }
 
   unsigned int nC = iEvent.get(IVFclustersToken_);
   unsigned int nCt = iEvent.get(IVFclustersMTDTimingToken_);
-  histos_["nc"]->Fill(nC);
-  histos_["nct"]->Fill(nCt);
+  histos1_["nc"]->Fill(nC);
+  histos1_["nct"]->Fill(nCt);
 
   std::vector<RecoJetCollection> RJCollections;
   RJCollections.push_back(rjc_->getRecoJetCollection());
   RJCollections.push_back(rjc_->getRecoJetGenMatchCollection());
   for (unsigned int iColl = 0; iColl < RJCollections.size(); iColl++) {
-    histos_["n" + rj_names_.at(iColl)]->Fill(RJCollections.at(iColl).size());
-    for (RecoJet& rj : RJCollections.at(iColl)) rj.fill(histos_, rj_names_.at(iColl));
+    histos1_["n" + rj_names_.at(iColl)]->Fill(RJCollections.at(iColl).size());
+    for (RecoJet& rj : RJCollections.at(iColl)) rj.fill(histos1_, rj_names_.at(iColl));
   }
 
   std::vector<GenJetCollection> GJCollections;
   GJCollections.push_back(gjc_->getGenJetCollection());
   GJCollections.push_back(gjc_->getGenJetRecoMatchCollection());
   for (unsigned int iColl = 0; iColl < GJCollections.size(); iColl++) {
-    histos_["n" + gj_names_.at(iColl)]->Fill(GJCollections.at(iColl).size());
-    for (GenJet& gj : GJCollections.at(iColl)) gj.fill(histos_, gj_names_.at(iColl));
+    histos1_["n" + gj_names_.at(iColl)]->Fill(GJCollections.at(iColl).size());
+    for (GenJet& gj : GJCollections.at(iColl)) gj.fill(histos1_, gj_names_.at(iColl));
   }
 
   for (unsigned int iGVs = 0; iGVs < GVCollections.size(); iGVs++) {
@@ -311,9 +336,9 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
           if (matcher_->match(gv, sv, TRACK)) {
             TString gv_name = gv_names_.at(iGVs) + "_" + sv_names_.at(iSVs);
             TString sv_name = sv_names_.at(iSVs) + "_" + gv_names_.at(iGVs);
-            gv.fill(histos_, gv_name);
-            sv.fill(histos_, sv_name);
-            matcher_->fill(histos_, gv_name, sv_name, gv, sv);
+            gv.fill(histos1_, gv_name);
+            sv.fill(histos1_, histos2_, sv_name);
+            matcher_->fill(histos1_, gv_name, sv_name, gv, sv);
           }
         }
       }

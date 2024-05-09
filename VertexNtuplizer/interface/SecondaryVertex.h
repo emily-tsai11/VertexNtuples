@@ -12,6 +12,7 @@
 
 #include "TMath.h"
 #include "TH1.h"
+#include "TH2.h"
 
 #include "VertexCalculator.h"
 
@@ -28,7 +29,7 @@ class SecondaryVertex {
         const edm::ValueMap<float>& trackTimeQualityMap);
     // ~SecondaryVertex();
 
-    void fill(std::map<TString, TH1F*>& histos, TString prefix);
+    void fill(std::map<TString, TH1F*>& histos, std::map<TString, TH2F*>& histos2, TString prefix);
 
     const std::vector<double>* trkTVal() const { return trk_tval_; }
     const std::vector<double>* trkTErr() const { return trk_terr_; }

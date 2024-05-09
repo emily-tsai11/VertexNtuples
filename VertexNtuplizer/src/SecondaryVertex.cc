@@ -100,55 +100,63 @@ SecondaryVertex::SecondaryVertex(const reco::Vertex& sv,
 // SecondaryVertex::~SecondaryVertex() {}
 
 
-void SecondaryVertex::fill(std::map<TString, TH1F*>& histos, TString prefix) {
+void SecondaryVertex::fill(std::map<TString, TH1F*>& histos1,
+    std::map<TString, TH2F*>& histos2, TString prefix) {
 
   for (unsigned int iTrk = 0; iTrk < nTracks(); iTrk++) {
-    histos[prefix + "_trk_tval"]->Fill(trkTVal()->at(iTrk));
-    histos[prefix + "_trk_terr"]->Fill(trkTErr()->at(iTrk));
-    histos[prefix + "_trk_tsig"]->Fill(trkTSig()->at(iTrk));
-    histos[prefix + "_trk_tqual"]->Fill(trkTQual()->at(iTrk));
-    histos[prefix + "_trk_pt"]->Fill(trkPt()->at(iTrk));
-    histos[prefix + "_trk_pt2"]->Fill(trkPt2()->at(iTrk));
-    histos[prefix + "_trk_eta"]->Fill(trkEta()->at(iTrk));
-    histos[prefix + "_trk_phi"]->Fill(trkPhi()->at(iTrk));
-    histos[prefix + "_trk_dxy"]->Fill(trkDxy()->at(iTrk));
-    histos[prefix + "_trk_dz"]->Fill(trkDz()->at(iTrk));
-    histos[prefix + "_trk_d3d"]->Fill(trkD3d()->at(iTrk));
-    histos[prefix + "_trk_dxyerr"]->Fill(trkDxyErr()->at(iTrk));
-    histos[prefix + "_trk_dzerr"]->Fill(trkDzErr()->at(iTrk));
-    histos[prefix + "_trk_d3derr"]->Fill(trkD3dErr()->at(iTrk));
-    histos[prefix + "_trk_dxysig"]->Fill(trkDxySig()->at(iTrk));
-    histos[prefix + "_trk_dzsig"]->Fill(trkDzSig()->at(iTrk));
-    histos[prefix + "_trk_d3dsig"]->Fill(trkD3dSig()->at(iTrk));
-    histos[prefix + "_trk_charge"]->Fill(trkCharge()->at(iTrk));
-    histos[prefix + "_trk_chi2"]->Fill(trkChi2()->at(iTrk));
-    histos[prefix + "_trk_ndof"]->Fill(trkNDOF()->at(iTrk));
-    histos[prefix + "_trk_chi2dof"]->Fill(trkChi2DOF()->at(iTrk));
+    histos1[prefix + "_trk_tval"]->Fill(trkTVal()->at(iTrk));
+    histos1[prefix + "_trk_terr"]->Fill(trkTErr()->at(iTrk));
+    histos1[prefix + "_trk_tsig"]->Fill(trkTSig()->at(iTrk));
+    histos1[prefix + "_trk_tqual"]->Fill(trkTQual()->at(iTrk));
+    histos1[prefix + "_trk_pt"]->Fill(trkPt()->at(iTrk));
+    histos1[prefix + "_trk_pt2"]->Fill(trkPt2()->at(iTrk));
+    histos1[prefix + "_trk_eta"]->Fill(trkEta()->at(iTrk));
+    histos1[prefix + "_trk_phi"]->Fill(trkPhi()->at(iTrk));
+    histos1[prefix + "_trk_dxy"]->Fill(trkDxy()->at(iTrk));
+    histos1[prefix + "_trk_dz"]->Fill(trkDz()->at(iTrk));
+    histos1[prefix + "_trk_d3d"]->Fill(trkD3d()->at(iTrk));
+    histos1[prefix + "_trk_dxyerr"]->Fill(trkDxyErr()->at(iTrk));
+    histos1[prefix + "_trk_dzerr"]->Fill(trkDzErr()->at(iTrk));
+    histos1[prefix + "_trk_d3derr"]->Fill(trkD3dErr()->at(iTrk));
+    histos1[prefix + "_trk_dxysig"]->Fill(trkDxySig()->at(iTrk));
+    histos1[prefix + "_trk_dzsig"]->Fill(trkDzSig()->at(iTrk));
+    histos1[prefix + "_trk_d3dsig"]->Fill(trkD3dSig()->at(iTrk));
+    histos1[prefix + "_trk_charge"]->Fill(trkCharge()->at(iTrk));
+    histos1[prefix + "_trk_chi2"]->Fill(trkChi2()->at(iTrk));
+    histos1[prefix + "_trk_ndof"]->Fill(trkNDOF()->at(iTrk));
+    histos1[prefix + "_trk_chi2dof"]->Fill(trkChi2DOF()->at(iTrk));
   }
 
-  histos[prefix + "_x"]->Fill(x());
-  histos[prefix + "_y"]->Fill(y());
-  histos[prefix + "_z"]->Fill(z());
-  histos[prefix + "_xerr"]->Fill(xErr());
-  histos[prefix + "_yerr"]->Fill(yErr());
-  histos[prefix + "_zerr"]->Fill(zErr());
-  histos[prefix + "_dxy"]->Fill(dxy());
-  histos[prefix + "_dz"]->Fill(dz());
-  histos[prefix + "_d3d"]->Fill(d3d());
-  histos[prefix + "_dxyerr"]->Fill(dxyErr());
-  histos[prefix + "_dzerr"]->Fill(dzErr());
-  histos[prefix + "_d3derr"]->Fill(d3dErr());
-  histos[prefix + "_dxysig"]->Fill(dxySig());
-  histos[prefix + "_dzsig"]->Fill(dzSig());
-  histos[prefix + "_d3dsig"]->Fill(d3dSig());
-  histos[prefix + "_pt"]->Fill(pt());
-  histos[prefix + "_pt2"]->Fill(pt2());
-  histos[prefix + "_eta"]->Fill(eta());
-  histos[prefix + "_phi"]->Fill(phi());
-  histos[prefix + "_tavg"]->Fill(tAvg());
-  histos[prefix + "_trange"]->Fill(tRange());
-  histos[prefix + "_chi2"]->Fill(chi2());
-  histos[prefix + "_ndof"]->Fill(nDOF());
-  histos[prefix + "_chi2dof"]->Fill(chi2DOF());
-  histos[prefix + "_ntrk"]->Fill(nTracks());
+  histos1[prefix + "_x"]->Fill(x());
+  histos1[prefix + "_y"]->Fill(y());
+  histos1[prefix + "_z"]->Fill(z());
+  histos1[prefix + "_xerr"]->Fill(xErr());
+  histos1[prefix + "_yerr"]->Fill(yErr());
+  histos1[prefix + "_zerr"]->Fill(zErr());
+  histos1[prefix + "_dxy"]->Fill(dxy());
+  histos1[prefix + "_dz"]->Fill(dz());
+  histos1[prefix + "_d3d"]->Fill(d3d());
+  histos1[prefix + "_dxyerr"]->Fill(dxyErr());
+  histos1[prefix + "_dzerr"]->Fill(dzErr());
+  histos1[prefix + "_d3derr"]->Fill(d3dErr());
+  histos1[prefix + "_dxysig"]->Fill(dxySig());
+  histos1[prefix + "_dzsig"]->Fill(dzSig());
+  histos1[prefix + "_d3dsig"]->Fill(d3dSig());
+  histos1[prefix + "_pt"]->Fill(pt());
+  histos1[prefix + "_pt2"]->Fill(pt2());
+  histos1[prefix + "_eta"]->Fill(eta());
+  histos1[prefix + "_phi"]->Fill(phi());
+  histos1[prefix + "_tavg"]->Fill(tAvg());
+  histos1[prefix + "_trange"]->Fill(tRange());
+  histos1[prefix + "_chi2"]->Fill(chi2());
+  histos1[prefix + "_ndof"]->Fill(nDOF());
+  histos1[prefix + "_chi2dof"]->Fill(chi2DOF());
+  histos1[prefix + "_ntrk"]->Fill(nTracks());
+
+  histos2[prefix + "_trange_pt"]->Fill(tRange(), pt());
+  histos2[prefix + "_trange_pt2"]->Fill(tRange(), pt2());
+  histos2[prefix + "_trange_dxy"]->Fill(tRange(), dxy());
+  histos2[prefix + "_trange_dxysig"]->Fill(tRange(), dxySig());
+  histos2[prefix + "_trange_d3d"]->Fill(tRange(), d3d());
+  histos2[prefix + "_trange_d3dsig"]->Fill(tRange(), d3dSig());
 }

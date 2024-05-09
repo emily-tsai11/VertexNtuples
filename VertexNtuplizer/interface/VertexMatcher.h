@@ -1,11 +1,14 @@
-#ifndef VERTEX_MATCHER
-#define VERTEX_MATCHER
+#ifndef VertexNtuples_VertexNtuplizer_VertexMatcher_h
+#define VertexNtuples_VertexNtuplizer_VertexMatcher_h
 
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include "DataFormats/Math/interface/deltaR.h"
 
+#include "TH1.h"
+
+#include "VertexCalculatorExtended.h"
 #include "GenVertex.h"
 #include "SecondaryVertex.h"
 #include "RecoJet.h"
@@ -26,6 +29,9 @@ class VertexMatcher {
 
     bool match(GenVertex& gv, SecondaryVertex& sv, MatchAlgo algo);
     bool match(SecondaryVertex& sv, RecoJet& rj);
+
+    void fill(std::map<TString, TH1F*>& histos, TString gvPrefix,
+        TString svPrefix, GenVertex& gv, SecondaryVertex& sv);
 
   private:
 

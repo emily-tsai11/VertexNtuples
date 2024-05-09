@@ -34,6 +34,7 @@ void GenJetCollectionBuilder::build(const edm::Event& iEvent,
     for (const pat::Jet& jet : jets_) {
       if (!goodJet(jet)) continue;
       const reco::GenJet* matchedGenJet = jet.genJet();
+      if (!matchedGenJet) continue;
       if (matchedGenJet->pt() != genJet.pt() ||
           matchedGenJet->eta() != genJet.eta() ||
           matchedGenJet->phi() != genJet.phi()) continue; // No matching reco jet found

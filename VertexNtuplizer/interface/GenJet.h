@@ -1,5 +1,5 @@
-#ifndef GEN_JET
-#define GEN_JET
+#ifndef VertexNtuples_VertexNtuplizer_GenJet_h
+#define VertexNtuples_VertexNtuplizer_GenJet_h
 
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
@@ -23,10 +23,10 @@ class GenJet {
 
     void fill(std::map<TString, TH1F*>& histos, TString prefix);
 
-    const float pt() const { return pt_; }
-    const float eta() const { return eta_; }
-    const float phi() const { return phi_; }
-    const float hadFlav() const { return hadFlav_; }
+    const double pt() const { return pt_; }
+    const double eta() const { return eta_; }
+    const double phi() const { return phi_; }
+    const double hadFlav() const { return hadFlav_; }
 
   private:
 

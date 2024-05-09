@@ -1,5 +1,5 @@
-#ifndef SECONDARY_VERTEX_COLLECTION_BUILDER
-#define SECONDARY_VERTEX_COLLECTION_BUILDER
+#ifndef VertexNtuples_VertexNtuplizer_SecondaryVertexCollectionBuilder_h
+#define VertexNtuples_VertexNtuplizer_SecondaryVertexCollectionBuilder_h
 
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"

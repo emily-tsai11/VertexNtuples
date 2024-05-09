@@ -55,3 +55,47 @@ bool VertexMatcher::vtxMatrixMatch(GenVertex& gv, SecondaryVertex& sv) {
   // Not yet implemented
   return false;
 }
+
+
+void VertexMatcher::fill(std::map<TString, TH1F*>& histos, TString gvPrefix,
+    TString svPrefix, GenVertex& gv, SecondaryVertex& sv) {
+
+  double xres = vertexntuples::xres(gv, sv);
+  double yres = vertexntuples::yres(gv, sv);
+  double zres = vertexntuples::zres(gv, sv);
+  double xpull = vertexntuples::xpull(gv, sv);
+  double ypull = vertexntuples::ypull(gv, sv);
+  double zpull = vertexntuples::zpull(gv, sv);
+  double dxy = vertexntuples::dxy(gv, sv);
+  double d3d = vertexntuples::d3d(gv, sv);
+  double dxyerr = vertexntuples::dxyErr(gv, sv);
+  double d3derr = vertexntuples::d3dErr(gv, sv);
+  double dxysig = dxy / dxyerr;
+  double d3dsig = d3d / d3derr;
+
+  histos[gvPrefix + "_xres"]->Fill(xres);
+  histos[gvPrefix + "_yres"]->Fill(yres);
+  histos[gvPrefix + "_zres"]->Fill(zres);
+  histos[gvPrefix + "_xpull"]->Fill(xpull);
+  histos[gvPrefix + "_ypull"]->Fill(ypull);
+  histos[gvPrefix + "_zpull"]->Fill(zpull);
+  histos[gvPrefix + "_matchdxy"]->Fill(dxy);
+  histos[gvPrefix + "_matchd3d"]->Fill(d3d);
+  histos[gvPrefix + "_matchdxyerr"]->Fill(dxyerr);
+  histos[gvPrefix + "_matchd3derr"]->Fill(d3derr);
+  histos[gvPrefix + "_matchdxysig"]->Fill(dxysig);
+  histos[gvPrefix + "_matchd3dsig"]->Fill(d3dsig);
+
+  histos[svPrefix + "_xres"]->Fill(xres);
+  histos[svPrefix + "_yres"]->Fill(yres);
+  histos[svPrefix + "_zres"]->Fill(zres);
+  histos[svPrefix + "_xpull"]->Fill(xpull);
+  histos[svPrefix + "_ypull"]->Fill(ypull);
+  histos[svPrefix + "_zpull"]->Fill(zpull);
+  histos[svPrefix + "_matchdxy"]->Fill(dxy);
+  histos[svPrefix + "_matchd3d"]->Fill(d3d);
+  histos[svPrefix + "_matchdxyerr"]->Fill(dxyerr);
+  histos[svPrefix + "_matchd3derr"]->Fill(d3derr);
+  histos[svPrefix + "_matchdxysig"]->Fill(dxysig);
+  histos[svPrefix + "_matchd3dsig"]->Fill(d3dsig);
+}

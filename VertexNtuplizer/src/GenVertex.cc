@@ -4,34 +4,21 @@
 GenVertex::GenVertex(const reco::GenParticle* mother, std::vector<const reco::Candidate*>* daughters,
     const reco::Vertex& primaryVertex, const int pdgIdBin) : mother_(mother), daughters_(daughters) {
 
-  float dx = abs(primaryVertex.x() - daughters->at(0)->vx());
-  float dy = abs(primaryVertex.y() - daughters->at(0)->vy());
-  float dxerr = primaryVertex.xError();
-  float dyerr = primaryVertex.yError();
-  float dx2 = dx*dx;
-  float dy2 = dy*dy;
-  float dx2err = 2*dx*dxerr;
-  float dy2err = 2*dy*dyerr;
-  float dxy2 = dx2 + dy2;
-  float dxy2err = TMath::Sqrt(dx2err*dx2err + dy2err*dy2err);
-  float dxy = TMath::Sqrt(dxy2);
-  float dxyerr = 0.5 * dxy2err / dxy;
-
-  float dz = abs(primaryVertex.z() - daughters->at(0)->vz());
-  float dzerr = primaryVertex.zError();
-  float dz2 = dz*dz;
-  float dz2err = 2*dz*dzerr;
-  float d3d2 = dxy2 + dz2;
-  float d3d2err = TMath::Sqrt(dxy2err*dxy2err + dz2err*dz2err);
-  float d3d = TMath::Sqrt(d3d2);
-  float d3derr = 0.5 * d3d2err / d3d;
-
-  dxy_ = dxy;
-  dxyerr_ = dxyerr;
-  dz_ = dz;
-  dzerr_ = dzerr;
-  d3d_ = d3d;
-  d3derr_ = d3derr;
+  x_ = daughters_->at(0)->vx();
+  y_ = daughters_->at(0)->vy();
+  z_ = daughters_->at(0)->vz();
+  xerr_ = 0.0;
+  yerr_ = 0.0;
+  zerr_ = 0.0;
+  dxy_ = vertexntuples::dxy(daughters_->at(0), primaryVertex);
+  dz_ = vertexntuples::dz(daughters_->at(0), primaryVertex);
+  d3d_ = vertexntuples::d3d(daughters_->at(0), primaryVertex);
+  dxyerr_ = vertexntuples::dxyErr(daughters_->at(0), primaryVertex);
+  dzerr_ = vertexntuples::dzErr(daughters_->at(0), primaryVertex);
+  d3derr_ = vertexntuples::d3dErr(daughters_->at(0), primaryVertex);
+  dxysig_ = dxy_ / dxyerr_;
+  dzsig_ = dz_ / dzerr_;
+  d3dsig_ = d3d_ / d3derr_;
   pdgIdBin_ = pdgIdBin;
 }
 

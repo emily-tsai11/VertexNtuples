@@ -1,5 +1,5 @@
-#ifndef GEN_VERTEX_COLLECTION_BUILDER
-#define GEN_VERTEX_COLLECTION_BUILDER
+#ifndef VertexNtuples_VertexNtuplizer_GenVertexCollectionBuilder_h
+#define VertexNtuples_VertexNtuplizer_GenVertexCollectionBuilder_h
 
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"

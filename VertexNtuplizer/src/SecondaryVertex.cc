@@ -8,27 +8,27 @@ SecondaryVertex::SecondaryVertex(const reco::Vertex& sv,
     const edm::ValueMap<float>& trackTimeErrorMap,
     const edm::ValueMap<float>& trackTimeQualityMap) {
 
-  trk_tval_ = new std::vector<float>;
-  trk_terr_ = new std::vector<float>;
-  trk_tsig_ = new std::vector<float>;
-  trk_tqual_ = new std::vector<float>;
-  trk_pt_ = new std::vector<float>;
-  trk_pt2_ = new std::vector<float>;
-  trk_eta_ = new std::vector<float>;
-  trk_phi_ = new std::vector<float>;
-  trk_dxy_ = new std::vector<float>;
-  trk_dz_ = new std::vector<float>;
-  trk_d3d_ = new std::vector<float>;
-  trk_dxyerr_ = new std::vector<float>;
-  trk_dzerr_ = new std::vector<float>;
-  trk_d3derr_ = new std::vector<float>;
-  trk_dxysig_ = new std::vector<float>;
-  trk_dzsig_ = new std::vector<float>;
-  trk_d3dsig_ = new std::vector<float>;
-  trk_charge_ = new std::vector<float>;
-  trk_chi2_ = new std::vector<float>;
-  trk_ndof_ = new std::vector<float>;
-  trk_chi2dof_ = new std::vector<float>;
+  trk_tval_ = new std::vector<double>;
+  trk_terr_ = new std::vector<double>;
+  trk_tsig_ = new std::vector<double>;
+  trk_tqual_ = new std::vector<double>;
+  trk_pt_ = new std::vector<double>;
+  trk_pt2_ = new std::vector<double>;
+  trk_eta_ = new std::vector<double>;
+  trk_phi_ = new std::vector<double>;
+  trk_dxy_ = new std::vector<double>;
+  trk_dz_ = new std::vector<double>;
+  trk_d3d_ = new std::vector<double>;
+  trk_dxyerr_ = new std::vector<double>;
+  trk_dzerr_ = new std::vector<double>;
+  trk_d3derr_ = new std::vector<double>;
+  trk_dxysig_ = new std::vector<double>;
+  trk_dzsig_ = new std::vector<double>;
+  trk_d3dsig_ = new std::vector<double>;
+  trk_charge_ = new std::vector<double>;
+  trk_chi2_ = new std::vector<double>;
+  trk_ndof_ = new std::vector<double>;
+  trk_chi2dof_ = new std::vector<double>;
 
   float tavg = 0.0;
   float tmin = 99999.9;
@@ -38,14 +38,9 @@ SecondaryVertex::SecondaryVertex(const reco::Vertex& sv,
     tmin = std::min(tmin, trackTimeValueMap[trkRef]);
     tmax = std::max(tmax, trackTimeValueMap[trkRef]);
 
-    float dxy2 = trkRef->dxy()*trkRef->dxy();
-    float dz2 = trkRef->dz()*trkRef->dz();
-    float dxy2err = 2*trkRef->dxyError()*trkRef->dxy();
-    float dz2err = 2*trkRef->dzError()*trkRef->dz();
-    float d3d2 = dxy2 + dz2;
-    float d3d2err = TMath::Sqrt(dxy2err*dxy2err + dz2err*dz2err);
-    float d3d = TMath::Sqrt(d3d2);
-    float d3derr = 0.5*d3d2err/d3d;
+    double d3d = vertexntuples::d3d(trkRef);
+    double d3derr = vertexntuples::d3dErr(trkRef);
+    double d3dsig = d3d / d3derr;
 
     trk_tval_->push_back(trackTimeValueMap[trkRef]);
     trk_terr_->push_back(trackTimeErrorMap[trkRef]);
@@ -63,7 +58,7 @@ SecondaryVertex::SecondaryVertex(const reco::Vertex& sv,
     trk_d3derr_->push_back(d3derr);
     trk_dxysig_->push_back(trkRef->dxy() / trkRef->dxyError());
     trk_dzsig_->push_back(trkRef->dz() / trkRef->dzError());
-    trk_d3dsig_->push_back(d3d / d3derr);
+    trk_d3dsig_->push_back(d3dsig);
     trk_charge_->push_back(trkRef->charge());
     trk_chi2_->push_back(trkRef->chi2());
     trk_ndof_->push_back(trkRef->ndof());
@@ -71,8 +66,8 @@ SecondaryVertex::SecondaryVertex(const reco::Vertex& sv,
   }
   tavg /= (float) tracks->size();
   float trange = tmax - tmin;
-  Measurement1D dxy = getDxy(sv, primaryVertex);
-  Measurement1D d3d = getD3d(sv, primaryVertex);
+  Measurement1D dxy = vertexntuples::dxy(sv, primaryVertex);
+  Measurement1D d3d = vertexntuples::d3d(sv, primaryVertex);
 
   x_ = sv.x();
   y_ = sv.y();
@@ -81,16 +76,16 @@ SecondaryVertex::SecondaryVertex(const reco::Vertex& sv,
   yerr_ = sv.yError();
   zerr_ = sv.zError();
   dxy_ = dxy.value();
-  dz_ = abs(sv.z() - primaryVertex.z());
+  dz_ = vertexntuples::dz(sv, primaryVertex);
   d3d_ = d3d.value();
   dxyerr_ = dxy.error();
-  dzerr_ = TMath::Sqrt(sv.zError()*sv.zError() + primaryVertex.zError()*primaryVertex.zError());
-  d3derr_ = dxy.error();
+  dzerr_ = vertexntuples::dzErr(sv, primaryVertex);
+  d3derr_ = d3d.error();
   dxysig_ = dxy.significance();
-  dzsig_ = dz_ == 0.0 ? 0.0 : dz_ / dzerr_;
+  dzsig_ = dz_ / dzerr_;
   d3dsig_ = d3d.significance();
   pt_ = sv.p4().Pt();
-  pt2_ = sv.p4().Pt()*sv.p4().Pt();
+  pt2_ = sv.p4().Pt() * sv.p4().Pt();
   eta_ = sv.p4().Eta();
   phi_ = sv.p4().Phi();
   tavg_ = tavg;
@@ -156,18 +151,4 @@ void SecondaryVertex::fill(std::map<TString, TH1F*>& histos, TString prefix) {
   histos[prefix + "_ndof"]->Fill(nDOF());
   histos[prefix + "_chi2dof"]->Fill(chi2DOF());
   histos[prefix + "_ntrk"]->Fill(nTracks());
-}
-
-
-Measurement1D SecondaryVertex::getDxy(const reco::Vertex sv, const reco::Vertex pv) {
-
-  VertexDistanceXY dist;
-  return dist.distance(sv, pv);
-}
-
-
-Measurement1D SecondaryVertex::getD3d(const reco::Vertex sv, const reco::Vertex pv) {
-
-  VertexDistance3D dist;
-  return dist.distance(sv, pv);
 }

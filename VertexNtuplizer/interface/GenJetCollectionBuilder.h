@@ -1,5 +1,5 @@
-#ifndef GEN_JET_COLLECTION_BUILDER
-#define GEN_JET_COLLECTION_BUILDER
+#ifndef VertexNtuples_VertexNtuplizer_GenJetCollectionBuilder_h
+#define VertexNtuples_VertexNtuplizer_GenJetCollectionBuilder_h
 
 
 #include <algorithm>

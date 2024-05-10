@@ -36,6 +36,7 @@ class SecondaryVertexCollectionBuilder {
   private:
 
     template <class T> bool goodRecoTrack(const T& trkRef);
+    static bool compareDxySig(const SecondaryVertex& sva, const SecondaryVertex& svb);
 
     double absEtaMax_;
     double trkPtMin_;

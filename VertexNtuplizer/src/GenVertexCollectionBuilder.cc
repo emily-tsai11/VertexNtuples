@@ -72,6 +72,12 @@ void GenVertexCollectionBuilder::build(const edm::Event& iEvent,
       }
     }
   } // End loop over all gen particles
+
+  // Sort collections
+  std::sort(genVertices_.begin(), genVertices_.end(), compareDxySig);
+  std::sort(genVerticesSimMatch_.begin(), genVerticesSimMatch_.end(), compareDxySig);
+  std::sort(genVerticesNoNu_.begin(), genVerticesNoNu_.end(), compareDxySig);
+  std::sort(genVerticesNoNuSimMatch_.begin(), genVerticesNoNuSimMatch_.end(), compareDxySig);
 }
 
 
@@ -162,4 +168,10 @@ int GenVertexCollectionBuilder::genPartID(int pdgId) {
   //   (checkPdgId == 3312) ||
   //   (checkPdgId == 3334)) return 4;
   return -1;
+}
+
+
+bool GenVertexCollectionBuilder::compareDxySig(const GenVertex& gva, const GenVertex& gvb) {
+
+  return gvb.dxySig() < gva.dxySig();
 }

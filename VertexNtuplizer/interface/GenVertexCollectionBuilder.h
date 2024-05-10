@@ -36,10 +36,11 @@ class GenVertexCollectionBuilder {
 
   private:
 
-    int genPartID(int pdgId);
     template <class P> bool goodGenParticle(const P* gp, double ptCut);
     template <class P> bool matchGenToSimTrack(const P* gp, const SimTrack& st);
     bool matchGenToSimVertex(const GenVertex& gv);
+    int genPartID(int pdgId);
+    static bool compareDxySig(const GenVertex& gva, const GenVertex& gvb);
 
     double absEtaMax_;
     double genMotherPtMin_;

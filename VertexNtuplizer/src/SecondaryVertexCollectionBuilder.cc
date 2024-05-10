@@ -57,6 +57,10 @@ void SecondaryVertexCollectionBuilder::build(const edm::Event& iEvent,
         trackTimeValueMap_, trackTimeErrorMap_, trackTimeQualityMap_);
     secondaryVerticesMTDTiming_.push_back(newSV);
   } // End loop over original SV collection with MTD timing
+
+  // Sort collections
+  std::sort(secondaryVertices_.begin(), secondaryVertices_.end(), compareDxySig);
+  std::sort(secondaryVerticesMTDTiming_.begin(), secondaryVerticesMTDTiming_.end(), compareDxySig);
 }
 
 
@@ -72,4 +76,10 @@ bool SecondaryVertexCollectionBuilder::goodRecoTrack(const T& trkRef) {
       // if (trackTimeQualityMap_[trkRef] < trkTimeQualityCut_) trkPass = false;
     }
     return trkPass;
+}
+
+
+bool SecondaryVertexCollectionBuilder::compareDxySig(const SecondaryVertex& sva, const SecondaryVertex& svb) {
+
+  return svb.dxySig() < sva.dxySig();
 }

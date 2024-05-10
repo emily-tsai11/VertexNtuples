@@ -89,6 +89,9 @@ class VertexNtuplizer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
     std::vector<TString> rj_names_;
     std::vector<TString> gj_names_;
 
+    std::map<TString, std::vector<float>> vars1_;
+    std::map<TString, std::vector<float>> vars2_;
+
     std::map<TString, TH1F*> histos1_;
     std::map<TString, TH2F*> histos2_;
 };
@@ -149,66 +152,63 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   const unsigned int nclus_ = 200;
   const unsigned int njet_ = 20;
 
-  std::map<TString, std::vector<float>> vars1_ = {
-    std::make_pair("tval", std::vector<float>{(float) nbins_, -0.8, 0.8}),
-    std::make_pair("terr", std::vector<float>{(float) nbins_, 0.0, 0.1}),
-    std::make_pair("tsig", std::vector<float>{(float) nbins_, -50.0, 50.0}),
-    std::make_pair("tqual", std::vector<float>{(float) nbins_, 0.0, 1.0}),
-    std::make_pair("tavg", std::vector<float>{(float) nbins_, -0.8, 0.8}),
-    std::make_pair("trange", std::vector<float>{(float) nbins_, 0.0, 0.8}),
-    std::make_pair("pt", std::vector<float>{(float) nbins_, 0.0, 200.0}),
-    std::make_pair("pt2", std::vector<float>{(float) nbins_, 0.0, 200.0}),
-    std::make_pair("eta", std::vector<float>{(float) nbins_, -3.1, 3.1}),
-    std::make_pair("phi", std::vector<float>{(float) nbins_, -3.15, 3.15}),
-    std::make_pair("charge", std::vector<float>{(float) 5, -2.0, 3.0}),
-    std::make_pair("motherPdgId", std::vector<float>{(float) nbins_, -5560.0, 5560.0}),
-    std::make_pair("pdgIdBin", std::vector<float>{4, 0.0, 4.0}),
-    std::make_pair("hadFlav", std::vector<float>{7, 0.0, 7.0}),
-    std::make_pair("chi2", std::vector<float>{(float) nbins_, 0.0, 100.0}),
-    std::make_pair("ndof", std::vector<float>{(float) nbins_, 0.0, 10.0}),
-    std::make_pair("chi2dof", std::vector<float>{(float) nbins_, 0.0, 10.0}),
-    std::make_pair("ntrk", std::vector<float>{(float) nbins_, 0.0, 10.0}), // Daughters for GenVertex
-    // From origin
-    std::make_pair("x", std::vector<float>{(float) nbins_, -1.0, 1.0}),
-    std::make_pair("y", std::vector<float>{(float) nbins_, -1.0, 1.0}),
-    std::make_pair("z", std::vector<float>{(float) nbins_, -20.0, 20.0}),
-    std::make_pair("xerr", std::vector<float>{(float) nbins_, -7.0, 7.0}),
-    std::make_pair("yerr", std::vector<float>{(float) nbins_, -7.0, 7.0}),
-    std::make_pair("zerr", std::vector<float>{(float) nbins_, -7.0, 7.0}),
-    // From primary vertex
-    std::make_pair("dxy", std::vector<float>{(float) nbins_, 0.0, 10.0}),
-    std::make_pair("dz", std::vector<float>{(float) nbins_, 0.0, 20.0}),
-    std::make_pair("d3d", std::vector<float>{(float) nbins_, 0.0, 20.0}),
-    std::make_pair("dxyerr", std::vector<float>{(float) nbins_, 0.0, 0.1}),
-    std::make_pair("dzerr", std::vector<float>{(float) nbins_, 0.0, 0.1}),
-    std::make_pair("d3derr", std::vector<float>{(float) nbins_, 0.0, 0.1}),
-    std::make_pair("dxysig", std::vector<float>{(float) nbins_, 0.0, 3000.0}),
-    std::make_pair("dzsig", std::vector<float>{(float) nbins_, 0.0, 1000.0}),
-    std::make_pair("d3dsig", std::vector<float>{(float) nbins_, 0.0, 1000.0}),
-    // Between matched GenVertex and SecondaryVertex
-    std::make_pair("xres", std::vector<float>{(float) nbins_, -0.15, 0.15}),
-    std::make_pair("yres", std::vector<float>{(float) nbins_, -0.15, 0.15}),
-    std::make_pair("zres", std::vector<float>{(float) nbins_, -0.15, 0.15}),
-    std::make_pair("xpull", std::vector<float>{(float) nbins_, -10.0, 10.0}),
-    std::make_pair("ypull", std::vector<float>{(float) nbins_, -10.0, 10.0}),
-    std::make_pair("zpull", std::vector<float>{(float) nbins_, -10.0, 10.0}),
-    std::make_pair("matchdxy", std::vector<float>{(float) nbins_, -10.0, 10.0}),
-    std::make_pair("matchd3d", std::vector<float>{(float) nbins_, -20.0, 20.0}),
-    std::make_pair("matchdxyerr", std::vector<float>{(float) nbins_, -10.0, 10.0}),
-    std::make_pair("matchd3derr", std::vector<float>{(float) nbins_, -10.0, 10.0}),
-    std::make_pair("matchdxysig", std::vector<float>{(float) nbins_, -10.0, 10.0}),
-    std::make_pair("matchd3dsig", std::vector<float>{(float) nbins_, -10.0, 10.0})
-  };
+  vars1_["tval"] = std::vector<float>{(float) nbins_, -0.8, 0.8};
+  vars1_["terr"] = std::vector<float>{(float) nbins_, 0.0, 0.1};
+  vars1_["tsig"] = std::vector<float>{(float) nbins_, -50.0, 50.0};
+  vars1_["tqual"] = std::vector<float>{(float) nbins_, 0.0, 1.0};
+  vars1_["tavg"] = std::vector<float>{(float) nbins_, -0.8, 0.8};
+  vars1_["trange"] = std::vector<float>{(float) nbins_, 0.0, 0.8};
+  vars1_["pt"] = std::vector<float>{(float) nbins_, 0.0, 200.0};
+  vars1_["pt2"] = std::vector<float>{(float) nbins_, 0.0, 200.0};
+  vars1_["eta"] = std::vector<float>{(float) nbins_, -3.1, 3.1};
+  vars1_["phi"] = std::vector<float>{(float) nbins_, -3.15, 3.15};
+  vars1_["charge"] = std::vector<float>{(float) 5, -2.0, 3.0};
+  vars1_["motherPdgId"] = std::vector<float>{(float) nbins_, -5560.0, 5560.0};
+  vars1_["pdgIdBin"] = std::vector<float>{4, 0.0, 4.0};
+  vars1_["hadFlav"] = std::vector<float>{7, 0.0, 7.0};
+  vars1_["chi2"] = std::vector<float>{(float) nbins_, 0.0, 100.0};
+  vars1_["ndof"] = std::vector<float>{(float) nbins_, 0.0, 10.0};
+  vars1_["chi2dof"] = std::vector<float>{(float) nbins_, 0.0, 10.0};
+  vars1_["ntrk"] = std::vector<float>{(float) nbins_, 0.0, 10.0}; // Daughters for GenVertex
+  // From origin
+  vars1_["x"] = std::vector<float>{(float) nbins_, -1.0, 1.0};
+  vars1_["y"] = std::vector<float>{(float) nbins_, -1.0, 1.0};
+  vars1_["z"] = std::vector<float>{(float) nbins_, -20.0, 20.0};
+  vars1_["xerr"] = std::vector<float>{(float) nbins_, -7.0, 7.0};
+  vars1_["yerr"] = std::vector<float>{(float) nbins_, -7.0, 7.0};
+  vars1_["zerr"] = std::vector<float>{(float) nbins_, -7.0, 7.0};
+  // From primary vertex
+  vars1_["dxy"] = std::vector<float>{(float) nbins_, 0.0, 10.0};
+  vars1_["dz"] = std::vector<float>{(float) nbins_, 0.0, 20.0};
+  vars1_["d3d"] = std::vector<float>{(float) nbins_, 0.0, 20.0};
+  vars1_["dxyerr"] = std::vector<float>{(float) nbins_, 0.0, 0.1};
+  vars1_["dzerr"] = std::vector<float>{(float) nbins_, 0.0, 0.1};
+  vars1_["d3derr"] = std::vector<float>{(float) nbins_, 0.0, 0.1};
+  vars1_["dxysig"] = std::vector<float>{(float) nbins_, 0.0, 3000.0};
+  vars1_["dzsig"] = std::vector<float>{(float) nbins_, 0.0, 1000.0};
+  vars1_["d3dsig"] = std::vector<float>{(float) nbins_, 0.0, 1000.0};
+  // Between matched GenVertex and SecondaryVertex
+  vars1_["xres"] = std::vector<float>{(float) nbins_, -0.15, 0.15};
+  vars1_["yres"] = std::vector<float>{(float) nbins_, -0.15, 0.15};
+  vars1_["zres"] = std::vector<float>{(float) nbins_, -0.15, 0.15};
+  vars1_["xpull"] = std::vector<float>{(float) nbins_, -10.0, 10.0};
+  vars1_["ypull"] = std::vector<float>{(float) nbins_, -10.0, 10.0};
+  vars1_["zpull"] = std::vector<float>{(float) nbins_, -10.0, 10.0};
+  vars1_["matchdxy"] = std::vector<float>{(float) nbins_, 0.0, 10.0};
+  vars1_["matchd3d"] = std::vector<float>{(float) nbins_, 0.0, 20.0};
+  vars1_["matchdxyerr"] = std::vector<float>{(float) nbins_, 0.0, 0.1};
+  vars1_["matchd3derr"] = std::vector<float>{(float) nbins_, 0.0, 0.1};
+  vars1_["matchdxysig"] = std::vector<float>{(float) nbins_, 0.0, 3000.0};
+  vars1_["matchd3dsig"] = std::vector<float>{(float) nbins_, 0.0, 1000.0};
 
-  std::map<TString, std::vector<float>> vars2_ = {
-    std::make_pair("trange_pt", std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 200.0}),
-    std::make_pair("trange_pt2", std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 200.0}),
-    std::make_pair("trange_dxy", std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 10.0}),
-    std::make_pair("trange_dxysig", std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 3000.0}),
-    std::make_pair("trange_d3d", std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 20.0}),
-    std::make_pair("trange_d3dsig", std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 1000.0})
-  };
+  vars2_["trange_pt"] = std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 200.0};
+  vars2_["trange_pt2"] = std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 200.0};
+  vars2_["trange_dxy"] = std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 10.0};
+  vars2_["trange_dxysig"] = std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 3000.0};
+  vars2_["trange_d3d"] = std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 20.0};
+  vars2_["trange_d3dsig"] = std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 1000.0};
 
+  // Count histograms
   for (TString gv_name : gv_names_) {
     TString name = "n" + gv_name;
     histos1_[name] = fs->make<TH1F>(name, name, nvtx_, 0, nvtx_);
@@ -234,6 +234,7 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
     histos1_[name]->Sumw2();
   }
 
+  // 1D histograms
   for (TString obj : objs_) {
     for (const auto& iter : vars1_) {
       TString name = obj + "_" + iter.first;
@@ -242,6 +243,7 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
     }
   }
 
+  // 2D histograms
   for (TString obj : sv_names_) {
     for (const auto& iter : vars2_) {
       TString name = obj + "_" + iter.first;
@@ -250,25 +252,39 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
     }
   }
 
+  // Matching histograms
   for (TString obj1 : objs_) {
     for (TString obj2 : objs_) {
       if (obj1.BeginsWith("gv") && obj2.BeginsWith("gv")) continue;
       if (obj1.BeginsWith("sv") && obj2.BeginsWith("sv")) continue;
       if (obj1.BeginsWith("rj") && obj2.BeginsWith("rj")) continue;
       if (obj1.BeginsWith("gj") && obj2.BeginsWith("gj")) continue;
-      if (obj1.EndsWith("_trk")) continue;
       if (obj1.EndsWith("_trk") && obj2.EndsWith("_trk")) continue;
+      if (obj1.EndsWith("_trk")) continue;
+
+      // 1D histograms
       for (const auto& iter : vars1_) {
         TString name = obj1 + "_" + obj2 + "_" + iter.first;
         histos1_[name] = fs->make<TH1F>(name, name, iter.second[0], iter.second[1], iter.second[2]);
         histos1_[name]->Sumw2();
       }
 
-      if (!obj1.BeginsWith("sv")) continue;
-      for (const auto& iter : vars2_) {
-        TString name = obj1 + "_" + obj2 + "_" + iter.first;
-        histos2_[name] = fs->make<TH2F>(name, name, iter.second[0], iter.second[1], iter.second[2], iter.second[3], iter.second[4], iter.second[5]);
-        histos2_[name]->Sumw2();
+      // 2D histograms
+      if (obj1.BeginsWith("sv")) {
+        for (const auto& iter : vars2_) {
+          TString name = obj1 + "_" + obj2 + "_" + iter.first;
+          histos2_[name] = fs->make<TH2F>(name, name, iter.second[0], iter.second[1], iter.second[2], iter.second[3], iter.second[4], iter.second[5]);
+          histos2_[name]->Sumw2();
+        }
+      }
+
+      // Efficiency histograms
+      if (obj1.BeginsWith("gv") && obj2.BeginsWith("sv")) {
+        for (const auto& iter : vars1_) {
+          TString name = obj1 + "_" + obj2 + "_" + iter.first + "_eff";
+          histos1_[name] = fs->make<TH1F>(name, name, iter.second[0], iter.second[1], iter.second[2]);
+          histos1_[name]->Sumw2();
+        }
       }
     }
   }
@@ -339,6 +355,7 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
             gv.fill(histos1_, gv_name);
             sv.fill(histos1_, histos2_, sv_name);
             matcher_->fill(histos1_, gv_name, sv_name, gv, sv);
+            break; // Restrict to only one match
           }
         }
       }
@@ -350,7 +367,65 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 void VertexNtuplizer::beginJob() {}
 
 
-void VertexNtuplizer::endJob() {}
+void VertexNtuplizer::endJob() {
+
+  // Calculate efficiencies
+  for (TString gv_name : gv_names_) {
+    for (TString sv_name : sv_names_) {
+      for (const auto& iter : vars1_) {
+        TString nameNum = gv_name + "_" + sv_name + "_" + iter.first;
+        TString nameDen = gv_name + "_" + iter.first;
+        TString nameEff = gv_name + "_" + sv_name + "_" + iter.first + "_eff";
+        if (histos1_[nameDen]->GetEntries() == 0) continue;
+        histos1_[nameEff]->Divide(histos1_[nameNum], histos1_[nameDen], 1.0, 1.0, "B");
+      }
+    }
+  }
+
+  // Catch under and over flows
+  for (auto iter : histos1_) {
+    int nBins = iter.second->GetNbinsX();
+    float firstBinContent = iter.second->GetBinContent(0) + iter.second->GetBinContent(1);
+    float firstBinError = TMath::Sqrt(iter.second->GetBinError(0) * iter.second->GetBinError(0) +
+        iter.second->GetBinError(1) * iter.second->GetBinError(1));
+    float lastBinContent = iter.second->GetBinContent(nBins) + iter.second->GetBinContent(nBins + 1);
+    float lastBinError = TMath::Sqrt(iter.second->GetBinError(nBins) * iter.second->GetBinError(nBins) +
+        iter.second->GetBinError(nBins + 1) * iter.second->GetBinError(nBins + 1));
+    iter.second->SetBinContent(1, firstBinContent);
+    iter.second->SetBinError(1, firstBinError);
+    iter.second->SetBinContent(nBins, lastBinContent);
+    iter.second->SetBinError(nBins, lastBinError);
+  }
+
+  for (auto iter : histos2_) {
+    int nBinsX = iter.second->GetNbinsX();
+    int nBinsY = iter.second->GetNbinsY();
+    for (int iBinX = 1; iBinX <= nBinsX; iBinX++) {
+      float firstBinContent = iter.second->GetBinContent(iBinX, 0) + iter.second->GetBinContent(iBinX, 1);
+      float firstBinError = TMath::Sqrt(iter.second->GetBinError(iBinX, 0) * iter.second->GetBinError(iBinX, 0) +
+          iter.second->GetBinError(iBinX, 1) * iter.second->GetBinError(iBinX, 1));
+      float lastBinContent = iter.second->GetBinContent(iBinX, nBinsY) + iter.second->GetBinContent(iBinX, nBinsY + 1);
+      float lastBinError = TMath::Sqrt(iter.second->GetBinError(iBinX, nBinsY) * iter.second->GetBinError(iBinX, nBinsY) +
+          iter.second->GetBinError(iBinX, nBinsY + 1) * iter.second->GetBinError(iBinX, nBinsY + 1));
+      iter.second->SetBinContent(iBinX, 1, firstBinContent);
+      iter.second->SetBinError(iBinX, 1, firstBinError);
+      iter.second->SetBinContent(iBinX, nBinsY, lastBinContent);
+      iter.second->SetBinError(iBinX, nBinsY, lastBinError);
+    }
+    for (int iBinY = 1; iBinY <= nBinsY; iBinY++) {
+      float firstBinContent = iter.second->GetBinContent(0, iBinY) + iter.second->GetBinContent(1, iBinY);
+      float firstBinError = TMath::Sqrt(iter.second->GetBinError(0, iBinY) * iter.second->GetBinError(0, iBinY) +
+          iter.second->GetBinError(1, iBinY) * iter.second->GetBinError(1, iBinY));
+      float lastBinContent = iter.second->GetBinContent(nBinsX, iBinY) + iter.second->GetBinContent(nBinsX + 1, iBinY);
+      float lastBinError = TMath::Sqrt(iter.second->GetBinError(nBinsX, iBinY) * iter.second->GetBinError(nBinsX, iBinY) +
+          iter.second->GetBinError(nBinsX + 1, iBinY) * iter.second->GetBinError(nBinsX + 1, iBinY));
+      iter.second->SetBinContent(1, iBinY, firstBinContent);
+      iter.second->SetBinError(1, iBinY, firstBinError);
+      iter.second->SetBinContent(nBinsX, iBinY, lastBinContent);
+      iter.second->SetBinError(nBinsX, iBinY, lastBinError);
+    }
+  }
+}
 
 
 void VertexNtuplizer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {

@@ -13,6 +13,9 @@ sampleName = "TTToHadronic_noPU"
 dRfix = 5.0
 pTfix = 5.0
 
+savePath = "/eos/home-b/btvweb/www/Offline/Phase2/etsai/Phase2/CutScan/"
+labels = ["GV-SV", "GV-SVt", "GVs-SV", "GVs-SVt", "GVn-SV", "GVn-SVt", "GVns-SV", "GVns-SVt"]
+
 dR = []
 dReff = [[], [], [], [], [], [], [], []]
 dRdxy = [[], [], [], [], [], [], [], []]
@@ -162,19 +165,18 @@ for i in range(len(pTeff)):
 # print(pTeff[6])
 # print(pTeff[7])
 
-labels = ["GV-SV", "GV-SVt", "GVs-SV", "GVs-SVt", "GVn-SV", "GVn-SVt", "GVns-SV", "GVns-SVt"]
-
 plt.figure()
 for i in range(8):
   plt.plot(dR, dReff[i], marker=".", linestyle="-", markersize=15, label=labels[i])
 plt.legend()
 plt.xlim(-0.1, pTfix + 0.1)
 plt.ylim(0.0, 1.2)
-plt.xlabel("$\Delta R$ cut [cm]")
-plt.ylabel("Matching efficiency at $p_{T}$ ratio cut = %.1f" % pTfix)
+plt.xlabel("$\Delta R$ cut [cm] with $p_{T}$ ratio cut = %.1f" % pTfix)
+plt.ylabel("Matching efficiency")
 hep.style.use("CMS")
 hep.cms.label("Private Work", data=False, rlabel="%s, %d events" % (sample, nevents), fontsize=22)
-plt.savefig(sampleName + "_dReff.pdf", bbox_inches="tight")
+plt.savefig(savePath + sampleName + "_dReff.png", bbox_inches="tight")
+plt.savefig(savePath + sampleName + "_dReff.pdf", bbox_inches="tight")
 plt.close()
 
 plt.figure()
@@ -182,11 +184,13 @@ for i in range(8):
   plt.errorbar(dR, dRdxy[i], yerr=dRdxyerr[i], marker=".", linestyle="-", markersize=15, label=labels[i])
 plt.legend()
 plt.xlim(-0.1, pTfix + 0.1)
-plt.xlabel("$\Delta R$ cut [cm]")
-plt.ylabel("Match $d_{xy}$ [cm] at $p_{T}$ ratio cut = %.1f" % pTfix)
+plt.ylim(0.0, 1.85)
+plt.xlabel("$\Delta R$ cut [cm] with $p_{T}$ ratio cut = %.1f" % pTfix)
+plt.ylabel("Match <$d_{xy}$> [cm]")
 hep.style.use("CMS")
 hep.cms.label("Private Work", data=False, rlabel="%s, %d events" % (sample, nevents), fontsize=22)
-plt.savefig(sampleName + "_dRdxy.pdf", bbox_inches="tight")
+plt.savefig(savePath + sampleName + "_dRdxy.png", bbox_inches="tight")
+plt.savefig(savePath + sampleName + "_dRdxy.pdf", bbox_inches="tight")
 plt.close()
 
 plt.figure()
@@ -194,11 +198,13 @@ for i in range(8):
   plt.errorbar(dR, dRd3d[i], yerr=dRd3derr[i], marker=".", linestyle="-", markersize=15, label=labels[i])
 plt.legend()
 plt.xlim(-0.1, pTfix + 0.1)
-plt.xlabel("$\Delta R$ cut [cm]")
-plt.ylabel("Match $d_{3D}$ [cm] at $p_{T}$ ratio cut = %.1f" % pTfix)
+plt.ylim(0.0, 1.85)
+plt.xlabel("$\Delta R$ cut [cm] with $p_{T}$ ratio cut = %.1f" % pTfix)
+plt.ylabel("Match <$d_{3D}$> [cm]")
 hep.style.use("CMS")
 hep.cms.label("Private Work", data=False, rlabel="%s, %d events" % (sample, nevents), fontsize=22)
-plt.savefig(sampleName + "_dRd3d.pdf", bbox_inches="tight")
+plt.savefig(savePath + sampleName + "_dRd3d.png", bbox_inches="tight")
+plt.savefig(savePath + sampleName + "_dRd3d.pdf", bbox_inches="tight")
 plt.close()
 
 plt.figure()
@@ -207,11 +213,12 @@ for i in range(8):
 plt.legend()
 plt.xlim(-0.1, dRfix + 0.1)
 plt.ylim(0.0, 1.2)
-plt.xlabel("$p_{T}$ ratio cut")
-plt.ylabel("Matching efficiency at $\Delta R$ cut = %.1f cm" % dRfix)
+plt.xlabel("$p_{T}$ ratio cut with $\Delta R$ cut = %.1f [cm]" % dRfix)
+plt.ylabel("Matching efficiency")
 hep.style.use("CMS")
 hep.cms.label("Private Work", data=False, rlabel="%s, %d events" % (sample, nevents), fontsize=22)
-plt.savefig(sampleName + "_pTeff.pdf", bbox_inches="tight")
+plt.savefig(savePath + sampleName + "_pTeff.png", bbox_inches="tight")
+plt.savefig(savePath + sampleName + "_pTeff.pdf", bbox_inches="tight")
 plt.close()
 
 plt.figure()
@@ -219,11 +226,13 @@ for i in range(8):
   plt.errorbar(pT, pTdxy[i], yerr=pTdxyerr[i], marker=".", linestyle="-", markersize=15, label=labels[i])
 plt.legend()
 plt.xlim(-0.1, dRfix + 0.1)
-plt.xlabel("$p_{T}$ ratio cut")
-plt.ylabel("Match $d_{xy}$ [cm] at $\Delta R$ cut = %.1f cm" % dRfix)
+plt.ylim(0.0, 1.85)
+plt.xlabel("$p_{T}$ ratio cut with $\Delta R$ cut = %.1f [cm]" % dRfix)
+plt.ylabel("Match <$d_{xy}$> [cm]")
 hep.style.use("CMS")
 hep.cms.label("Private Work", data=False, rlabel="%s, %d events" % (sample, nevents), fontsize=22)
-plt.savefig(sampleName + "_pTdxy.pdf", bbox_inches="tight")
+plt.savefig(savePath + sampleName + "_pTdxy.png", bbox_inches="tight")
+plt.savefig(savePath + sampleName + "_pTdxy.pdf", bbox_inches="tight")
 plt.close()
 
 plt.figure()
@@ -231,9 +240,11 @@ for i in range(8):
   plt.errorbar(pT, pTd3d[i], yerr=pTd3derr[i], marker=".", linestyle="-", markersize=15, label=labels[i])
 plt.legend()
 plt.xlim(-0.1, dRfix + 0.1)
-plt.xlabel("$p_{T}$ ratio cut")
-plt.ylabel("Match $d_{3D}$ [cm] at $\Delta R$ cut = %.1f cm" % dRfix)
+plt.ylim(0.0, 1.85)
+plt.xlabel("$p_{T}$ ratio cut with $\Delta R$ cut = %.1f [cm]" % dRfix)
+plt.ylabel("Match <$d_{3D}$> [cm]")
 hep.style.use("CMS")
 hep.cms.label("Private Work", data=False, rlabel="%s, %d events" % (sample, nevents), fontsize=22)
-plt.savefig(sampleName + "_pTd3d.pdf", bbox_inches="tight")
+plt.savefig(savePath + sampleName + "_pTd3d.png", bbox_inches="tight")
+plt.savefig(savePath + sampleName + "_pTd3d.pdf", bbox_inches="tight")
 plt.close()

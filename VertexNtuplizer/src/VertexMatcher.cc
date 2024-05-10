@@ -46,7 +46,7 @@ bool VertexMatcher::vtxTrackMatch(GenVertex& gv, SecondaryVertex& sv) {
       }
     }
   }
-  return (nmatch/(float)gv.nDaughters()) >= vtxMatchFrac_;
+  return (nmatch / (float)gv.nDaughters()) >= vtxMatchFrac_;
 }
 
 

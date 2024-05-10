@@ -40,7 +40,7 @@ class GenVertexCollectionBuilder {
     template <class P> bool matchGenToSimTrack(const P* gp, const SimTrack& st);
     bool matchGenToSimVertex(const GenVertex& gv);
     int genPartID(int pdgId);
-    static bool compareDxySig(const GenVertex& gva, const GenVertex& gvb);
+    static bool compare(const GenVertex& gva, const GenVertex& gvb);
 
     double absEtaMax_;
     double genMotherPtMin_;

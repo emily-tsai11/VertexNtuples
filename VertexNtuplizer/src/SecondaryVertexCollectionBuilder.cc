@@ -59,8 +59,8 @@ void SecondaryVertexCollectionBuilder::build(const edm::Event& iEvent,
   } // End loop over original SV collection with MTD timing
 
   // Sort collections
-  // std::sort(secondaryVertices_.begin(), secondaryVertices_.end(), compareDxySig);
-  // std::sort(secondaryVerticesMTDTiming_.begin(), secondaryVerticesMTDTiming_.end(), compareDxySig);
+  // std::sort(secondaryVertices_.begin(), secondaryVertices_.end(), compare);
+  // std::sort(secondaryVerticesMTDTiming_.begin(), secondaryVerticesMTDTiming_.end(), compare);
 }
 
 
@@ -79,7 +79,7 @@ bool SecondaryVertexCollectionBuilder::goodRecoTrack(const T& trkRef) {
 }
 
 
-bool SecondaryVertexCollectionBuilder::compareDxySig(const SecondaryVertex& sva, const SecondaryVertex& svb) {
+bool SecondaryVertexCollectionBuilder::compare(const SecondaryVertex& sva, const SecondaryVertex& svb) {
 
-  return svb.dxySig() < sva.dxySig();
+  return svb.d3d() < sva.d3d();
 }

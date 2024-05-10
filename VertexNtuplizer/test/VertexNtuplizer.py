@@ -11,8 +11,7 @@ options.register("maxEvents",   -1,      VarParsing.VarParsing.multiplicity.sing
 options.register("reportEvery", 100,     VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int,    "Report every N events")
 options.register("run2",        False,   VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool,   "Sets |eta| to max 2.5 for 2018 tracker coverage")
 options.register("scanCuts",    False,   VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool,   "Scan pT and dR cuts")
-if hasattr(sys, "argv"):
-  options.parseArguments()
+options.parseArguments()
 
 
 # Poor man's solution because the "RECREATE" option is not working to delete the output ROOT file for some reason

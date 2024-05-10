@@ -117,10 +117,8 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
     genJetsFlavourInfoToken_(consumes<reco::JetFlavourInfoMatchingCollection>(iConfig.getUntrackedParameter<edm::InputTag>("genJetsFlavourInfo"))) {
 
   scanCuts_ = iConfig.getUntrackedParameter<bool>("scanCuts");
-  if (scanCuts_) {
-    trkMatchDrCut_ = iConfig.getUntrackedParameter<double>("recoTrkMatchDrCut");
-    trkMatchPtCut_ = iConfig.getUntrackedParameter<double>("recoTrkMatchPtCut");
-  }
+  trkMatchDrCut_ = iConfig.getUntrackedParameter<double>("recoTrkMatchDrCut");
+  trkMatchPtCut_ = iConfig.getUntrackedParameter<double>("recoTrkMatchPtCut");
 
   gvc_ = new GenVertexCollectionBuilder(iConfig);
   svc_ = new SecondaryVertexCollectionBuilder(iConfig);
@@ -424,6 +422,19 @@ void VertexNtuplizer::endJob() {
     std::cout << "gvns_svt: " << histos1_["gvns_svt_pt"]->GetEntries() / histos1_["gvns_pt"]->GetEntries() << " "
         << histos1_["gvns_svt_matchdxy"]->GetMean() << " " << histos1_["gvns_svt_matchdxy"]->GetMeanError() << " "
         << histos1_["gvns_svt_matchd3d"]->GetMean() << " " << histos1_["gvns_svt_matchd3d"]->GetMeanError() << std::endl;
+  } else {
+    // Print summary
+    std::cout << "Efficiencies:" << std::endl;
+    std::cout << "trkMatchDrCut = " << trkMatchDrCut_ << " cm" << std::endl;
+    std::cout << "trkMatchPtCut = " << trkMatchPtCut_ << std::endl;
+    std::cout << "GV-SV efficiency = " << histos1_["gv_sv_pt"]->GetEntries() / histos1_["gv_pt"]->GetEntries() << std::endl;
+    std::cout << "GV-SVt efficiency = " << histos1_["gv_svt_pt"]->GetEntries() / histos1_["gv_pt"]->GetEntries() << std::endl;
+    std::cout << "GVs-SV efficiency = " << histos1_["gvs_sv_pt"]->GetEntries() / histos1_["gvs_pt"]->GetEntries() << std::endl;
+    std::cout << "GVs-SVt efficiency = " << histos1_["gvs_svt_pt"]->GetEntries() / histos1_["gvs_pt"]->GetEntries() << std::endl;
+    std::cout << "GVn-SV efficiency = " << histos1_["gvn_sv_pt"]->GetEntries() / histos1_["gvn_pt"]->GetEntries() << std::endl;
+    std::cout << "GVn-SVt efficiency = " << histos1_["gvn_svt_pt"]->GetEntries() / histos1_["gvn_pt"]->GetEntries() << std::endl;
+    std::cout << "GVns-SV efficiency = " << histos1_["gvns_sv_pt"]->GetEntries() / histos1_["gvns_pt"]->GetEntries() << std::endl;
+    std::cout << "GVns-SVt efficiency = " << histos1_["gvns_svt_pt"]->GetEntries() / histos1_["gvns_pt"]->GetEntries() << std::endl;
   }
 
   // Catch under and over flows

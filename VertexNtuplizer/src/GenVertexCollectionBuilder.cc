@@ -74,10 +74,10 @@ void GenVertexCollectionBuilder::build(const edm::Event& iEvent,
   } // End loop over all gen particles
 
   // Sort collections
-  // std::sort(genVertices_.begin(), genVertices_.end(), compareDxySig);
-  // std::sort(genVerticesSimMatch_.begin(), genVerticesSimMatch_.end(), compareDxySig);
-  // std::sort(genVerticesNoNu_.begin(), genVerticesNoNu_.end(), compareDxySig);
-  // std::sort(genVerticesNoNuSimMatch_.begin(), genVerticesNoNuSimMatch_.end(), compareDxySig);
+  // std::sort(genVertices_.begin(), genVertices_.end(), compare);
+  // std::sort(genVerticesSimMatch_.begin(), genVerticesSimMatch_.end(), compare);
+  // std::sort(genVerticesNoNu_.begin(), genVerticesNoNu_.end(), compare);
+  // std::sort(genVerticesNoNuSimMatch_.begin(), genVerticesNoNuSimMatch_.end(), compare);
 }
 
 
@@ -171,7 +171,7 @@ int GenVertexCollectionBuilder::genPartID(int pdgId) {
 }
 
 
-bool GenVertexCollectionBuilder::compareDxySig(const GenVertex& gva, const GenVertex& gvb) {
+bool GenVertexCollectionBuilder::compare(const GenVertex& gva, const GenVertex& gvb) {
 
-  return gvb.dxySig() < gva.dxySig();
+  return gvb.d3d() < gva.d3d();
 }

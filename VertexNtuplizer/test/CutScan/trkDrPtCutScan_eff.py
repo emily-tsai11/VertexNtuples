@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import mplhep as hep
 hep.style.use("CMS")
 
-sort = False
+sort = "sortD3d"
 
 nevents = 2000
 sample = "$t\\bar{t}$ no PU"
@@ -18,12 +18,8 @@ pTfix = 5.0
 savePath = "/eos/home-b/btvweb/www/Offline/Phase2/etsai/Phase2/CutScan/"
 labels = ["GV-SV", "GV-SVt", "GVs-SV", "GVs-SVt", "GVn-SV", "GVn-SVt", "GVns-SV", "GVns-SVt"]
 
-# Sorting is by dxy significance
-fileName = sampleName + "_cutScan.txt"
-saveName = savePath + sampleName
-if not sort:
-  fileName = sampleName + "_cutScan_noSort.txt"
-  saveName = savePath + sampleName + "_noSort"
+fileName = sampleName + "_cutScan_" + sort + ".txt"
+saveName = savePath + sampleName + "_" + sort
 
 dR = []
 dReff = [[], [], [], [], [], [], [], []]

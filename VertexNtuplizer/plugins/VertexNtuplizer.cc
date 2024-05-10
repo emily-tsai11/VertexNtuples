@@ -94,6 +94,10 @@ class VertexNtuplizer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
 
     std::map<TString, TH1F*> histos1_;
     std::map<TString, TH2F*> histos2_;
+
+    bool scanCuts_;
+    double trkMatchDrCut_;
+    double trkMatchPtCut_;
 };
 
 
@@ -111,6 +115,12 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
     jetsToken_(consumes<pat::JetCollection>(iConfig.getUntrackedParameter<edm::InputTag>("jets"))),
     genJetsToken_(consumes<reco::GenJetCollection>(iConfig.getUntrackedParameter<edm::InputTag>("genJets"))),
     genJetsFlavourInfoToken_(consumes<reco::JetFlavourInfoMatchingCollection>(iConfig.getUntrackedParameter<edm::InputTag>("genJetsFlavourInfo"))) {
+
+  scanCuts_ = iConfig.getUntrackedParameter<bool>("scanCuts");
+  if (scanCuts_) {
+    trkMatchDrCut_ = iConfig.getUntrackedParameter<double>("recoTrkMatchDrCut");
+    trkMatchPtCut_ = iConfig.getUntrackedParameter<double>("recoTrkMatchPtCut");
+  }
 
   gvc_ = new GenVertexCollectionBuilder(iConfig);
   svc_ = new SecondaryVertexCollectionBuilder(iConfig);
@@ -347,9 +357,13 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
   for (unsigned int iGVs = 0; iGVs < GVCollections.size(); iGVs++) {
     for (unsigned int iSVs = 0; iSVs < SVCollections.size(); iSVs++) {
+      std::vector<bool> SVmatched(SVCollections.at(iSVs).size(), false);
       for (GenVertex& gv : GVCollections.at(iGVs)) {
+        int iSV = -1;
         for (SecondaryVertex& sv : SVCollections.at(iSVs)) {
-          if (matcher_->match(gv, sv, TRACK)) {
+          iSV++;
+          if (matcher_->match(gv, sv, TRACK) && !SVmatched.at(iSV)) {
+            SVmatched.at(iSV) = true;
             TString gv_name = gv_names_.at(iGVs) + "_" + sv_names_.at(iSVs);
             TString sv_name = sv_names_.at(iSVs) + "_" + gv_names_.at(iGVs);
             gv.fill(histos1_, gv_name);
@@ -380,6 +394,36 @@ void VertexNtuplizer::endJob() {
         histos1_[nameEff]->Divide(histos1_[nameNum], histos1_[nameDen], 1.0, 1.0, "B");
       }
     }
+  }
+
+  if (scanCuts_) {
+    std::cout << "Efficiencies:" << std::endl;
+    std::cout << "trkMatchDrCut = " << trkMatchDrCut_ << std::endl;
+    std::cout << "trkMatchPtCut = " << trkMatchPtCut_ << std::endl;
+    std::cout << "gv_sv: " << histos1_["gv_sv_pt"]->GetEntries() / histos1_["gv_pt"]->GetEntries() << " "
+        << histos1_["gv_sv_matchdxy"]->GetMean() << " " << histos1_["gv_sv_matchdxy"]->GetMeanError() << " "
+        << histos1_["gv_sv_matchd3d"]->GetMean() << " " << histos1_["gv_sv_matchd3d"]->GetMeanError() << std::endl;
+    std::cout << "gv_svt: " << histos1_["gv_svt_pt"]->GetEntries() / histos1_["gv_pt"]->GetEntries() << " "
+        << histos1_["gv_svt_matchdxy"]->GetMean() << " " << histos1_["gv_svt_matchdxy"]->GetMeanError() << " "
+        << histos1_["gv_svt_matchd3d"]->GetMean() << " " << histos1_["gv_svt_matchd3d"]->GetMeanError() << std::endl;
+    std::cout << "gvs_sv: " << histos1_["gvs_sv_pt"]->GetEntries() / histos1_["gvs_pt"]->GetEntries() << " "
+        << histos1_["gvs_sv_matchdxy"]->GetMean() << " " << histos1_["gvs_sv_matchdxy"]->GetMeanError() << " "
+        << histos1_["gvs_sv_matchd3d"]->GetMean() << " " << histos1_["gvs_sv_matchd3d"]->GetMeanError() << std::endl;
+    std::cout << "gvs_svt: " << histos1_["gvs_svt_pt"]->GetEntries() / histos1_["gvs_pt"]->GetEntries() << " "
+        << histos1_["gvs_svt_matchdxy"]->GetMean() << " " << histos1_["gvs_svt_matchdxy"]->GetMeanError() << " "
+        << histos1_["gvs_svt_matchd3d"]->GetMean() << " " << histos1_["gvs_svt_matchd3d"]->GetMeanError() << std::endl;
+    std::cout << "gvn_sv: " << histos1_["gvn_sv_pt"]->GetEntries() / histos1_["gvn_pt"]->GetEntries() << " "
+        << histos1_["gvn_sv_matchdxy"]->GetMean() << " " << histos1_["gvn_sv_matchdxy"]->GetMeanError() << " "
+        << histos1_["gvn_sv_matchd3d"]->GetMean() << " " << histos1_["gvn_sv_matchd3d"]->GetMeanError() << std::endl;
+    std::cout << "gvn_svt: " << histos1_["gvn_svt_pt"]->GetEntries() / histos1_["gvn_pt"]->GetEntries() << " "
+        << histos1_["gvn_svt_matchdxy"]->GetMean() << " " << histos1_["gvn_svt_matchdxy"]->GetMeanError() << " "
+        << histos1_["gvn_svt_matchd3d"]->GetMean() << " " << histos1_["gvn_svt_matchd3d"]->GetMeanError() << std::endl;
+    std::cout << "gvns_sv: " << histos1_["gvns_sv_pt"]->GetEntries() / histos1_["gvns_pt"]->GetEntries() << " "
+        << histos1_["gvns_sv_matchdxy"]->GetMean() << " " << histos1_["gvns_sv_matchdxy"]->GetMeanError() << " "
+        << histos1_["gvns_sv_matchd3d"]->GetMean() << " " << histos1_["gvns_sv_matchd3d"]->GetMeanError() << std::endl;
+    std::cout << "gvns_svt: " << histos1_["gvns_svt_pt"]->GetEntries() / histos1_["gvns_pt"]->GetEntries() << " "
+        << histos1_["gvns_svt_matchdxy"]->GetMean() << " " << histos1_["gvns_svt_matchdxy"]->GetMeanError() << " "
+        << histos1_["gvns_svt_matchd3d"]->GetMean() << " " << histos1_["gvns_svt_matchd3d"]->GetMeanError() << std::endl;
   }
 
   // Catch under and over flows

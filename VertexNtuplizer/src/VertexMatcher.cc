@@ -3,8 +3,8 @@
 
 VertexMatcher::VertexMatcher(const edm::ParameterSet& iConfig) {
 
-  trkMatchDrCut_ = iConfig.getUntrackedParameter<double>("trkMatchDrCut");
-  trkMatchPtCut_ = iConfig.getUntrackedParameter<double>("trkMatchPtCut");
+  trkMatchDrCut_ = iConfig.getUntrackedParameter<double>("recoTrkMatchDrCut");
+  trkMatchPtCut_ = iConfig.getUntrackedParameter<double>("recoTrkMatchPtCut");
   vtxMatchFrac_ = iConfig.getUntrackedParameter<double>("vtxMatchFrac");
   jetRadius_ = iConfig.getUntrackedParameter<double>("jetRadius");
 }

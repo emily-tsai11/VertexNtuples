@@ -6,8 +6,8 @@ GenVertexCollectionBuilder::GenVertexCollectionBuilder(const edm::ParameterSet& 
   absEtaMax_ = iConfig.getUntrackedParameter<double>("absEtaMax");
   genMotherPtMin_ = iConfig.getUntrackedParameter<double>("genMotherPtMin");
   genDaughterPtMin_ = iConfig.getUntrackedParameter<double>("genDaughterPtMin");
-  drCut_ = iConfig.getUntrackedParameter<double>("trkMatchDrCut");
-  ptCut_ = iConfig.getUntrackedParameter<double>("trkMatchPtCut");
+  drCut_ = iConfig.getUntrackedParameter<double>("simTrkMatchDrCut");
+  ptCut_ = iConfig.getUntrackedParameter<double>("simTrkMatchPtCut");
   matchFrac_ = iConfig.getUntrackedParameter<double>("vtxMatchFrac");
 }
 

@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import mplhep as hep
 hep.style.use("CMS")
 
+sort = False
+
 nevents = 2000
 sample = "$t\\bar{t}$ no PU"
 sampleName = "TTToHadronic_noPU"
@@ -16,6 +18,13 @@ pTfix = 5.0
 savePath = "/eos/home-b/btvweb/www/Offline/Phase2/etsai/Phase2/CutScan/"
 labels = ["GV-SV", "GV-SVt", "GVs-SV", "GVs-SVt", "GVn-SV", "GVn-SVt", "GVns-SV", "GVns-SVt"]
 
+# Sorting is by dxy significance
+fileName = sampleName + "_cutScan.txt"
+saveName = savePath + sampleName
+if not sort:
+  fileName = sampleName + "_cutScan_noSort.txt"
+  saveName = savePath + sampleName + "_noSort"
+
 dR = []
 dReff = [[], [], [], [], [], [], [], []]
 dRdxy = [[], [], [], [], [], [], [], []]
@@ -29,7 +38,7 @@ pTdxyerr = [[], [], [], [], [], [], [], []]
 pTd3d = [[], [], [], [], [], [], [], []]
 pTd3derr = [[], [], [], [], [], [], [], []]
 
-with open(sampleName + "_cutScan.txt") as f:
+with open(fileName) as f:
   line = f.readline().strip()
   while len(line) > 0:
     vals = line.split()
@@ -175,8 +184,8 @@ plt.xlabel("$\Delta R$ cut [cm] with $p_{T}$ ratio cut = %.1f" % pTfix)
 plt.ylabel("Matching efficiency")
 hep.style.use("CMS")
 hep.cms.label("Private Work", data=False, rlabel="%s, %d events" % (sample, nevents), fontsize=22)
-plt.savefig(savePath + sampleName + "_dReff.png", bbox_inches="tight")
-plt.savefig(savePath + sampleName + "_dReff.pdf", bbox_inches="tight")
+plt.savefig(saveName + "_dReff.png", bbox_inches="tight")
+plt.savefig(saveName + "_dReff.pdf", bbox_inches="tight")
 plt.close()
 
 plt.figure()
@@ -189,8 +198,8 @@ plt.xlabel("$\Delta R$ cut [cm] with $p_{T}$ ratio cut = %.1f" % pTfix)
 plt.ylabel("Match <$d_{xy}$> [cm]")
 hep.style.use("CMS")
 hep.cms.label("Private Work", data=False, rlabel="%s, %d events" % (sample, nevents), fontsize=22)
-plt.savefig(savePath + sampleName + "_dRdxy.png", bbox_inches="tight")
-plt.savefig(savePath + sampleName + "_dRdxy.pdf", bbox_inches="tight")
+plt.savefig(saveName + "_dRdxy.png", bbox_inches="tight")
+plt.savefig(saveName + "_dRdxy.pdf", bbox_inches="tight")
 plt.close()
 
 plt.figure()
@@ -203,8 +212,8 @@ plt.xlabel("$\Delta R$ cut [cm] with $p_{T}$ ratio cut = %.1f" % pTfix)
 plt.ylabel("Match <$d_{3D}$> [cm]")
 hep.style.use("CMS")
 hep.cms.label("Private Work", data=False, rlabel="%s, %d events" % (sample, nevents), fontsize=22)
-plt.savefig(savePath + sampleName + "_dRd3d.png", bbox_inches="tight")
-plt.savefig(savePath + sampleName + "_dRd3d.pdf", bbox_inches="tight")
+plt.savefig(saveName + "_dRd3d.png", bbox_inches="tight")
+plt.savefig(saveName + "_dRd3d.pdf", bbox_inches="tight")
 plt.close()
 
 plt.figure()
@@ -217,8 +226,8 @@ plt.xlabel("$p_{T}$ ratio cut with $\Delta R$ cut = %.1f [cm]" % dRfix)
 plt.ylabel("Matching efficiency")
 hep.style.use("CMS")
 hep.cms.label("Private Work", data=False, rlabel="%s, %d events" % (sample, nevents), fontsize=22)
-plt.savefig(savePath + sampleName + "_pTeff.png", bbox_inches="tight")
-plt.savefig(savePath + sampleName + "_pTeff.pdf", bbox_inches="tight")
+plt.savefig(saveName + "_pTeff.png", bbox_inches="tight")
+plt.savefig(saveName + "_pTeff.pdf", bbox_inches="tight")
 plt.close()
 
 plt.figure()
@@ -231,8 +240,8 @@ plt.xlabel("$p_{T}$ ratio cut with $\Delta R$ cut = %.1f [cm]" % dRfix)
 plt.ylabel("Match <$d_{xy}$> [cm]")
 hep.style.use("CMS")
 hep.cms.label("Private Work", data=False, rlabel="%s, %d events" % (sample, nevents), fontsize=22)
-plt.savefig(savePath + sampleName + "_pTdxy.png", bbox_inches="tight")
-plt.savefig(savePath + sampleName + "_pTdxy.pdf", bbox_inches="tight")
+plt.savefig(saveName + "_pTdxy.png", bbox_inches="tight")
+plt.savefig(saveName + "_pTdxy.pdf", bbox_inches="tight")
 plt.close()
 
 plt.figure()
@@ -245,6 +254,6 @@ plt.xlabel("$p_{T}$ ratio cut with $\Delta R$ cut = %.1f [cm]" % dRfix)
 plt.ylabel("Match <$d_{3D}$> [cm]")
 hep.style.use("CMS")
 hep.cms.label("Private Work", data=False, rlabel="%s, %d events" % (sample, nevents), fontsize=22)
-plt.savefig(savePath + sampleName + "_pTd3d.png", bbox_inches="tight")
-plt.savefig(savePath + sampleName + "_pTd3d.pdf", bbox_inches="tight")
+plt.savefig(saveName + "_pTd3d.png", bbox_inches="tight")
+plt.savefig(saveName + "_pTd3d.pdf", bbox_inches="tight")
 plt.close()

@@ -59,8 +59,8 @@ void SecondaryVertexCollectionBuilder::build(const edm::Event& iEvent,
   } // End loop over original SV collection with MTD timing
 
   // Sort collections
-  std::sort(secondaryVertices_.begin(), secondaryVertices_.end(), compareDxySig);
-  std::sort(secondaryVerticesMTDTiming_.begin(), secondaryVerticesMTDTiming_.end(), compareDxySig);
+  // std::sort(secondaryVertices_.begin(), secondaryVertices_.end(), compareDxySig);
+  // std::sort(secondaryVerticesMTDTiming_.begin(), secondaryVerticesMTDTiming_.end(), compareDxySig);
 }
 
 

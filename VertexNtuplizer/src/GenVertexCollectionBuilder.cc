@@ -74,10 +74,10 @@ void GenVertexCollectionBuilder::build(const edm::Event& iEvent,
   } // End loop over all gen particles
 
   // Sort collections
-  std::sort(genVertices_.begin(), genVertices_.end(), compareDxySig);
-  std::sort(genVerticesSimMatch_.begin(), genVerticesSimMatch_.end(), compareDxySig);
-  std::sort(genVerticesNoNu_.begin(), genVerticesNoNu_.end(), compareDxySig);
-  std::sort(genVerticesNoNuSimMatch_.begin(), genVerticesNoNuSimMatch_.end(), compareDxySig);
+  // std::sort(genVertices_.begin(), genVertices_.end(), compareDxySig);
+  // std::sort(genVerticesSimMatch_.begin(), genVerticesSimMatch_.end(), compareDxySig);
+  // std::sort(genVerticesNoNu_.begin(), genVerticesNoNu_.end(), compareDxySig);
+  // std::sort(genVerticesNoNuSimMatch_.begin(), genVerticesNoNuSimMatch_.end(), compareDxySig);
 }
 
 

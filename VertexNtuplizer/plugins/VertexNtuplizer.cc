@@ -167,17 +167,17 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   vars1_["tavg"] = std::vector<float>{(float) nbins_, -0.8, 0.8};
   vars1_["trange"] = std::vector<float>{(float) nbins_, 0.0, 0.8};
   vars1_["pt"] = std::vector<float>{(float) nbins_, 0.0, 200.0};
-  vars1_["pt2"] = std::vector<float>{(float) nbins_, 0.0, 200.0};
+  vars1_["pt2"] = std::vector<float>{(float) nbins_, 0.0, 1000.0};
   vars1_["eta"] = std::vector<float>{(float) nbins_, -3.1, 3.1};
   vars1_["phi"] = std::vector<float>{(float) nbins_, -3.15, 3.15};
-  vars1_["charge"] = std::vector<float>{(float) 5, -2.0, 3.0};
+  vars1_["charge"] = std::vector<float>{3, -1.0, 2.0};
   vars1_["motherPdgId"] = std::vector<float>{(float) nbins_, -5560.0, 5560.0};
   vars1_["pdgIdBin"] = std::vector<float>{4, 0.0, 4.0};
   vars1_["hadFlav"] = std::vector<float>{7, 0.0, 7.0};
   vars1_["chi2"] = std::vector<float>{(float) nbins_, 0.0, 100.0};
   vars1_["ndof"] = std::vector<float>{(float) nbins_, 0.0, 10.0};
   vars1_["chi2dof"] = std::vector<float>{(float) nbins_, 0.0, 10.0};
-  vars1_["ntrk"] = std::vector<float>{(float) nbins_, 0.0, 10.0}; // Daughters for GenVertex
+  vars1_["ntrk"] = std::vector<float>{10, 0.0, 10.0}; // Daughters for GenVertex
   // From origin
   vars1_["x"] = std::vector<float>{(float) nbins_, -1.0, 1.0};
   vars1_["y"] = std::vector<float>{(float) nbins_, -1.0, 1.0};
@@ -187,14 +187,14 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   vars1_["zerr"] = std::vector<float>{(float) nbins_, -7.0, 7.0};
   // From primary vertex
   vars1_["dxy"] = std::vector<float>{(float) nbins_, 0.0, 10.0};
-  vars1_["dz"] = std::vector<float>{(float) nbins_, 0.0, 20.0};
-  vars1_["d3d"] = std::vector<float>{(float) nbins_, 0.0, 20.0};
-  vars1_["dxyerr"] = std::vector<float>{(float) nbins_, 0.0, 0.1};
+  vars1_["dz"] = std::vector<float>{(float) nbins_, 0.0, 10.0};
+  vars1_["d3d"] = std::vector<float>{(float) nbins_, 0.0, 10.0};
+  vars1_["dxyerr"] = std::vector<float>{(float) nbins_, 0.0, 0.05};
   vars1_["dzerr"] = std::vector<float>{(float) nbins_, 0.0, 0.1};
   vars1_["d3derr"] = std::vector<float>{(float) nbins_, 0.0, 0.1};
-  vars1_["dxysig"] = std::vector<float>{(float) nbins_, 0.0, 3000.0};
+  vars1_["dxysig"] = std::vector<float>{(float) nbins_, 0.0, 1500.0};
   vars1_["dzsig"] = std::vector<float>{(float) nbins_, 0.0, 1000.0};
-  vars1_["d3dsig"] = std::vector<float>{(float) nbins_, 0.0, 1000.0};
+  vars1_["d3dsig"] = std::vector<float>{(float) nbins_, 0.0, 1500.0};
   // Between matched GenVertex and SecondaryVertex
   vars1_["xres"] = std::vector<float>{(float) nbins_, -0.15, 0.15};
   vars1_["yres"] = std::vector<float>{(float) nbins_, -0.15, 0.15};

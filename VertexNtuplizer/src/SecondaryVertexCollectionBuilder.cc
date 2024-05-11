@@ -31,6 +31,7 @@ void SecondaryVertexCollectionBuilder::build(const edm::Event& iEvent,
   secondaryVerticesMTDTiming_.clear();
 
   for (const reco::Vertex& sv : cmsSecondaryVertices_) {
+    if (abs(sv.p4().Eta()) > absEtaMax_) continue;
     if (sv.normalizedChi2() > svChi2dofMax_) continue; // Take out poorly fitted vertices
     // Count how many good tracks and check if this is a "real" vertex
     std::vector<reco::TrackBaseRef>* goodTracks = new std::vector<reco::TrackBaseRef>;
@@ -45,6 +46,7 @@ void SecondaryVertexCollectionBuilder::build(const edm::Event& iEvent,
   } // End loop over original SV collection
 
   for (const reco::Vertex& sv : cmsSecondaryVerticesMTDTiming_) {
+    if (abs(sv.p4().Eta()) > absEtaMax_) continue;
     if (sv.normalizedChi2() > svChi2dofMax_) continue; // Take out poorly fitted vertices
     // Count how many good tracks and check if this is a "real" vertex
     std::vector<reco::TrackBaseRef>* goodTracks = new std::vector<reco::TrackBaseRef>;

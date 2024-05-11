@@ -2,13 +2,13 @@ import matplotlib.pyplot as plt
 import mplhep as hep
 hep.style.use("CMS")
 
-sort = "sortD3d"
+sort = "noSort"
 
 nevents = 2000
 sample = "$t\\bar{t}$ no PU"
 sampleName = "TTToHadronic_noPU"
 
-# nevents = 200
+# nevents = 299
 # sample = "$t\\bar{t}$ PU 200"
 # sampleName = "TTToHadronic_PU200"
 

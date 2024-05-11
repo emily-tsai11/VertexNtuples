@@ -57,8 +57,8 @@ bool VertexMatcher::vtxMatrixMatch(GenVertex& gv, SecondaryVertex& sv) {
 }
 
 
-void VertexMatcher::fill(std::map<TString, TH1F*>& histos, TString gvPrefix,
-    TString svPrefix, GenVertex& gv, SecondaryVertex& sv) {
+void VertexMatcher::fill(std::map<TString, TH1F*>& histos1, std::map<TString, TH2F*>& histos2,
+    TString gvPrefix, TString svPrefix, GenVertex& gv, SecondaryVertex& sv) {
 
   double xres = vertexntuples::xres(gv, sv);
   double yres = vertexntuples::yres(gv, sv);
@@ -73,29 +73,39 @@ void VertexMatcher::fill(std::map<TString, TH1F*>& histos, TString gvPrefix,
   double dxysig = dxy / dxyerr;
   double d3dsig = d3d / d3derr;
 
-  histos[gvPrefix + "_xres"]->Fill(xres);
-  histos[gvPrefix + "_yres"]->Fill(yres);
-  histos[gvPrefix + "_zres"]->Fill(zres);
-  histos[gvPrefix + "_xpull"]->Fill(xpull);
-  histos[gvPrefix + "_ypull"]->Fill(ypull);
-  histos[gvPrefix + "_zpull"]->Fill(zpull);
-  histos[gvPrefix + "_matchdxy"]->Fill(dxy);
-  histos[gvPrefix + "_matchd3d"]->Fill(d3d);
-  histos[gvPrefix + "_matchdxyerr"]->Fill(dxyerr);
-  histos[gvPrefix + "_matchd3derr"]->Fill(d3derr);
-  histos[gvPrefix + "_matchdxysig"]->Fill(dxysig);
-  histos[gvPrefix + "_matchd3dsig"]->Fill(d3dsig);
+  histos1[gvPrefix + "_xres"]->Fill(xres);
+  histos1[gvPrefix + "_yres"]->Fill(yres);
+  histos1[gvPrefix + "_zres"]->Fill(zres);
+  histos1[gvPrefix + "_xpull"]->Fill(xpull);
+  histos1[gvPrefix + "_ypull"]->Fill(ypull);
+  histos1[gvPrefix + "_zpull"]->Fill(zpull);
+  histos1[gvPrefix + "_matchdxy"]->Fill(dxy);
+  histos1[gvPrefix + "_matchd3d"]->Fill(d3d);
+  histos1[gvPrefix + "_matchdxyerr"]->Fill(dxyerr);
+  histos1[gvPrefix + "_matchd3derr"]->Fill(d3derr);
+  histos1[gvPrefix + "_matchdxysig"]->Fill(dxysig);
+  histos1[gvPrefix + "_matchd3dsig"]->Fill(d3dsig);
 
-  histos[svPrefix + "_xres"]->Fill(xres);
-  histos[svPrefix + "_yres"]->Fill(yres);
-  histos[svPrefix + "_zres"]->Fill(zres);
-  histos[svPrefix + "_xpull"]->Fill(xpull);
-  histos[svPrefix + "_ypull"]->Fill(ypull);
-  histos[svPrefix + "_zpull"]->Fill(zpull);
-  histos[svPrefix + "_matchdxy"]->Fill(dxy);
-  histos[svPrefix + "_matchd3d"]->Fill(d3d);
-  histos[svPrefix + "_matchdxyerr"]->Fill(dxyerr);
-  histos[svPrefix + "_matchd3derr"]->Fill(d3derr);
-  histos[svPrefix + "_matchdxysig"]->Fill(dxysig);
-  histos[svPrefix + "_matchd3dsig"]->Fill(d3dsig);
+  histos2[gvPrefix + "_matchdxy_dxy"]->Fill(dxy, gv.dxy());
+  histos2[gvPrefix + "_matchdxy_d3d"]->Fill(dxy, gv.d3d());
+  histos2[gvPrefix + "_matchd3d_dxy"]->Fill(d3d, gv.dxy());
+  histos2[gvPrefix + "_matchd3d_d3d"]->Fill(d3d, gv.d3d());
+
+  histos1[svPrefix + "_xres"]->Fill(xres);
+  histos1[svPrefix + "_yres"]->Fill(yres);
+  histos1[svPrefix + "_zres"]->Fill(zres);
+  histos1[svPrefix + "_xpull"]->Fill(xpull);
+  histos1[svPrefix + "_ypull"]->Fill(ypull);
+  histos1[svPrefix + "_zpull"]->Fill(zpull);
+  histos1[svPrefix + "_matchdxy"]->Fill(dxy);
+  histos1[svPrefix + "_matchd3d"]->Fill(d3d);
+  histos1[svPrefix + "_matchdxyerr"]->Fill(dxyerr);
+  histos1[svPrefix + "_matchd3derr"]->Fill(d3derr);
+  histos1[svPrefix + "_matchdxysig"]->Fill(dxysig);
+  histos1[svPrefix + "_matchd3dsig"]->Fill(d3dsig);
+
+  histos2[svPrefix + "_matchdxy_dxy"]->Fill(dxy, sv.dxy());
+  histos2[svPrefix + "_matchdxy_d3d"]->Fill(dxy, sv.d3d());
+  histos2[svPrefix + "_matchd3d_dxy"]->Fill(d3d, sv.dxy());
+  histos2[svPrefix + "_matchd3d_d3d"]->Fill(d3d, sv.d3d());
 }

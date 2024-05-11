@@ -30,8 +30,8 @@ class VertexMatcher {
     bool match(GenVertex& gv, SecondaryVertex& sv, MatchAlgo algo);
     bool match(SecondaryVertex& sv, RecoJet& rj);
 
-    void fill(std::map<TString, TH1F*>& histos, TString gvPrefix,
-        TString svPrefix, GenVertex& gv, SecondaryVertex& sv);
+    void fill(std::map<TString, TH1F*>& histos1, std::map<TString, TH2F*>& histos2,
+        TString gvPrefix, TString svPrefix, GenVertex& gv, SecondaryVertex& sv);
 
   private:
 

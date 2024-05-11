@@ -215,6 +215,11 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   vars2_["trange_dxysig"] = std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 3000.0};
   vars2_["trange_d3d"] = std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 20.0};
   vars2_["trange_d3dsig"] = std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 1000.0};
+  // Between matched GenVertex and SecondaryVertex
+  vars2_["matchdxy_dxy"] = std::vector<float>{(float) nbins_, 0.0, 10.0, (float) nbins_, 0.0, 10.0};
+  vars2_["matchdxy_d3d"] = std::vector<float>{(float) nbins_, 0.0, 10.0, (float) nbins_, 0.0, 10.0};
+  vars2_["matchd3d_dxy"] = std::vector<float>{(float) nbins_, 0.0, 10.0, (float) nbins_, 0.0, 10.0};
+  vars2_["matchd3d_d3d"] = std::vector<float>{(float) nbins_, 0.0, 10.0, (float) nbins_, 0.0, 10.0};
 
   // Count histograms
   for (TString gv_name : gv_names_) {
@@ -278,7 +283,7 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
       }
 
       // 2D histograms
-      if (obj1.BeginsWith("sv")) {
+      if (obj1.BeginsWith("gv") || obj1.BeginsWith("sv")) {
         for (const auto& iter : vars2_) {
           TString name = obj1 + "_" + obj2 + "_" + iter.first;
           histos2_[name] = fs->make<TH2F>(name, name, iter.second[0], iter.second[1], iter.second[2], iter.second[3], iter.second[4], iter.second[5]);
@@ -357,7 +362,7 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
             TString sv_name = sv_names_.at(iSVs) + "_" + gv_names_.at(iGVs);
             gv.fill(histos1_, gv_name);
             sv.fill(histos1_, histos2_, sv_name);
-            matcher_->fill(histos1_, gv_name, sv_name, gv, sv);
+            matcher_->fill(histos1_, histos2_, gv_name, sv_name, gv, sv);
             break; // Restrict to only one match
           }
         }

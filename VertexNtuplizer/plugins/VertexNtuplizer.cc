@@ -156,8 +156,8 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   for (TString obj : gj_names_) objs_.push_back(obj);
 
   const unsigned int nbins_ = 100;
-  const unsigned int nvtx_ = 30;
-  const unsigned int nclus_ = 200;
+  const unsigned int ngv_ = 15;
+  const unsigned int nsv_ = 200;
   const unsigned int njet_ = 20;
 
   vars1_["tval"] = std::vector<float>{(float) nbins_, -0.8, 0.8};
@@ -219,17 +219,17 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   // Count histograms
   for (TString gv_name : gv_names_) {
     TString name = "n" + gv_name;
-    histos1_[name] = fs->make<TH1F>(name, name, nvtx_, 0, nvtx_);
+    histos1_[name] = fs->make<TH1F>(name, name, ngv_, 0, ngv_);
     histos1_[name]->Sumw2();
   }
   for (TString sv_name : sv_names_) {
     TString name = "n" + sv_name;
-    histos1_[name] = fs->make<TH1F>(name, name, nvtx_, 0, nvtx_);
+    histos1_[name] = fs->make<TH1F>(name, name, nsv_, 0, nsv_);
     histos1_[name]->Sumw2();
   }
-  histos1_["nc"] = fs->make<TH1F>("nc", "nc", nclus_, 0, nclus_);
+  histos1_["nc"] = fs->make<TH1F>("nc", "nc", nsv_, 0, nsv_);
   histos1_["nc"]->Sumw2();
-  histos1_["nct"] = fs->make<TH1F>("nct", "nct", nclus_, 0, nclus_);
+  histos1_["nct"] = fs->make<TH1F>("nct", "nct", nsv_, 0, nsv_);
   histos1_["nct"]->Sumw2();
   for (TString rj_name : rj_names_) {
     TString name = "n" + rj_name;

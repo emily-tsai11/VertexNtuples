@@ -33,7 +33,7 @@ SecondaryVertex::SecondaryVertex(const reco::Vertex& sv,
   float tavg = 0.0;
   float tmin = 99999.9;
   float tmax = -99999.9;
-  for (const reco::TrackBaseRef& trkRef : sv.tracks()) {
+  for (const reco::TrackBaseRef& trkRef : *tracks) {
     tavg += trackTimeValueMap[trkRef];
     tmin = std::min(tmin, trackTimeValueMap[trkRef]);
     tmax = std::max(tmax, trackTimeValueMap[trkRef]);

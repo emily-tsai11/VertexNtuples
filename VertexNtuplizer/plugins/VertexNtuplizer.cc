@@ -182,9 +182,9 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   vars1_["x"] = std::vector<float>{(float) nbins_, -1.0, 1.0};
   vars1_["y"] = std::vector<float>{(float) nbins_, -1.0, 1.0};
   vars1_["z"] = std::vector<float>{(float) nbins_, -20.0, 20.0};
-  vars1_["xerr"] = std::vector<float>{(float) nbins_, -7.0, 7.0};
-  vars1_["yerr"] = std::vector<float>{(float) nbins_, -7.0, 7.0};
-  vars1_["zerr"] = std::vector<float>{(float) nbins_, -7.0, 7.0};
+  vars1_["xerr"] = std::vector<float>{(float) nbins_, 0.0, 0.5};
+  vars1_["yerr"] = std::vector<float>{(float) nbins_, 0.0, 0.5};
+  vars1_["zerr"] = std::vector<float>{(float) nbins_, 0.0, 0.5};
   // From primary vertex
   vars1_["dxy"] = std::vector<float>{(float) nbins_, 0.0, 10.0};
   vars1_["dz"] = std::vector<float>{(float) nbins_, 0.0, 10.0};
@@ -199,9 +199,9 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   vars1_["xres"] = std::vector<float>{(float) nbins_, -0.15, 0.15};
   vars1_["yres"] = std::vector<float>{(float) nbins_, -0.15, 0.15};
   vars1_["zres"] = std::vector<float>{(float) nbins_, -0.15, 0.15};
-  vars1_["xpull"] = std::vector<float>{(float) nbins_, -10.0, 10.0};
-  vars1_["ypull"] = std::vector<float>{(float) nbins_, -10.0, 10.0};
-  vars1_["zpull"] = std::vector<float>{(float) nbins_, -10.0, 10.0};
+  vars1_["xpull"] = std::vector<float>{(float) nbins_, -6.5, 6.5};
+  vars1_["ypull"] = std::vector<float>{(float) nbins_, -6.5, 6.5};
+  vars1_["zpull"] = std::vector<float>{(float) nbins_, -6.5, 6.5};
   vars1_["matchdxy"] = std::vector<float>{(float) nbins_, 0.0, 10.0};
   vars1_["matchd3d"] = std::vector<float>{(float) nbins_, 0.0, 20.0};
   vars1_["matchdxyerr"] = std::vector<float>{(float) nbins_, 0.0, 0.1};
@@ -283,15 +283,6 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
           TString name = obj1 + "_" + obj2 + "_" + iter.first;
           histos2_[name] = fs->make<TH2F>(name, name, iter.second[0], iter.second[1], iter.second[2], iter.second[3], iter.second[4], iter.second[5]);
           histos2_[name]->Sumw2();
-        }
-      }
-
-      // Efficiency histograms
-      if (obj1.BeginsWith("gv") && obj2.BeginsWith("sv")) {
-        for (const auto& iter : vars1_) {
-          TString name = obj1 + "_" + obj2 + "_" + iter.first + "_eff";
-          histos1_[name] = fs->make<TH1F>(name, name, iter.second[0], iter.second[1], iter.second[2]);
-          histos1_[name]->Sumw2();
         }
       }
     }
@@ -381,19 +372,6 @@ void VertexNtuplizer::beginJob() {}
 
 void VertexNtuplizer::endJob() {
 
-  // Calculate efficiencies
-  for (TString gv_name : gv_names_) {
-    for (TString sv_name : sv_names_) {
-      for (const auto& iter : vars1_) {
-        TString nameNum = gv_name + "_" + sv_name + "_" + iter.first;
-        TString nameDen = gv_name + "_" + iter.first;
-        TString nameEff = gv_name + "_" + sv_name + "_" + iter.first + "_eff";
-        if (histos1_[nameDen]->GetEntries() == 0) continue;
-        histos1_[nameEff]->Divide(histos1_[nameNum], histos1_[nameDen], 1.0, 1.0, "B");
-      }
-    }
-  }
-
   if (scanCuts_) {
     std::cout << "Efficiencies:" << std::endl;
     std::cout << "trkMatchDrCut = " << trkMatchDrCut_ << std::endl;
@@ -438,19 +416,19 @@ void VertexNtuplizer::endJob() {
   }
 
   // Catch under and over flows
-  for (auto iter : histos1_) {
-    int nBins = iter.second->GetNbinsX();
-    float firstBinContent = iter.second->GetBinContent(0) + iter.second->GetBinContent(1);
-    float firstBinError = TMath::Sqrt(iter.second->GetBinError(0) * iter.second->GetBinError(0) +
-        iter.second->GetBinError(1) * iter.second->GetBinError(1));
-    float lastBinContent = iter.second->GetBinContent(nBins) + iter.second->GetBinContent(nBins + 1);
-    float lastBinError = TMath::Sqrt(iter.second->GetBinError(nBins) * iter.second->GetBinError(nBins) +
-        iter.second->GetBinError(nBins + 1) * iter.second->GetBinError(nBins + 1));
-    iter.second->SetBinContent(1, firstBinContent);
-    iter.second->SetBinError(1, firstBinError);
-    iter.second->SetBinContent(nBins, lastBinContent);
-    iter.second->SetBinError(nBins, lastBinError);
-  }
+  // for (auto iter : histos1_) {
+  //   int nBins = iter.second->GetNbinsX();
+  //   float firstBinContent = iter.second->GetBinContent(0) + iter.second->GetBinContent(1);
+  //   float firstBinError = TMath::Sqrt(iter.second->GetBinError(0) * iter.second->GetBinError(0) +
+  //       iter.second->GetBinError(1) * iter.second->GetBinError(1));
+  //   float lastBinContent = iter.second->GetBinContent(nBins) + iter.second->GetBinContent(nBins + 1);
+  //   float lastBinError = TMath::Sqrt(iter.second->GetBinError(nBins) * iter.second->GetBinError(nBins) +
+  //       iter.second->GetBinError(nBins + 1) * iter.second->GetBinError(nBins + 1));
+  //   iter.second->SetBinContent(1, firstBinContent);
+  //   iter.second->SetBinError(1, firstBinError);
+  //   iter.second->SetBinContent(nBins, lastBinContent);
+  //   iter.second->SetBinError(nBins, lastBinError);
+  // }
 
   for (auto iter : histos2_) {
     int nBinsX = iter.second->GetNbinsX();

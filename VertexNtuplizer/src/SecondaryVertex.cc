@@ -128,6 +128,11 @@ void SecondaryVertex::fill(std::map<TString, TH1F*>& histos1,
     histos1[prefix + "_trk_chi2"]->Fill(trkChi2()->at(iTrk));
     histos1[prefix + "_trk_ndof"]->Fill(trkNDOF()->at(iTrk));
     histos1[prefix + "_trk_chi2dof"]->Fill(trkChi2DOF()->at(iTrk));
+
+    histos2[prefix + "_trk_eta_tval"]->Fill(trkEta()->at(iTrk), trkTVal()->at(iTrk));
+    histos2[prefix + "_trk_eta_terr"]->Fill(trkEta()->at(iTrk), trkTErr()->at(iTrk));
+    histos2[prefix + "_trk_eta_tsig"]->Fill(trkEta()->at(iTrk), trkTSig()->at(iTrk));
+    histos2[prefix + "_trk_eta_tqual"]->Fill(trkEta()->at(iTrk), trkTQual()->at(iTrk));
   }
 
   histos1[prefix + "_x"]->Fill(x());
@@ -156,6 +161,8 @@ void SecondaryVertex::fill(std::map<TString, TH1F*>& histos1,
   histos1[prefix + "_chi2dof"]->Fill(chi2DOF());
   histos1[prefix + "_ntrk"]->Fill(nTracks());
 
+  histos2[prefix + "_eta_tavg"]->Fill(eta(), tAvg());
+  histos2[prefix + "_eta_trange"]->Fill(eta(), tRange());
   histos2[prefix + "_trange_pt"]->Fill(tRange(), pt());
   histos2[prefix + "_trange_pt2"]->Fill(tRange(), pt2());
   histos2[prefix + "_trange_dxy"]->Fill(tRange(), dxy());

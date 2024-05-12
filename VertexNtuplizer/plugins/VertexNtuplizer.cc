@@ -211,6 +211,12 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   vars1_["deltaR"] = std::vector<float>{(float) nbins_, 0, 4.0};
   vars1_["ptresnorm"] = std::vector<float>{(float) nbins_, 0.0, 1.0};
 
+  vars2_["eta_tval"] = std::vector<float>{(float) nbins_, -3.1, 3.1, (float) nbins_, -0.8, 0.8};
+  vars2_["eta_terr"] = std::vector<float>{(float) nbins_, -3.1, 3.1, (float) nbins_, 0.0, 0.1};
+  vars2_["eta_tsig"] = std::vector<float>{(float) nbins_, -3.1, 3.1, (float) nbins_, -50.0, 50.0};
+  vars2_["eta_tqual"] = std::vector<float>{(float) nbins_, -3.1, 3.1, (float) nbins_, 0.0, 1.0};
+  vars2_["eta_tavg"] = std::vector<float>{(float) nbins_, -3.1, 3.1, (float) nbins_, -0.8, 0.8};
+  vars2_["eta_trange"] = std::vector<float>{(float) nbins_, -3.1, 3.1, (float) nbins_, 0.0, 0.8};
   vars2_["trange_pt"] = std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 200.0};
   vars2_["trange_pt2"] = std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 200.0};
   vars2_["trange_dxy"] = std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 10.0};
@@ -265,6 +271,9 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
       TString name = obj + "_" + iter.first;
       histos2_[name] = fs->make<TH2F>(name, name, iter.second[0], iter.second[1], iter.second[2], iter.second[3], iter.second[4], iter.second[5]);
       histos2_[name]->Sumw2();
+      TString trkName = obj + "_trk_" + iter.first;
+      histos2_[trkName] = fs->make<TH2F>(trkName, trkName, iter.second[0], iter.second[1], iter.second[2], iter.second[3], iter.second[4], iter.second[5]);
+      histos2_[trkName]->Sumw2();
     }
   }
 

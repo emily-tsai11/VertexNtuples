@@ -36,10 +36,17 @@ if options.run2:
   process.vertexNtuplizer.etaMax = 2.5
 
 
+# Also create a process with loose GV to SV matching cuts for comparison
+process.vertexNtuplizerLoose = process.vertexNtuplizer.clone(
+  recoTrkMatchDrCut=4.0,
+  recoTrkMatchPtCut=1.0
+)
+
+
 # Run process
 release = os.environ["CMSSW_VERSION"][6:]
 print("Using release " + release)
-process.p = cms.Path(process.vertexNtuplizer)
+process.p = cms.Path(process.vertexNtuplizer * process.vertexNtuplizerLoose)
 
 
 if options.scanCuts:

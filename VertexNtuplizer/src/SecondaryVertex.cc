@@ -30,6 +30,9 @@ SecondaryVertex::SecondaryVertex(const reco::Vertex& sv,
   trk_ndof_ = new std::vector<double>;
   trk_chi2dof_ = new std::vector<double>;
 
+  trk_deltaR_ = new std::vector<double>;
+  trk_ptresnorm_ = new std::vector<double>;
+
   float tavg = 0.0;
   float tmin = 99999.9;
   float tmax = -99999.9;

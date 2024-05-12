@@ -22,6 +22,12 @@ class GenVertex {
     void fill(std::map<TString, TH1F*>& histos, TString prefix);
     void print();
 
+    void addDeltaR(double deltaR) { dau_deltaR_->push_back(deltaR); }
+    void addPtResNorm(double ptresnorm) { dau_ptresnorm_->push_back(ptresnorm); }
+
+    const std::vector<double>* dauMatchDeltaR() const { return dau_deltaR_; }
+    const std::vector<double>* dauMatchPtResNorm() const { return dau_ptresnorm_; }
+
     const double x() const { return x_; }
     const double y() const { return y_; }
     const double z() const { return z_; }
@@ -66,6 +72,10 @@ class GenVertex {
     double dzsig_;
     double d3dsig_;
     int pdgIdBin_;
+
+    // Filled when matching to SecondaryVertex
+    std::vector<double>* dau_deltaR_;
+    std::vector<double>* dau_ptresnorm_;
 
     const reco::GenParticle* mother_;
     std::vector<const reco::Candidate*>* daughters_;

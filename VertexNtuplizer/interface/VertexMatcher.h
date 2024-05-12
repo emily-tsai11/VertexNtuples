@@ -31,7 +31,7 @@ class VertexMatcher {
     bool match(SecondaryVertex& sv, RecoJet& rj);
 
     void fill(std::map<TString, TH1F*>& histos1, std::map<TString, TH2F*>& histos2,
-        TString gvPrefix, TString svPrefix, GenVertex& gv, SecondaryVertex& sv);
+        TString gvPrefix, TString svPrefix, const GenVertex& gv, const SecondaryVertex& sv);
 
   private:
 

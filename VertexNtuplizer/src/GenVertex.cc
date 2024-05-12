@@ -4,6 +4,9 @@
 GenVertex::GenVertex(const reco::GenParticle* mother, std::vector<const reco::Candidate*>* daughters,
     const reco::Vertex& primaryVertex, const int pdgIdBin) : mother_(mother), daughters_(daughters) {
 
+  dau_deltaR_ = new std::vector<double>;
+  dau_ptresnorm_ = new std::vector<double>;
+
   x_ = daughters_->at(0)->vx();
   y_ = daughters_->at(0)->vy();
   z_ = daughters_->at(0)->vz();

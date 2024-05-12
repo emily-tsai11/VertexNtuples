@@ -208,6 +208,8 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   vars1_["matchd3derr"] = std::vector<float>{(float) nbins_, 0.0, 0.1};
   vars1_["matchdxysig"] = std::vector<float>{(float) nbins_, 0.0, 3000.0};
   vars1_["matchd3dsig"] = std::vector<float>{(float) nbins_, 0.0, 1000.0};
+  vars1_["deltaR"] = std::vector<float>{(float) nbins_, 0, 4.0};
+  vars1_["ptresnorm"] = std::vector<float>{(float) nbins_, 0.0, 1.0};
 
   vars2_["trange_pt"] = std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 200.0};
   vars2_["trange_pt2"] = std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 200.0};
@@ -220,6 +222,7 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   vars2_["matchdxy_d3d"] = std::vector<float>{(float) nbins_, 0.0, 10.0, (float) nbins_, 0.0, 10.0};
   vars2_["matchd3d_dxy"] = std::vector<float>{(float) nbins_, 0.0, 10.0, (float) nbins_, 0.0, 10.0};
   vars2_["matchd3d_d3d"] = std::vector<float>{(float) nbins_, 0.0, 10.0, (float) nbins_, 0.0, 10.0};
+  vars2_["deltaR_ptresnorm"] = std::vector<float>{(float) nbins_, 0.0, 4.0, (float) nbins_, 0.0, 1.0};
 
   // Count histograms
   for (TString gv_name : gv_names_) {
@@ -353,9 +356,8 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     for (unsigned int iSVs = 0; iSVs < SVCollections.size(); iSVs++) {
       std::vector<bool> SVmatched(SVCollections.at(iSVs).size(), false);
       for (GenVertex& gv : GVCollections.at(iGVs)) {
-        int iSV = -1;
-        for (SecondaryVertex& sv : SVCollections.at(iSVs)) {
-          iSV++;
+        for (unsigned int iSV = 0; iSV < SVCollections.at(iSVs).size(); iSV++) {
+          SecondaryVertex& sv = SVCollections.at(iSVs).at(iSV);
           if (matcher_->match(gv, sv, TRACK) && !SVmatched.at(iSV)) {
             SVmatched.at(iSV) = true;
             TString gv_name = gv_names_.at(iGVs) + "_" + sv_names_.at(iSVs);
@@ -408,7 +410,7 @@ void VertexNtuplizer::endJob() {
   } else {
     // Print summary
     std::cout << "Efficiencies:" << std::endl;
-    std::cout << "trkMatchDrCut = " << trkMatchDrCut_ << " cm" << std::endl;
+    std::cout << "trkMatchDrCut = " << trkMatchDrCut_ << std::endl;
     std::cout << "trkMatchPtCut = " << trkMatchPtCut_ << std::endl;
     std::cout << "GV-SV efficiency = " << histos1_["gv_sv_pt"]->GetEntries() / histos1_["gv_pt"]->GetEntries() << std::endl;
     std::cout << "GV-SVt efficiency = " << histos1_["gv_svt_pt"]->GetEntries() / histos1_["gv_pt"]->GetEntries() << std::endl;

@@ -104,9 +104,12 @@ bool GenVertexCollectionBuilder::matchGenToSimTrack(const P* gp, const SimTrack&
 bool GenVertexCollectionBuilder::matchGenToSimVertex(const GenVertex& gv) {
 
   double nmatch = 0;
+  std::vector<bool> STmatched(simTracks_.size(), false);
   for (const reco::Candidate* dau : *(gv.daughters())) {
-    for (const SimTrack& st : simTracks_) {
-      if (matchGenToSimTrack(dau, st)) {
+    for (unsigned int iST = 0; iST < simTracks_.size(); iST++) {
+      const SimTrack& st = simTracks_.at(iST);
+      if (matchGenToSimTrack(dau, st) && !STmatched.at(iST)) {
+        STmatched.at(iST) = true;
         nmatch++;
         break;
       }

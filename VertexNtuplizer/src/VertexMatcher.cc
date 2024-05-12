@@ -35,12 +35,20 @@ bool VertexMatcher::match(SecondaryVertex& sv, RecoJet& rj) {
 bool VertexMatcher::vtxTrackMatch(GenVertex& gv, SecondaryVertex& sv) {
 
   float nmatch = 0;
+  std::vector<bool> trkMatched(sv.nTracks(), false);
   for (const reco::Candidate* dau : *(gv.daughters())) {
     for (unsigned int iTrk = 0; iTrk < sv.nTracks(); iTrk++) {
       bool match = true;
-      if (reco::deltaR(sv.trkEta()->at(iTrk), sv.trkPhi()->at(iTrk), dau->eta(), dau->phi()) > trkMatchDrCut_) match = false;
-      if (abs(dau->pt() - sv.trkPt()->at(iTrk)) / (dau->pt() + sv.trkPt()->at(iTrk)) > trkMatchPtCut_) match = false;
-      if (match) {
+      double matchdR = reco::deltaR(sv.trkEta()->at(iTrk), sv.trkPhi()->at(iTrk), dau->eta(), dau->phi());
+      double matchPtResNorm = abs(dau->pt() - sv.trkPt()->at(iTrk)) / (dau->pt() + sv.trkPt()->at(iTrk));
+      if (matchdR > trkMatchDrCut_) match = false;
+      if (matchPtResNorm > trkMatchPtCut_) match = false;
+      if (match && !trkMatched.at(iTrk)) {
+        trkMatched.at(iTrk) = true;
+        gv.addPtResNorm(matchPtResNorm);
+        gv.addDeltaR(matchdR);
+        sv.addPtResNorm(matchPtResNorm);
+        sv.addDeltaR(matchdR);
         nmatch++;
         break;
       }
@@ -58,7 +66,7 @@ bool VertexMatcher::vtxMatrixMatch(GenVertex& gv, SecondaryVertex& sv) {
 
 
 void VertexMatcher::fill(std::map<TString, TH1F*>& histos1, std::map<TString, TH2F*>& histos2,
-    TString gvPrefix, TString svPrefix, GenVertex& gv, SecondaryVertex& sv) {
+    TString gvPrefix, TString svPrefix, const GenVertex& gv, const SecondaryVertex& sv) {
 
   double xres = vertexntuples::xres(gv, sv);
   double yres = vertexntuples::yres(gv, sv);
@@ -108,4 +116,15 @@ void VertexMatcher::fill(std::map<TString, TH1F*>& histos1, std::map<TString, TH
   histos2[svPrefix + "_matchdxy_d3d"]->Fill(dxy, sv.d3d());
   histos2[svPrefix + "_matchd3d_dxy"]->Fill(d3d, sv.dxy());
   histos2[svPrefix + "_matchd3d_d3d"]->Fill(d3d, sv.d3d());
+
+  for (unsigned int iTrk = 0; iTrk < gv.dauMatchDeltaR()->size(); iTrk++) {
+    histos1[gvPrefix + "_trk_deltaR"]->Fill(gv.dauMatchDeltaR()->at(iTrk));
+    histos1[gvPrefix + "_trk_ptresnorm"]->Fill(gv.dauMatchPtResNorm()->at(iTrk));
+    histos2[gvPrefix + "_trk_deltaR_ptresnorm"]->Fill(gv.dauMatchDeltaR()->at(iTrk), gv.dauMatchPtResNorm()->at(iTrk));
+  }
+  for (unsigned int iTrk = 0; iTrk < sv.trkMatchDeltaR()->size(); iTrk++) {
+    histos1[svPrefix + "_trk_deltaR"]->Fill(sv.trkMatchDeltaR()->at(iTrk));
+    histos1[svPrefix + "_trk_ptresnorm"]->Fill(sv.trkMatchPtResNorm()->at(iTrk));
+    histos2[svPrefix + "_trk_deltaR_ptresnorm"]->Fill(sv.trkMatchDeltaR()->at(iTrk), sv.trkMatchPtResNorm()->at(iTrk));
+  }
 }

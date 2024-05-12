@@ -50,47 +50,50 @@ process.p = cms.Path(process.vertexNtuplizer * process.vertexNtuplizerLoose)
 
 
 if options.scanCuts:
-  print("Scanning 18 dR cuts and 18 pT cuts with %d events." % options.maxEvents)
+  print("Scanning 24 dR cuts and 15 pT cuts with %d events." % options.maxEvents)
 
-  pTfix = 5.0
+  pTfix = 1.0
   process.vertexNtuplizer1 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=0.05, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
-  process.vertexNtuplizer2 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=0.1, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
-  process.vertexNtuplizer3 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=0.2, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
-  process.vertexNtuplizer4 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=0.3, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
-  process.vertexNtuplizer5 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=0.5, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
-  process.vertexNtuplizer6 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=0.7, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
-  process.vertexNtuplizer7 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=0.9, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
-  process.vertexNtuplizer8 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=1.1, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
-  process.vertexNtuplizer9 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=1.3, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
-  process.vertexNtuplizer10 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=1.5, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
-  process.vertexNtuplizer11 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=1.7, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
-  process.vertexNtuplizer12 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=2.0, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
-  process.vertexNtuplizer13 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=2.5, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
-  process.vertexNtuplizer14 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=3.0, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
-  process.vertexNtuplizer15 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=3.5, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
-  process.vertexNtuplizer16 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=4.0, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
-  process.vertexNtuplizer17 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=4.5, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
-  process.vertexNtuplizer18 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=5.0, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
+  process.vertexNtuplizer2 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=0.06, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
+  process.vertexNtuplizer3 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=0.07, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
+  process.vertexNtuplizer4 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=0.08, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
+  process.vertexNtuplizer5 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=0.09, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
+  process.vertexNtuplizer6 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=0.1, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
+  process.vertexNtuplizer7 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=0.2, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
+  process.vertexNtuplizer8 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=0.3, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
+  process.vertexNtuplizer9 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=0.4, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
+  process.vertexNtuplizer10 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=0.5, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
+  process.vertexNtuplizer11 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=0.6, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
+  process.vertexNtuplizer12 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=0.7, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
+  process.vertexNtuplizer13 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=0.8, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
+  process.vertexNtuplizer14 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=0.9, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
+  process.vertexNtuplizer15 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=1.0, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
+  process.vertexNtuplizer16 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=1.1, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
+  process.vertexNtuplizer17 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=1.3, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
+  process.vertexNtuplizer18 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=1.5, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
+  process.vertexNtuplizer19 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=1.7, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
+  process.vertexNtuplizer20 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=2.0, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
+  process.vertexNtuplizer21 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=2.5, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
+  process.vertexNtuplizer22 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=3.0, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
+  process.vertexNtuplizer23 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=3.5, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
+  process.vertexNtuplizer24 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=4.0, recoTrkMatchPtCut=pTfix, scanCuts=options.scanCuts)
 
-  dRfix = 5.0
-  process.vertexNtuplizer19 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=0.05, scanCuts=options.scanCuts)
-  process.vertexNtuplizer20 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=0.1, scanCuts=options.scanCuts)
-  process.vertexNtuplizer21 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=0.2, scanCuts=options.scanCuts)
-  process.vertexNtuplizer22 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=0.3, scanCuts=options.scanCuts)
-  process.vertexNtuplizer23 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=0.5, scanCuts=options.scanCuts)
-  process.vertexNtuplizer24 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=0.7, scanCuts=options.scanCuts)
-  process.vertexNtuplizer25 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=0.9, scanCuts=options.scanCuts)
-  process.vertexNtuplizer26 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=1.1, scanCuts=options.scanCuts)
-  process.vertexNtuplizer27 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=1.3, scanCuts=options.scanCuts)
-  process.vertexNtuplizer28 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=1.5, scanCuts=options.scanCuts)
-  process.vertexNtuplizer29 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=1.7, scanCuts=options.scanCuts)
-  process.vertexNtuplizer30 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=2.0, scanCuts=options.scanCuts)
-  process.vertexNtuplizer31 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=2.5, scanCuts=options.scanCuts)
-  process.vertexNtuplizer32 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=3.0, scanCuts=options.scanCuts)
-  process.vertexNtuplizer33 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=3.5, scanCuts=options.scanCuts)
-  process.vertexNtuplizer34 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=4.0, scanCuts=options.scanCuts)
-  process.vertexNtuplizer35 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=4.5, scanCuts=options.scanCuts)
-  process.vertexNtuplizer36 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=5.0, scanCuts=options.scanCuts)
+  dRfix = 4.0
+  process.vertexNtuplizer25 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=0.05, scanCuts=options.scanCuts)
+  process.vertexNtuplizer26 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=0.06, scanCuts=options.scanCuts)
+  process.vertexNtuplizer27 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=0.07, scanCuts=options.scanCuts)
+  process.vertexNtuplizer28 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=0.08, scanCuts=options.scanCuts)
+  process.vertexNtuplizer29 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=0.09, scanCuts=options.scanCuts)
+  process.vertexNtuplizer30 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=0.1, scanCuts=options.scanCuts)
+  process.vertexNtuplizer31 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=0.2, scanCuts=options.scanCuts)
+  process.vertexNtuplizer32 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=0.3, scanCuts=options.scanCuts)
+  process.vertexNtuplizer33 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=0.4, scanCuts=options.scanCuts)
+  process.vertexNtuplizer34 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=0.5, scanCuts=options.scanCuts)
+  process.vertexNtuplizer35 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=0.6, scanCuts=options.scanCuts)
+  process.vertexNtuplizer36 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=0.7, scanCuts=options.scanCuts)
+  process.vertexNtuplizer37 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=0.8, scanCuts=options.scanCuts)
+  process.vertexNtuplizer38 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=0.9, scanCuts=options.scanCuts)
+  process.vertexNtuplizer39 = process.vertexNtuplizer.clone(recoTrkMatchDrCut=dRfix, recoTrkMatchPtCut=1.0, scanCuts=options.scanCuts)
 
   process.p = cms.Path(
       process.vertexNtuplizer1*process.vertexNtuplizer2*process.vertexNtuplizer3*process.vertexNtuplizer4*
@@ -101,7 +104,8 @@ if options.scanCuts:
       process.vertexNtuplizer21*process.vertexNtuplizer22*process.vertexNtuplizer23*process.vertexNtuplizer24*
       process.vertexNtuplizer25*process.vertexNtuplizer26*process.vertexNtuplizer27*process.vertexNtuplizer28*
       process.vertexNtuplizer29*process.vertexNtuplizer30*process.vertexNtuplizer31*process.vertexNtuplizer32*
-      process.vertexNtuplizer33*process.vertexNtuplizer34*process.vertexNtuplizer35*process.vertexNtuplizer36)
+      process.vertexNtuplizer33*process.vertexNtuplizer34*process.vertexNtuplizer35*process.vertexNtuplizer36*
+      process.vertexNtuplizer37*process.vertexNtuplizer38*process.vertexNtuplizer39)
 
 
 # Dump process config

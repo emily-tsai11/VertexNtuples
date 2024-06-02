@@ -5,6 +5,7 @@
 #include "FWCore/Utilities/interface/isFinite.h"
 
 #include "DataFormats/Candidate/interface/Candidate.h"
+#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "RecoVertex/VertexTools/interface/VertexDistanceXY.h"
 #include "RecoVertex/VertexTools/interface/VertexDistance3D.h"
@@ -24,6 +25,13 @@ namespace vertexntuples {
   const double dxyErr(const reco::Candidate* dau, const reco::Vertex& v);
   const double dzErr(const reco::Candidate* dau, const reco::Vertex& v);
   const double d3dErr(const reco::Candidate* dau, const reco::Vertex& v);
+
+  const double dxy(const HepMC::FourVector& pos, const reco::Vertex& v);
+  const double dz(const HepMC::FourVector& pos, const reco::Vertex& v);
+  const double d3d(const HepMC::FourVector& pos, const reco::Vertex& v);
+  const double dxyErr(const HepMC::FourVector& pos, const reco::Vertex& v);
+  const double dzErr(const HepMC::FourVector& pos, const reco::Vertex& v);
+  const double d3dErr(const HepMC::FourVector& pos, const reco::Vertex& v);
 
   const double d3d(const reco::TrackBaseRef& trkRef);
   const double d3dErr(const reco::TrackBaseRef& trkRef);

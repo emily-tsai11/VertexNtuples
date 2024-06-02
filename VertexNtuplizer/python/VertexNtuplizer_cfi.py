@@ -2,19 +2,34 @@ import FWCore.ParameterSet.Config as cms
 
 vertexNtuplizer = cms.EDAnalyzer("VertexNtuplizer",
   # Collections
-  genParticles               = cms.untracked.InputTag("prunedGenParticles",             "",           "BTV"),
-  simTracks                  = cms.untracked.InputTag("g4SimHits",                      "",           "SIM"),
-  primaryVertices            = cms.untracked.InputTag("offlinePrimaryVertices",         "",           "BTV"),
-  secondaryVertices          = cms.untracked.InputTag("inclusiveVertexFinder",          "",           "BTV"),
-  secondaryVerticesMTDTiming = cms.untracked.InputTag("inclusiveVertexFinderMTDTiming", "",           "BTV"),
-  IVFclusters                = cms.untracked.InputTag("inclusiveVertexFinder",          "nClusters",  "BTV"),
-  IVFclustersMTDTiming       = cms.untracked.InputTag("inclusiveVertexFinderMTDTiming", "nClusters",  "BTV"),
-  trackTimeValueMap          = cms.untracked.InputTag("tofPID",                         "t0",         "BTV"),
-  trackTimeErrorMap          = cms.untracked.InputTag("tofPID",                         "sigmat0",    "BTV"),
-  trackTimeQualityMap        = cms.untracked.InputTag("mtdTrackQualityMVA",             "mtdQualMVA", "BTV"),
-  jets                       = cms.untracked.InputTag("slimmedJets",                    "",           "BTV"),
-  genJets                    = cms.untracked.InputTag("slimmedGenJets",                 "",           "BTV"),
-  genJetsFlavourInfo         = cms.untracked.InputTag("slimmedGenJetsFlavourInfos",     "",           "BTV"),
+  genParticles            = cms.untracked.InputTag("prunedGenParticles",          "",                 "BTV"),
+  simTracks               = cms.untracked.InputTag("g4SimHits",                   "",                 "SIM"),
+  # trackingParticles       = cms.untracked.InputTag("mix",                         "MergedTrackTruth", "HLT"),
+  trackingVertices        = cms.untracked.InputTag("mix",                         "MergedTrackTruth", "HLT"),
+  primaryVertices         = cms.untracked.InputTag("offlinePrimaryVertices",      "",                 "BTV"),
+  nIVFClusters            = cms.untracked.InputTag("inclusiveVertexFinder",       "nClusters",        "BTV"),
+  # nIVFClustersMTDBS       = cms.untracked.InputTag("inclusiveVertexFinderMTDBS",  "nClusters",        "BTV"),
+
+  # nIVFClustersMTDBS4      = cms.untracked.InputTag("inclusiveVertexFinderMTDBS4", "nClusters",        "BTV"),
+  nIVFClustersMTDBS4      = cms.untracked.InputTag("inclusiveVertexFinderMTDTiming", "nClusters",        "BTV"),
+
+  # nIVFClustersMTDPV       = cms.untracked.InputTag("inclusiveVertexFinderMTDPV",  "nClusters",        "BTV"),
+  secondaryVertices       = cms.untracked.InputTag("inclusiveVertexFinder",       "",                 "BTV"),
+  secondaryVerticesMTDBS  = cms.untracked.InputTag("inclusiveVertexFinderMTDBS",  "",                 "BTV"),
+
+  # secondaryVerticesMTDBS4 = cms.untracked.InputTag("inclusiveVertexFinderMTDBS4", "",                 "BTV"),
+  secondaryVerticesMTDBS4 = cms.untracked.InputTag("inclusiveVertexFinderMTDTiming", "",                 "BTV"),
+
+  secondaryVerticesMTDPV  = cms.untracked.InputTag("inclusiveVertexFinderMTDPB",  "",                 "BTV"),
+  trackTimeBSValueMap     = cms.untracked.InputTag("tofPID",                      "t0",               "BTV"),
+  trackTimeBSErrorMap     = cms.untracked.InputTag("tofPID",                      "sigmat0",          "BTV"),
+  trackTimeBSQualityMap   = cms.untracked.InputTag("mtdTrackQualityMVA",          "mtdQualMVA",       "BTV"),
+  # trackTimePVValueMap     = cms.untracked.InputTag("tofPID",                      "t0",               "BTV"),
+  # trackTimePVErrorMap     = cms.untracked.InputTag("tofPID",                      "sigmat0",          "BTV"),
+  # trackTimePVQualityMap   = cms.untracked.InputTag("mtdTrackQualityMVA",          "mtdQualMVA",       "BTV"),
+  jets                    = cms.untracked.InputTag("slimmedJets",                 "",                 "BTV"),
+  genJets                 = cms.untracked.InputTag("slimmedGenJets",              "",                 "BTV"),
+  genJetsFlavourInfo      = cms.untracked.InputTag("slimmedGenJetsFlavourInfos",  "",                 "BTV"),
 
   # Kinematic cuts
   absEtaMax                  = cms.untracked.double(3.0), # MTD coverage

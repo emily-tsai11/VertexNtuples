@@ -8,6 +8,8 @@
 
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 #include "SimDataFormats/Track/interface/SimTrackContainer.h"
+// #include "SimDataFormats/TrackingAnalysis/interface/TrackingParticle.h"
+#include "SimDataFormats/TrackingAnalysis/interface/TrackingVertexContainer.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/Math/interface/deltaR.h"
 
@@ -27,20 +29,30 @@ class GenVertexCollectionBuilder {
     void build(const edm::Event& iEvent,
         edm::EDGetTokenT<reco::GenParticleCollection>& genParticlesToken,
         edm::EDGetTokenT<edm::SimTrackContainer>& simTracksToken,
+        // edm::EDGetTokenT<TrackingParticleCollection>& trackingParticlesToken,
+        edm::EDGetTokenT<TrackingVertexCollection>& trackingVerticesToken,
         const reco::Vertex& primaryVertex);
 
     GenVertexCollection getGenVertexCollection() { return genVertices_; }
     GenVertexCollection getGenVertexSimMatchCollection() { return genVerticesSimMatch_; }
     GenVertexCollection getGenVertexNoNuCollection() { return genVerticesNoNu_; }
     GenVertexCollection getGenVertexNoNuSimMatchCollection() { return genVerticesNoNuSimMatch_; }
+    GenVertexCollection getGenVertexFromTV() { return genVerticesFromTV_; }
+    GenVertexCollection getGenVertexFromTVNoNu() { return genVerticesFromTVNoNu_; }
+
+    typedef edm::Ref<edm::HepMCProduct, HepMC::GenVertex> GenVertexRef;
 
   private:
 
+    typedef HepMC::GenVertex::particles_in_const_iterator it_in;
+    typedef HepMC::GenVertex::particles_out_const_iterator it_out;
+
     template <class P> bool goodGenParticle(const P* gp, double ptCut);
+    bool goodHepMCGenParticle(const HepMC::GenParticle* gp, double ptCut);
     template <class P> bool matchGenToSimTrack(const P* gp, const SimTrack& st);
     bool matchGenToSimVertex(const GenVertex& gv);
     int genPartID(int pdgId);
-    static bool compare(const GenVertex& gva, const GenVertex& gvb);
+    // static bool compare(const GenVertex& gva, const GenVertex& gvb);
 
     double absEtaMax_;
     double genMotherPtMin_;
@@ -53,9 +65,13 @@ class GenVertexCollectionBuilder {
     GenVertexCollection genVerticesSimMatch_;
     GenVertexCollection genVerticesNoNu_;
     GenVertexCollection genVerticesNoNuSimMatch_;
+    GenVertexCollection genVerticesFromTV_;
+    GenVertexCollection genVerticesFromTVNoNu_;
 
     reco::GenParticleCollection genParticles_;
     edm::SimTrackContainer simTracks_;
+    // TrackingParticleCollection trackingParticles_;
+    TrackingVertexCollection trackingVertices_;
 };
 
 

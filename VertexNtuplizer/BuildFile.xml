@@ -8,6 +8,7 @@
 <use name="DataFormats/JetReco"/>
 <use name="DataFormats/JetMatching"/>
 <use name="SimDataFormats/Track"/>
+<use name="SimDataFormats/TrackingAnalysis"/>
 <use name="RecoVertex/VertexTools"/>
 <export>
    <lib name="1"/>

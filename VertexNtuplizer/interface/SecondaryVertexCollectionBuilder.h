@@ -24,18 +24,25 @@ class SecondaryVertexCollectionBuilder {
 
     void build(const edm::Event& iEvent,
         edm::EDGetTokenT<reco::VertexCollection>& secondaryVerticesToken,
-        edm::EDGetTokenT<reco::VertexCollection>& secondaryVerticesMTDTimingToken,
-        const reco::Vertex& primaryVertex,
-        edm::EDGetTokenT<edm::ValueMap<float>>& trackTimeValueMapToken,
-        edm::EDGetTokenT<edm::ValueMap<float>>& trackTimeErrorMapToken,
-        edm::EDGetTokenT<edm::ValueMap<float>>& trackTimeQualityMapToken);
+        // edm::EDGetTokenT<reco::VertexCollection>& secondaryVerticesMTDBSToken,
+        edm::EDGetTokenT<reco::VertexCollection>& secondaryVerticesMTDBS4Token,
+        edm::EDGetTokenT<edm::ValueMap<float>>& trackTimeBSValueMapToken,
+        edm::EDGetTokenT<edm::ValueMap<float>>& trackTimeBSErrorMapToken,
+        edm::EDGetTokenT<edm::ValueMap<float>>& trackTimeBSQualityMapToken,
+        // edm::EDGetTokenT<reco::VertexCollection>& secondaryVerticesMTDPVToken,
+        // edm::EDGetTokenT<edm::ValueMap<float>>& trackTimePVValueMapToken,
+        // edm::EDGetTokenT<edm::ValueMap<float>>& trackTimePVErrorMapToken,
+        // edm::EDGetTokenT<edm::ValueMap<float>>& trackTimePVQualityMapToken,
+        const reco::Vertex& primaryVertex);
 
     SecondaryVertexCollection getSecondaryVertexCollection() { return secondaryVertices_; }
-    SecondaryVertexCollection getSecondaryVertexCollectionMTDTiming() { return secondaryVerticesMTDTiming_; }
+    // SecondaryVertexCollection getSecondaryVertexCollectionMTDBS() { return secondaryVerticesMTDBS_; }
+    SecondaryVertexCollection getSecondaryVertexCollectionMTDBS4() { return secondaryVerticesMTDBS4_; }
+    // SecondaryVertexCollection getSecondaryVertexCollectionMTDPV() { return secondaryVerticesMTDPV_; }
 
   private:
 
-    template <class T> bool goodRecoTrack(const T& trkRef);
+    bool goodRecoVertex(const reco::Vertex& v);
     static bool compare(const SecondaryVertex& sva, const SecondaryVertex& svb);
 
     double absEtaMax_;
@@ -44,13 +51,20 @@ class SecondaryVertexCollectionBuilder {
     double svChi2dofMax_;
 
     SecondaryVertexCollection secondaryVertices_;
-    SecondaryVertexCollection secondaryVerticesMTDTiming_;
+    // SecondaryVertexCollection secondaryVerticesMTDBS_;
+    SecondaryVertexCollection secondaryVerticesMTDBS4_;
+    // SecondaryVertexCollection secondaryVerticesMTDPV_;
 
     reco::VertexCollection cmsSecondaryVertices_;
-    reco::VertexCollection cmsSecondaryVerticesMTDTiming_;
-    edm::ValueMap<float> trackTimeValueMap_;
-    edm::ValueMap<float> trackTimeErrorMap_;
-    edm::ValueMap<float> trackTimeQualityMap_;
+    // reco::VertexCollection cmsSecondaryVerticesMTDBS_;
+    reco::VertexCollection cmsSecondaryVerticesMTDBS4_;
+    edm::ValueMap<float> trackTimeBSValueMap_;
+    edm::ValueMap<float> trackTimeBSErrorMap_;
+    edm::ValueMap<float> trackTimeBSQualityMap_;
+    // reco::VertexCollection cmsSecondaryVerticesMTDPV_;
+    // edm::ValueMap<float> trackTimePVValueMap_;
+    // edm::ValueMap<float> trackTimePVErrorMap_;
+    // edm::ValueMap<float> trackTimePVQualityMap_;
 };
 
 

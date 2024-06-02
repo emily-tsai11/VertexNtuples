@@ -33,6 +33,9 @@
 
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 #include "SimDataFormats/Track/interface/SimTrackContainer.h"
+// #include "SimDataFormats/TrackingAnalysis/interface/TrackingParticle.h"
+#include "SimDataFormats/TrackingAnalysis/interface/TrackingVertexContainer.h"
+
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/JetReco/interface/GenJetCollection.h"
@@ -66,14 +69,23 @@ class VertexNtuplizer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
 
     edm::EDGetTokenT<reco::GenParticleCollection> genParticlesToken_;
     edm::EDGetTokenT<edm::SimTrackContainer> simTracksToken_;
+    // edm::EDGetTokenT<TrackingParticleCollection> trackingParticlesToken_;
+    edm::EDGetTokenT<TrackingVertexCollection> trackingVerticesToken_;
     edm::EDGetTokenT<reco::VertexCollection> primaryVerticesToken_;
+    edm::EDGetTokenT<unsigned int> nIVFClustersToken_;
+    // edm::EDGetTokenT<unsigned int> nIVFClustersMTDBSToken_;
+    edm::EDGetTokenT<unsigned int> nIVFClustersMTDBS4Token_;
+    // edm::EDGetTokenT<unsigned int> nIVFClustersMTDPVToken_;
     edm::EDGetTokenT<reco::VertexCollection> secondaryVerticesToken_;
-    edm::EDGetTokenT<reco::VertexCollection> secondaryVerticesMTDTimingToken_;
-    edm::EDGetTokenT<unsigned int> IVFclustersToken_;
-    edm::EDGetTokenT<unsigned int> IVFclustersMTDTimingToken_;
-    edm::EDGetTokenT<edm::ValueMap<float>> trackTimeValueMapToken_;
-    edm::EDGetTokenT<edm::ValueMap<float>> trackTimeErrorMapToken_;
-    edm::EDGetTokenT<edm::ValueMap<float>> trackTimeQualityMapToken_;
+    // edm::EDGetTokenT<reco::VertexCollection> secondaryVerticesMTDBSToken_;
+    edm::EDGetTokenT<reco::VertexCollection> secondaryVerticesMTDBS4Token_;
+    edm::EDGetTokenT<edm::ValueMap<float>> trackTimeBSValueMapToken_;
+    edm::EDGetTokenT<edm::ValueMap<float>> trackTimeBSErrorMapToken_;
+    edm::EDGetTokenT<edm::ValueMap<float>> trackTimeBSQualityMapToken_;
+    // edm::EDGetTokenT<reco::VertexCollection> secondaryVerticesMTDPVToken_;
+    // edm::EDGetTokenT<edm::ValueMap<float>> trackTimePVValueMapToken_;
+    // edm::EDGetTokenT<edm::ValueMap<float>> trackTimePVErrorMapToken_;
+    // edm::EDGetTokenT<edm::ValueMap<float>> trackTimePVQualityMapToken_;
     edm::EDGetTokenT<pat::JetCollection> jetsToken_;
     edm::EDGetTokenT<reco::GenJetCollection> genJetsToken_;
     edm::EDGetTokenT<reco::JetFlavourInfoMatchingCollection> genJetsFlavourInfoToken_;
@@ -104,14 +116,23 @@ class VertexNtuplizer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
 VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
     genParticlesToken_(consumes<reco::GenParticleCollection>(iConfig.getUntrackedParameter<edm::InputTag>("genParticles"))),
     simTracksToken_(consumes<edm::SimTrackContainer>(iConfig.getUntrackedParameter<edm::InputTag>("simTracks"))),
+    // trackingParticlesToken_(consumes<TrackingParticleCollection>(iConfig.getUntrackedParameter<edm::InputTag>("trackingParticles"))),
+    trackingVerticesToken_(consumes<TrackingVertexCollection>(iConfig.getUntrackedParameter<edm::InputTag>("trackingVertices"))),
     primaryVerticesToken_(consumes<reco::VertexCollection>(iConfig.getUntrackedParameter<edm::InputTag>("primaryVertices"))),
+    nIVFClustersToken_(consumes<unsigned int>(iConfig.getUntrackedParameter<edm::InputTag>("nIVFClusters"))),
+    // nIVFClustersMTDBSToken_(consumes<unsigned int>(iConfig.getUntrackedParameter<edm::InputTag>("nIVFClustersMTDBS"))),
+    nIVFClustersMTDBS4Token_(consumes<unsigned int>(iConfig.getUntrackedParameter<edm::InputTag>("nIVFClustersMTDBS4"))),
+    // nIVFClustersMTDPVToken_(consumes<unsigned int>(iConfig.getUntrackedParameter<edm::InputTag>("nIVFClustersMTDPV"))),
     secondaryVerticesToken_(consumes<reco::VertexCollection>(iConfig.getUntrackedParameter<edm::InputTag>("secondaryVertices"))),
-    secondaryVerticesMTDTimingToken_(consumes<reco::VertexCollection>(iConfig.getUntrackedParameter<edm::InputTag>("secondaryVerticesMTDTiming"))),
-    IVFclustersToken_(consumes<unsigned int>(iConfig.getUntrackedParameter<edm::InputTag>("IVFclusters"))),
-    IVFclustersMTDTimingToken_(consumes<unsigned int>(iConfig.getUntrackedParameter<edm::InputTag>("IVFclustersMTDTiming"))),
-    trackTimeValueMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimeValueMap"))),
-    trackTimeErrorMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimeErrorMap"))),
-    trackTimeQualityMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimeQualityMap"))),
+    // secondaryVerticesMTDBSToken_(consumes<reco::VertexCollection>(iConfig.getUntrackedParameter<edm::InputTag>("secondaryVerticesMTDBS"))),
+    secondaryVerticesMTDBS4Token_(consumes<reco::VertexCollection>(iConfig.getUntrackedParameter<edm::InputTag>("secondaryVerticesMTDBS4"))),
+    trackTimeBSValueMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimeBSValueMap"))),
+    trackTimeBSErrorMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimeBSErrorMap"))),
+    trackTimeBSQualityMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimeBSQualityMap"))),
+    // secondaryVerticesMTDPVToken_(consumes<reco::VertexCollection>(iConfig.getUntrackedParameter<edm::InputTag>("secondaryVerticesMTDPV"))),
+    // trackTimePVValueMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimePVValueMap"))),
+    // trackTimePVErrorMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimePVErrorMap"))),
+    // trackTimePVQualityMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimePVQualityMap"))),
     jetsToken_(consumes<pat::JetCollection>(iConfig.getUntrackedParameter<edm::InputTag>("jets"))),
     genJetsToken_(consumes<reco::GenJetCollection>(iConfig.getUntrackedParameter<edm::InputTag>("genJets"))),
     genJetsFlavourInfoToken_(consumes<reco::JetFlavourInfoMatchingCollection>(iConfig.getUntrackedParameter<edm::InputTag>("genJetsFlavourInfo"))) {
@@ -131,11 +152,15 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
 
   gv_names_.push_back("gv"); // GenVertex
   gv_names_.push_back("gvs"); // GenVertex w/SIM match
-  gv_names_.push_back("gvn"); // GenVertex without neutrino daughters
-  gv_names_.push_back("gvns"); // GenVertex without neutrino daughters w/SIM match
+  gv_names_.push_back("gvn"); // GenVertex w/out neutrino daughters
+  gv_names_.push_back("gvns"); // GenVertex w/out neutrino daughters w/SIM match
+  gv_names_.push_back("gvt"); // GenVertex constructed from TrackingVertexs
+  gv_names_.push_back("gvtn"); // GenVertex constructed from TrackingVertexs w/out neutrino daughters
 
   sv_names_.push_back("sv"); // SecondaryVertex
-  sv_names_.push_back("svt"); // SecondaryVertex w/time range cut
+  // sv_names_.push_back("svbs"); // SecondaryVertex w/track time extrapolated to the beam spot
+  sv_names_.push_back("svbs4"); // SecondaryVertex w/range cut on track time extrapolated to the beam spot
+  // sv_names_.push_back("svpv"); // SecondaryVertex w/track time extrapolated to the primary vertex
 
   rj_names_.push_back("rj"); // RecoJet
   rj_names_.push_back("rjg"); // RecoJet w/GEN match
@@ -172,7 +197,7 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   vars1_["phi"] = std::vector<float>{(float) nbins_, -3.15, 3.15};
   vars1_["charge"] = std::vector<float>{3, -1.0, 2.0};
   vars1_["motherPdgId"] = std::vector<float>{(float) nbins_, -5560.0, 5560.0};
-  vars1_["pdgIdBin"] = std::vector<float>{4, 0.0, 4.0};
+  vars1_["pdgIdBin"] = std::vector<float>{5, 0.0, 5.0};
   vars1_["hadFlav"] = std::vector<float>{7, 0.0, 7.0};
   vars1_["chi2"] = std::vector<float>{(float) nbins_, 0.0, 100.0};
   vars1_["ndof"] = std::vector<float>{(float) nbins_, 0.0, 10.0};
@@ -192,9 +217,9 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   vars1_["dxyerr"] = std::vector<float>{(float) nbins_, 0.0, 0.05};
   vars1_["dzerr"] = std::vector<float>{(float) nbins_, 0.0, 0.1};
   vars1_["d3derr"] = std::vector<float>{(float) nbins_, 0.0, 0.1};
-  vars1_["dxysig"] = std::vector<float>{(float) nbins_, 0.0, 1500.0};
-  vars1_["dzsig"] = std::vector<float>{(float) nbins_, 0.0, 1000.0};
-  vars1_["d3dsig"] = std::vector<float>{(float) nbins_, 0.0, 1500.0};
+  vars1_["dxysig"] = std::vector<float>{(float) nbins_, 0.0, 10.0};
+  vars1_["dzsig"] = std::vector<float>{(float) nbins_, 0.0, 10.0};
+  vars1_["d3dsig"] = std::vector<float>{(float) nbins_, 0.0, 10.0};
   // Between matched GenVertex and SecondaryVertex
   vars1_["xres"] = std::vector<float>{(float) nbins_, -0.15, 0.15};
   vars1_["yres"] = std::vector<float>{(float) nbins_, -0.15, 0.15};
@@ -206,10 +231,10 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   vars1_["matchd3d"] = std::vector<float>{(float) nbins_, 0.0, 20.0};
   vars1_["matchdxyerr"] = std::vector<float>{(float) nbins_, 0.0, 0.1};
   vars1_["matchd3derr"] = std::vector<float>{(float) nbins_, 0.0, 0.1};
-  vars1_["matchdxysig"] = std::vector<float>{(float) nbins_, 0.0, 3000.0};
-  vars1_["matchd3dsig"] = std::vector<float>{(float) nbins_, 0.0, 1000.0};
+  vars1_["matchdxysig"] = std::vector<float>{(float) nbins_, 0.0, 10.0};
+  vars1_["matchd3dsig"] = std::vector<float>{(float) nbins_, 0.0, 10.0};
   vars1_["deltaR"] = std::vector<float>{(float) nbins_, 0, 4.0};
-  vars1_["ptresnorm"] = std::vector<float>{(float) nbins_, 0.0, 1.0};
+  vars1_["ptResNorm"] = std::vector<float>{(float) nbins_, 0.0, 1.0};
 
   vars2_["eta_tval"] = std::vector<float>{(float) nbins_, -3.1, 3.1, (float) nbins_, -0.8, 0.8};
   vars2_["eta_terr"] = std::vector<float>{(float) nbins_, -3.1, 3.1, (float) nbins_, 0.0, 0.1};
@@ -220,15 +245,15 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   vars2_["trange_pt"] = std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 200.0};
   vars2_["trange_pt2"] = std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 200.0};
   vars2_["trange_dxy"] = std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 10.0};
-  vars2_["trange_dxysig"] = std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 3000.0};
+  vars2_["trange_dxysig"] = std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 10.0};
   vars2_["trange_d3d"] = std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 20.0};
-  vars2_["trange_d3dsig"] = std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 1000.0};
+  vars2_["trange_d3dsig"] = std::vector<float>{(float) nbins_, 0.0, 0.8, (float) nbins_, 0.0, 10.0};
   // Between matched GenVertex and SecondaryVertex
   vars2_["matchdxy_dxy"] = std::vector<float>{(float) nbins_, 0.0, 10.0, (float) nbins_, 0.0, 10.0};
   vars2_["matchdxy_d3d"] = std::vector<float>{(float) nbins_, 0.0, 10.0, (float) nbins_, 0.0, 10.0};
   vars2_["matchd3d_dxy"] = std::vector<float>{(float) nbins_, 0.0, 10.0, (float) nbins_, 0.0, 10.0};
   vars2_["matchd3d_d3d"] = std::vector<float>{(float) nbins_, 0.0, 10.0, (float) nbins_, 0.0, 10.0};
-  vars2_["deltaR_ptresnorm"] = std::vector<float>{(float) nbins_, 0.0, 4.0, (float) nbins_, 0.0, 1.0};
+  vars2_["deltaR_ptResNorm"] = std::vector<float>{(float) nbins_, 0.0, 4.0, (float) nbins_, 0.0, 1.0};
 
   // Count histograms
   for (TString gv_name : gv_names_) {
@@ -243,8 +268,12 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   }
   histos1_["nc"] = fs->make<TH1F>("nc", "nc", nsv_, 0, nsv_);
   histos1_["nc"]->Sumw2();
-  histos1_["nct"] = fs->make<TH1F>("nct", "nct", nsv_, 0, nsv_);
-  histos1_["nct"]->Sumw2();
+  // histos1_["ncbs"] = fs->make<TH1F>("ncbs", "ncbs", nsv_, 0, nsv_);
+  // histos1_["ncbs"]->Sumw2();
+  histos1_["ncbs4"] = fs->make<TH1F>("ncbs4", "ncbs4", nsv_, 0, nsv_);
+  histos1_["ncbs4"]->Sumw2();
+  // histos1_["ncpv"] = fs->make<TH1F>("ncpv", "ncpv", nsv_, 0, nsv_);
+  // histos1_["ncpv"]->Sumw2();
   for (TString rj_name : rj_names_) {
     TString name = "n" + rj_name;
     histos1_[name] = fs->make<TH1F>(name, name, njet_, 0, njet_);
@@ -316,9 +345,17 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   // Sorting described here: https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideOfflinePrimaryVertexProduction
   const reco::Vertex& primaryVertex = primaryVertices.at(0); // Most likely the signal vertex
 
-  gvc_->build(iEvent, genParticlesToken_, simTracksToken_, primaryVertex);
-  svc_->build(iEvent, secondaryVerticesToken_, secondaryVerticesMTDTimingToken_, primaryVertex,
-      trackTimeValueMapToken_, trackTimeErrorMapToken_, trackTimeQualityMapToken_);
+  gvc_->build(iEvent, genParticlesToken_, simTracksToken_,
+    // trackingParticlesToken_,
+    trackingVerticesToken_, primaryVertex);
+  svc_->build(iEvent,
+      secondaryVerticesToken_,
+      // secondaryVerticesMTDBSToken_,
+      secondaryVerticesMTDBS4Token_,
+      trackTimeBSValueMapToken_, trackTimeBSErrorMapToken_, trackTimeBSQualityMapToken_,
+      // secondaryVerticesMTDPVToken_,
+      // trackTimePVValueMapToken_, trackTimePVErrorMapToken_, trackTimePVQualityMapToken_,
+      primaryVertex);
   rjc_->build(iEvent, jetsToken_, genJetsFlavourInfoToken_);
   gjc_->build(iEvent, genJetsToken_, genJetsFlavourInfoToken_, jetsToken_);
 
@@ -327,23 +364,38 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   GVCollections.push_back(gvc_->getGenVertexSimMatchCollection());
   GVCollections.push_back(gvc_->getGenVertexNoNuCollection());
   GVCollections.push_back(gvc_->getGenVertexNoNuSimMatchCollection());
+  GVCollections.push_back(gvc_->getGenVertexFromTV());
+  GVCollections.push_back(gvc_->getGenVertexFromTVNoNu());
   for (unsigned int iColl = 0; iColl < GVCollections.size(); iColl++) {
     histos1_["n" + gv_names_.at(iColl)]->Fill(GVCollections.at(iColl).size());
     for (GenVertex& gv : GVCollections.at(iColl)) gv.fill(histos1_, gv_names_.at(iColl));
   }
 
+  // std::cout << "GV:   " << GVCollections.at(0).size() << std::endl;
+  // std::cout << "GVs:  " << GVCollections.at(1).size() << std::endl;
+  // std::cout << "GVn:  " << GVCollections.at(2).size() << std::endl;
+  // std::cout << "GVns: " << GVCollections.at(3).size() << std::endl;
+  // std::cout << "TV:   " << GVCollections.at(4).size() << std::endl;
+  // std::cout << "TVn:  " << GVCollections.at(5).size() << std::endl;
+
   std::vector<SecondaryVertexCollection> SVCollections;
   SVCollections.push_back(svc_->getSecondaryVertexCollection());
-  SVCollections.push_back(svc_->getSecondaryVertexCollectionMTDTiming());
+  // SVCollections.push_back(svc_->getSecondaryVertexCollectionMTDBS());
+  SVCollections.push_back(svc_->getSecondaryVertexCollectionMTDBS4());
+  // SVCollections.push_back(svc_->getSecondaryVertexCollectionMTDPV());
   for (unsigned int iColl = 0; iColl < SVCollections.size(); iColl++) {
     histos1_["n" + sv_names_.at(iColl)]->Fill(SVCollections.at(iColl).size());
     for (SecondaryVertex& sv : SVCollections.at(iColl)) sv.fill(histos1_, histos2_, sv_names_.at(iColl));
   }
 
-  unsigned int nC = iEvent.get(IVFclustersToken_);
-  unsigned int nCt = iEvent.get(IVFclustersMTDTimingToken_);
+  unsigned int nC = iEvent.get(nIVFClustersToken_);
+  // unsigned int nCBS = iEvent.get(nIVFClustersMTDBSToken_);
+  unsigned int nCBS4 = iEvent.get(nIVFClustersMTDBS4Token_);
+  // unsigned int nCPV = iEvent.get(nIVFClustersMTDPVToken_);
   histos1_["nc"]->Fill(nC);
-  histos1_["nct"]->Fill(nCt);
+  // histos1_["ncbs"]->Fill(nCBS);
+  histos1_["ncbs4"]->Fill(nCBS4);
+  // histos1_["ncpv"]->Fill(nCPV);
 
   std::vector<RecoJetCollection> RJCollections;
   RJCollections.push_back(rjc_->getRecoJetCollection());
@@ -395,40 +447,40 @@ void VertexNtuplizer::endJob() {
     std::cout << "gv_sv: " << histos1_["gv_sv_pt"]->GetEntries() / histos1_["gv_pt"]->GetEntries() << " "
         << histos1_["gv_sv_matchdxy"]->GetMean() << " " << histos1_["gv_sv_matchdxy"]->GetMeanError() << " "
         << histos1_["gv_sv_matchd3d"]->GetMean() << " " << histos1_["gv_sv_matchd3d"]->GetMeanError() << std::endl;
-    std::cout << "gv_svt: " << histos1_["gv_svt_pt"]->GetEntries() / histos1_["gv_pt"]->GetEntries() << " "
-        << histos1_["gv_svt_matchdxy"]->GetMean() << " " << histos1_["gv_svt_matchdxy"]->GetMeanError() << " "
-        << histos1_["gv_svt_matchd3d"]->GetMean() << " " << histos1_["gv_svt_matchd3d"]->GetMeanError() << std::endl;
+    std::cout << "gv_svbs4: " << histos1_["gv_svbs4_pt"]->GetEntries() / histos1_["gv_pt"]->GetEntries() << " "
+        << histos1_["gv_svbs4_matchdxy"]->GetMean() << " " << histos1_["gv_svbs4_matchdxy"]->GetMeanError() << " "
+        << histos1_["gv_svbs4_matchd3d"]->GetMean() << " " << histos1_["gv_svbs4_matchd3d"]->GetMeanError() << std::endl;
     std::cout << "gvs_sv: " << histos1_["gvs_sv_pt"]->GetEntries() / histos1_["gvs_pt"]->GetEntries() << " "
         << histos1_["gvs_sv_matchdxy"]->GetMean() << " " << histos1_["gvs_sv_matchdxy"]->GetMeanError() << " "
         << histos1_["gvs_sv_matchd3d"]->GetMean() << " " << histos1_["gvs_sv_matchd3d"]->GetMeanError() << std::endl;
-    std::cout << "gvs_svt: " << histos1_["gvs_svt_pt"]->GetEntries() / histos1_["gvs_pt"]->GetEntries() << " "
-        << histos1_["gvs_svt_matchdxy"]->GetMean() << " " << histos1_["gvs_svt_matchdxy"]->GetMeanError() << " "
-        << histos1_["gvs_svt_matchd3d"]->GetMean() << " " << histos1_["gvs_svt_matchd3d"]->GetMeanError() << std::endl;
+    std::cout << "gvs_svbs4: " << histos1_["gvs_svbs4_pt"]->GetEntries() / histos1_["gvs_pt"]->GetEntries() << " "
+        << histos1_["gvs_svbs4_matchdxy"]->GetMean() << " " << histos1_["gvs_svbs4_matchdxy"]->GetMeanError() << " "
+        << histos1_["gvs_svbs4_matchd3d"]->GetMean() << " " << histos1_["gvs_svbs4_matchd3d"]->GetMeanError() << std::endl;
     std::cout << "gvn_sv: " << histos1_["gvn_sv_pt"]->GetEntries() / histos1_["gvn_pt"]->GetEntries() << " "
         << histos1_["gvn_sv_matchdxy"]->GetMean() << " " << histos1_["gvn_sv_matchdxy"]->GetMeanError() << " "
         << histos1_["gvn_sv_matchd3d"]->GetMean() << " " << histos1_["gvn_sv_matchd3d"]->GetMeanError() << std::endl;
-    std::cout << "gvn_svt: " << histos1_["gvn_svt_pt"]->GetEntries() / histos1_["gvn_pt"]->GetEntries() << " "
-        << histos1_["gvn_svt_matchdxy"]->GetMean() << " " << histos1_["gvn_svt_matchdxy"]->GetMeanError() << " "
-        << histos1_["gvn_svt_matchd3d"]->GetMean() << " " << histos1_["gvn_svt_matchd3d"]->GetMeanError() << std::endl;
+    std::cout << "gvn_svbs4: " << histos1_["gvn_svbs4_pt"]->GetEntries() / histos1_["gvn_pt"]->GetEntries() << " "
+        << histos1_["gvn_svbs4_matchdxy"]->GetMean() << " " << histos1_["gvn_svbs4_matchdxy"]->GetMeanError() << " "
+        << histos1_["gvn_svbs4_matchd3d"]->GetMean() << " " << histos1_["gvn_svbs4_matchd3d"]->GetMeanError() << std::endl;
     std::cout << "gvns_sv: " << histos1_["gvns_sv_pt"]->GetEntries() / histos1_["gvns_pt"]->GetEntries() << " "
         << histos1_["gvns_sv_matchdxy"]->GetMean() << " " << histos1_["gvns_sv_matchdxy"]->GetMeanError() << " "
         << histos1_["gvns_sv_matchd3d"]->GetMean() << " " << histos1_["gvns_sv_matchd3d"]->GetMeanError() << std::endl;
-    std::cout << "gvns_svt: " << histos1_["gvns_svt_pt"]->GetEntries() / histos1_["gvns_pt"]->GetEntries() << " "
-        << histos1_["gvns_svt_matchdxy"]->GetMean() << " " << histos1_["gvns_svt_matchdxy"]->GetMeanError() << " "
-        << histos1_["gvns_svt_matchd3d"]->GetMean() << " " << histos1_["gvns_svt_matchd3d"]->GetMeanError() << std::endl;
+    std::cout << "gvns_svbs4: " << histos1_["gvns_svbs4_pt"]->GetEntries() / histos1_["gvns_pt"]->GetEntries() << " "
+        << histos1_["gvns_svbs4_matchdxy"]->GetMean() << " " << histos1_["gvns_svbs4_matchdxy"]->GetMeanError() << " "
+        << histos1_["gvns_svbs4_matchd3d"]->GetMean() << " " << histos1_["gvns_svbs4_matchd3d"]->GetMeanError() << std::endl;
   } else {
     // Print summary
     std::cout << "Efficiencies:" << std::endl;
-    std::cout << "trkMatchDrCut = " << trkMatchDrCut_ << std::endl;
-    std::cout << "trkMatchPtCut = " << trkMatchPtCut_ << std::endl;
-    std::cout << "GV-SV efficiency = " << histos1_["gv_sv_pt"]->GetEntries() / histos1_["gv_pt"]->GetEntries() << std::endl;
-    std::cout << "GV-SVt efficiency = " << histos1_["gv_svt_pt"]->GetEntries() / histos1_["gv_pt"]->GetEntries() << std::endl;
-    std::cout << "GVs-SV efficiency = " << histos1_["gvs_sv_pt"]->GetEntries() / histos1_["gvs_pt"]->GetEntries() << std::endl;
-    std::cout << "GVs-SVt efficiency = " << histos1_["gvs_svt_pt"]->GetEntries() / histos1_["gvs_pt"]->GetEntries() << std::endl;
-    std::cout << "GVn-SV efficiency = " << histos1_["gvn_sv_pt"]->GetEntries() / histos1_["gvn_pt"]->GetEntries() << std::endl;
-    std::cout << "GVn-SVt efficiency = " << histos1_["gvn_svt_pt"]->GetEntries() / histos1_["gvn_pt"]->GetEntries() << std::endl;
-    std::cout << "GVns-SV efficiency = " << histos1_["gvns_sv_pt"]->GetEntries() / histos1_["gvns_pt"]->GetEntries() << std::endl;
-    std::cout << "GVns-SVt efficiency = " << histos1_["gvns_svt_pt"]->GetEntries() / histos1_["gvns_pt"]->GetEntries() << std::endl;
+    std::cout << "trkMatchDrCut         = " << trkMatchDrCut_ << std::endl;
+    std::cout << "trkMatchPtCut         = " << trkMatchPtCut_ << std::endl;
+    std::cout << "GV-SV efficiency      = " << histos1_["gv_sv_pt"]->GetEntries() / histos1_["gv_pt"]->GetEntries() << std::endl;
+    std::cout << "GV-SVbs4 efficiency   = " << histos1_["gv_svbs4_pt"]->GetEntries() / histos1_["gv_pt"]->GetEntries() << std::endl;
+    std::cout << "GVs-SV efficiency     = " << histos1_["gvs_sv_pt"]->GetEntries() / histos1_["gvs_pt"]->GetEntries() << std::endl;
+    std::cout << "GVs-SVbs4 efficiency  = " << histos1_["gvs_svbs4_pt"]->GetEntries() / histos1_["gvs_pt"]->GetEntries() << std::endl;
+    std::cout << "GVn-SV efficiency     = " << histos1_["gvn_sv_pt"]->GetEntries() / histos1_["gvn_pt"]->GetEntries() << std::endl;
+    std::cout << "GVn-SVbs4 efficiency  = " << histos1_["gvn_svbs4_pt"]->GetEntries() / histos1_["gvn_pt"]->GetEntries() << std::endl;
+    std::cout << "GVns-SV efficiency    = " << histos1_["gvns_sv_pt"]->GetEntries() / histos1_["gvns_pt"]->GetEntries() << std::endl;
+    std::cout << "GVns-SVbs4 efficiency = " << histos1_["gvns_svbs4_pt"]->GetEntries() / histos1_["gvns_pt"]->GetEntries() << std::endl;
   }
 
   // Catch under and over flows

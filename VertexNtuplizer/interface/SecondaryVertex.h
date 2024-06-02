@@ -21,8 +21,8 @@ class SecondaryVertex {
 
   public:
 
+    SecondaryVertex(const reco::Vertex& sv, const reco::Vertex& primaryVertex);
     SecondaryVertex(const reco::Vertex& sv,
-        const std::vector<reco::TrackBaseRef>* tracks,
         const reco::Vertex& primaryVertex,
         const edm::ValueMap<float>& trackTimeValueMap,
         const edm::ValueMap<float>& trackTimeErrorMap,
@@ -32,7 +32,7 @@ class SecondaryVertex {
     void fill(std::map<TString, TH1F*>& histos, std::map<TString, TH2F*>& histos2, TString prefix);
 
     void addDeltaR(double deltaR) { trk_deltaR_->push_back(deltaR); }
-    void addPtResNorm(double ptresnorm) { trk_ptresnorm_->push_back(ptresnorm); }
+    void addPtResNorm(double ptResNorm) { trk_ptResNorm_->push_back(ptResNorm); }
 
     const std::vector<double>* trkTVal() const { return trk_tval_; }
     const std::vector<double>* trkTErr() const { return trk_terr_; }
@@ -57,7 +57,7 @@ class SecondaryVertex {
     const std::vector<double>* trkChi2DOF() const { return trk_chi2dof_; }
 
     const std::vector<double>* trkMatchDeltaR() const { return trk_deltaR_; }
-    const std::vector<double>* trkMatchPtResNorm() const { return trk_ptresnorm_; }
+    const std::vector<double>* trkMatchPtResNorm() const { return trk_ptResNorm_; }
 
     const double x() const { return x_; }
     const double y() const { return y_; }
@@ -71,9 +71,9 @@ class SecondaryVertex {
     const double dxyErr() const { return dxyerr_; }
     const double dzErr() const { return dzerr_; }
     const double d3dErr() const { return d3derr_; }
-    const double dxySig() const { return dxy_ / dxyerr_; }
-    const double dzSig() const { return dz_ / dzerr_; }
-    const double d3dSig() const { return d3d_ / d3derr_; }
+    const double dxySig() const { return dxysig_; }
+    const double dzSig() const { return dzsig_; }
+    const double d3dSig() const { return d3dsig_; }
     const double pt() const { return pt_; }
     const double pt2() const { return pt2_; }
     const double eta() const { return eta_; }
@@ -109,10 +109,6 @@ class SecondaryVertex {
     std::vector<double>* trk_ndof_;
     std::vector<double>* trk_chi2dof_;
 
-    // Filled when matching to GenVertex
-    std::vector<double>* trk_deltaR_;
-    std::vector<double>* trk_ptresnorm_;
-
     double x_;
     double y_;
     double z_;
@@ -138,6 +134,10 @@ class SecondaryVertex {
     double ndof_;
     double chi2dof_;
     unsigned int ntrk_;
+
+    // Filled when matching to GenVertex
+    std::vector<double>* trk_deltaR_;
+    std::vector<double>* trk_ptResNorm_;
 };
 
 

@@ -16,6 +16,8 @@ namespace vertexntuples {
     return returnValue;
   }
 
+  // ---------------------------------------------------------------------- //
+
   const double dxy(const reco::Candidate* dau, const reco::Vertex& v) {
 
     return dxy(dau->vx(), v.x(), dau->vy(), v.y());
@@ -55,6 +57,49 @@ namespace vertexntuples {
     return d3dErr(dxyval, dxyerr, dzval, dzerr);
   }
 
+  // ---------------------------------------------------------------------- //
+
+  const double dxy(const HepMC::FourVector& pos, const reco::Vertex& v) {
+
+    return dxy(pos.x(), v.x(), pos.y(), v.y());
+  }
+
+  const double dz(const HepMC::FourVector& pos, const reco::Vertex& v) {
+
+    return dz(pos.z(), v.z());
+  }
+
+  const double d3d(const HepMC::FourVector& pos, const reco::Vertex& v) {
+
+    double dxyval = dxy(pos.x(), v.x(), pos.y(), v.y());
+    double dzval = dz(pos.z(), v.z());
+    return d3d(dxyval, dzval);
+  }
+
+  const double dxyErr(const HepMC::FourVector& pos, const reco::Vertex& v) {
+
+    // 0.0 error for generated daughter
+    return dxyErr(pos.x(), v.x(), 0.0, v.xError(), pos.y(), v.y(), 0.0, v.yError());
+  }
+
+  const double dzErr(const HepMC::FourVector& pos, const reco::Vertex& v) {
+
+    // 0.0 error for generated daughter
+    return dzErr(0.0, v.zError());
+  }
+
+  const double d3dErr(const HepMC::FourVector& pos, const reco::Vertex& v) {
+
+    // 0.0 error for generated daughter
+    double dxyval = dxy(pos.x(), v.x(), pos.y(), v.y());
+    double dxyerr = dxyErr(pos.x(), v.x(), 0.0, v.xError(), pos.y(), v.y(), 0.0, v.yError());
+    double dzval = dz(pos.z(), v.z());
+    double dzerr = dzErr(0.0, v.zError());
+    return d3dErr(dxyval, dxyerr, dzval, dzerr);
+  }
+
+  // ---------------------------------------------------------------------- //
+
   const double d3d(const reco::TrackBaseRef& trkRef) {
 
     return d3d(trkRef->dxy(), trkRef->dz());
@@ -64,6 +109,8 @@ namespace vertexntuples {
 
     return d3dErr(trkRef->dxy(), trkRef->dxyError(), trkRef->dz(), trkRef->dzError());
   }
+
+  // ---------------------------------------------------------------------- //
 
   Measurement1D dxy(const reco::Vertex& v1, const reco::Vertex& v2) {
 
@@ -92,6 +139,8 @@ namespace vertexntuples {
 
     return dzErr(v1.zError(), v2.zError());
   }
+
+  // ---------------------------------------------------------------------- //
 
   const double dxy(const double x1, const double x2, const double y1, const double y2) {
 

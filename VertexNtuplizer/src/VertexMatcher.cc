@@ -119,12 +119,12 @@ void VertexMatcher::fill(std::map<TString, TH1F*>& histos1, std::map<TString, TH
 
   for (unsigned int iTrk = 0; iTrk < gv.dauMatchDeltaR()->size(); iTrk++) {
     histos1[gvPrefix + "_trk_deltaR"]->Fill(gv.dauMatchDeltaR()->at(iTrk));
-    histos1[gvPrefix + "_trk_ptresnorm"]->Fill(gv.dauMatchPtResNorm()->at(iTrk));
-    histos2[gvPrefix + "_trk_deltaR_ptresnorm"]->Fill(gv.dauMatchDeltaR()->at(iTrk), gv.dauMatchPtResNorm()->at(iTrk));
+    histos1[gvPrefix + "_trk_ptResNorm"]->Fill(gv.dauMatchPtResNorm()->at(iTrk));
+    histos2[gvPrefix + "_trk_deltaR_ptResNorm"]->Fill(gv.dauMatchDeltaR()->at(iTrk), gv.dauMatchPtResNorm()->at(iTrk));
   }
   for (unsigned int iTrk = 0; iTrk < sv.trkMatchDeltaR()->size(); iTrk++) {
     histos1[svPrefix + "_trk_deltaR"]->Fill(sv.trkMatchDeltaR()->at(iTrk));
-    histos1[svPrefix + "_trk_ptresnorm"]->Fill(sv.trkMatchPtResNorm()->at(iTrk));
-    histos2[svPrefix + "_trk_deltaR_ptresnorm"]->Fill(sv.trkMatchDeltaR()->at(iTrk), sv.trkMatchPtResNorm()->at(iTrk));
+    histos1[svPrefix + "_trk_ptResNorm"]->Fill(sv.trkMatchPtResNorm()->at(iTrk));
+    histos2[svPrefix + "_trk_deltaR_ptResNorm"]->Fill(sv.trkMatchDeltaR()->at(iTrk), sv.trkMatchPtResNorm()->at(iTrk));
   }
 }

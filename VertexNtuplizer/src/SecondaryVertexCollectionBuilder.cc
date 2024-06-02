@@ -15,50 +15,56 @@ SecondaryVertexCollectionBuilder::SecondaryVertexCollectionBuilder(const edm::Pa
 
 void SecondaryVertexCollectionBuilder::build(const edm::Event& iEvent,
     edm::EDGetTokenT<reco::VertexCollection>& secondaryVerticesToken,
-    edm::EDGetTokenT<reco::VertexCollection>& secondaryVerticesMTDTimingToken,
-    const reco::Vertex& primaryVertex,
-    edm::EDGetTokenT<edm::ValueMap<float>>& trackTimeValueMapToken,
-    edm::EDGetTokenT<edm::ValueMap<float>>& trackTimeErrorMapToken,
-    edm::EDGetTokenT<edm::ValueMap<float>>& trackTimeQualityMapToken) {
+    // edm::EDGetTokenT<reco::VertexCollection>& secondaryVerticesMTDBSToken,
+    edm::EDGetTokenT<reco::VertexCollection>& secondaryVerticesMTDBS4Token,
+    edm::EDGetTokenT<edm::ValueMap<float>>& trackTimeBSValueMapToken,
+    edm::EDGetTokenT<edm::ValueMap<float>>& trackTimeBSErrorMapToken,
+    edm::EDGetTokenT<edm::ValueMap<float>>& trackTimeBSQualityMapToken,
+    // edm::EDGetTokenT<reco::VertexCollection>& secondaryVerticesMTDPVToken,
+    // edm::EDGetTokenT<edm::ValueMap<float>>& trackTimePVValueMapToken,
+    // edm::EDGetTokenT<edm::ValueMap<float>>& trackTimePVErrorMapToken,
+    // edm::EDGetTokenT<edm::ValueMap<float>>& trackTimePVQualityMapToken,
+    const reco::Vertex& primaryVertex) {
 
   cmsSecondaryVertices_ = iEvent.get(secondaryVerticesToken);
-  cmsSecondaryVerticesMTDTiming_ = iEvent.get(secondaryVerticesMTDTimingToken);
-  trackTimeValueMap_ = iEvent.get(trackTimeValueMapToken);
-  trackTimeErrorMap_ = iEvent.get(trackTimeErrorMapToken);
-  trackTimeQualityMap_ = iEvent.get(trackTimeQualityMapToken);
+  // secondaryVerticesMTDBS_ = iEvent.get(secondaryVerticesMTDBSToken);
+  cmsSecondaryVerticesMTDBS4_ = iEvent.get(secondaryVerticesMTDBS4Token);
+  trackTimeBSValueMap_ = iEvent.get(trackTimeBSValueMapToken);
+  trackTimeBSErrorMap_ = iEvent.get(trackTimeBSErrorMapToken);
+  trackTimeBSQualityMap_ = iEvent.get(trackTimeBSQualityMapToken);
+  // cmsSecondaryVerticesMTDPV_ = iEvent.get(secondaryVerticesMTDPVToken);
+  // trackTimePVValueMap_ = iEvent.get(trackTimePVValueMapToken);
+  // trackTimePVErrorMap_ = iEvent.get(trackTimePVErrorMapToken);
+  // trackTimePVQualityMap_ = iEvent.get(trackTimePVQualityMapToken);
 
   secondaryVertices_.clear();
-  secondaryVerticesMTDTiming_.clear();
+  // secondaryVerticesMTDBS_.clear();
+  secondaryVerticesMTDBS4_.clear();
+  // secondaryVerticesMTDPV_.clear();
 
   for (const reco::Vertex& sv : cmsSecondaryVertices_) {
-    if (abs(sv.p4().Eta()) > absEtaMax_) continue;
-    if (sv.normalizedChi2() > svChi2dofMax_) continue; // Take out poorly fitted vertices
-    // Count how many good tracks and check if this is a "real" vertex
-    std::vector<reco::TrackBaseRef>* goodTracks = new std::vector<reco::TrackBaseRef>;
-    for (const reco::TrackBaseRef& trkRef : sv.tracks()) {
-      if (goodRecoTrack(trkRef)) goodTracks->push_back(trkRef);
-    }
-    if (goodTracks->size() < 2) continue; // Not a vertex
-
-    SecondaryVertex newSV(sv, goodTracks, primaryVertex,
-        trackTimeValueMap_, trackTimeErrorMap_, trackTimeQualityMap_);
+    if (!goodRecoVertex(sv)) continue;
+    SecondaryVertex newSV(sv, primaryVertex);
     secondaryVertices_.push_back(newSV);
-  } // End loop over original SV collection
+  }
 
-  for (const reco::Vertex& sv : cmsSecondaryVerticesMTDTiming_) {
-    if (abs(sv.p4().Eta()) > absEtaMax_) continue;
-    if (sv.normalizedChi2() > svChi2dofMax_) continue; // Take out poorly fitted vertices
-    // Count how many good tracks and check if this is a "real" vertex
-    std::vector<reco::TrackBaseRef>* goodTracks = new std::vector<reco::TrackBaseRef>;
-    for (const reco::TrackBaseRef& trkRef : sv.tracks()) {
-      if (goodRecoTrack(trkRef)) goodTracks->push_back(trkRef);
-    }
-    if (goodTracks->size() < 2) continue; // Not a vertex
+  // for (const reco::Vertex& sv : cmsSecondaryVerticesMTDBS_) {
+  //   if (!goodRecoVertex(sv)) continue;
+  //   SecondaryVertex newSV(sv, primaryVertex, trackTimeBSValueMap_, trackTimeBSErrorMap_, trackTimeBSQualityMap_);
+  //   secondaryVerticesMTDBS_.push_back(newSV);
+  // }
 
-    SecondaryVertex newSV(sv, goodTracks, primaryVertex,
-        trackTimeValueMap_, trackTimeErrorMap_, trackTimeQualityMap_);
-    secondaryVerticesMTDTiming_.push_back(newSV);
-  } // End loop over original SV collection with MTD timing
+  for (const reco::Vertex& sv : cmsSecondaryVerticesMTDBS4_) {
+    if (!goodRecoVertex(sv)) continue;
+    SecondaryVertex newSV(sv, primaryVertex, trackTimeBSValueMap_, trackTimeBSErrorMap_, trackTimeBSQualityMap_);
+    secondaryVerticesMTDBS4_.push_back(newSV);
+  }
+
+  // for (const reco::Vertex& sv : cmsSecondaryVerticesMTDPV_) {
+  //   if (!goodRecoVertex(sv)) continue;
+  //   SecondaryVertex newSV(sv, primaryVertex, trackTimePVValueMap_, trackTimePVErrorMap_, trackTimePVQualityMap_);
+  //   secondaryVerticesMTDPV_.push_back(newSV);
+  // }
 
   // Sort collections
   // std::sort(secondaryVertices_.begin(), secondaryVertices_.end(), compare);
@@ -66,22 +72,17 @@ void SecondaryVertexCollectionBuilder::build(const edm::Event& iEvent,
 }
 
 
-template <class T>
-bool SecondaryVertexCollectionBuilder::goodRecoTrack(const T& trkRef) {
+bool SecondaryVertexCollectionBuilder::goodRecoVertex(const reco::Vertex& v) {
 
-    bool trkPass = true;
-    if (trkRef->pt() < trkPtMin_) trkPass = false;
-    if (abs(trkRef->eta()) > absEtaMax_) trkPass = false;
-    if (!trackTimeValueMap_.contains(trkRef.id())) trkPass = false;
-    else {
-      if (trackTimeErrorMap_[trkRef] == -1.0) trkPass = false;
-      // if (trackTimeQualityMap_[trkRef] < trkTimeQualityCut_) trkPass = false;
-    }
-    return trkPass;
+  bool vtxPass = true;
+  if (abs(v.p4().Eta()) > absEtaMax_) vtxPass = false;
+  if (v.normalizedChi2() > svChi2dofMax_) vtxPass = false; // Take out poorly fitted vertices
+  if (v.tracksSize() < 2) vtxPass = false; // Not a vertex
+  return vtxPass;
 }
 
 
-bool SecondaryVertexCollectionBuilder::compare(const SecondaryVertex& sva, const SecondaryVertex& svb) {
+// bool SecondaryVertexCollectionBuilder::compare(const SecondaryVertex& sva, const SecondaryVertex& svb) {
 
-  return svb.d3d() < sva.d3d();
-}
+//   return svb.d3d() < sva.d3d();
+// }

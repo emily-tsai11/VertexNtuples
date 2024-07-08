@@ -16,13 +16,15 @@ GenVertexCollectionBuilder::GenVertexCollectionBuilder(const edm::ParameterSet& 
 
 
 void GenVertexCollectionBuilder::build(const edm::Event& iEvent,
-    edm::EDGetTokenT<reco::GenParticleCollection>& genParticlesToken,
+    edm::EDGetTokenT<reco::GenParticleCollection>& prunedGenParticlesToken,
+    edm::EDGetTokenT<pat::PackedGenParticleCollection>& packedGenParticlesToken,
     edm::EDGetTokenT<edm::SimTrackContainer>& simTracksToken,
     // edm::EDGetTokenT<TrackingParticleCollection>& trackingParticlesToken,
     edm::EDGetTokenT<TrackingVertexCollection>& trackingVerticesToken,
     const reco::Vertex& primaryVertex) {
 
-  genParticles_ = iEvent.get(genParticlesToken);
+  prunedGenParticles_ = iEvent.get(prunedGenParticlesToken);
+  packedGenParticles_ = iEvent.get(packedGenParticlesToken);
   simTracks_ = iEvent.get(simTracksToken);
   // trackingParticles_ = iEvent.get(trackingParticlesToken);
   trackingVertices_ = iEvent.get(trackingVerticesToken);
@@ -33,9 +35,12 @@ void GenVertexCollectionBuilder::build(const edm::Event& iEvent,
   genVerticesNoNuSimMatch_.clear();
   genVerticesFromTV_.clear();
   genVerticesFromTVNoNu_.clear();
+  genVerticesFromPackedGen_.clear();
+  genVerticesFromPackedGenNoNu_.clear();
+  genVerticesFromPackedGenNoNuSimMatch_.clear();
 
-  // Construct GenVertexCollections from GenParticles
-  for (reco::GenParticle& gp : genParticles_) {
+  // Construct GenVertexCollections from pruned GenParticles
+  for (reco::GenParticle& gp : prunedGenParticles_) {
     const reco::GenParticle* mother = gp.clone();
 
     if (mother->numberOfDaughters() < 2) continue; // Not a vertex
@@ -79,7 +84,12 @@ void GenVertexCollectionBuilder::build(const edm::Event& iEvent,
         genVerticesNoNuSimMatch_.push_back(newGVNoNu);
       }
     }
-  } // End loop over GenParticles
+  } // End loop over pruned GenParticles
+
+  // Construct GenVertexCollections from packed GenParticles
+  for (const pat::PackedGenParticle& gp : packedGenParticles_) {
+    //
+  }
 
   // Construct GenVertexCollections from TrackingVertices
   // Maybe this will give pileup information?

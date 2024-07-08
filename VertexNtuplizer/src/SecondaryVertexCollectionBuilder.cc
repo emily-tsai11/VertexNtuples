@@ -15,32 +15,32 @@ SecondaryVertexCollectionBuilder::SecondaryVertexCollectionBuilder(const edm::Pa
 
 void SecondaryVertexCollectionBuilder::build(const edm::Event& iEvent,
     edm::EDGetTokenT<reco::VertexCollection>& secondaryVerticesToken,
-    // edm::EDGetTokenT<reco::VertexCollection>& secondaryVerticesMTDBSToken,
+    edm::EDGetTokenT<reco::VertexCollection>& secondaryVerticesMTDBSToken,
     edm::EDGetTokenT<reco::VertexCollection>& secondaryVerticesMTDBS4Token,
     edm::EDGetTokenT<edm::ValueMap<float>>& trackTimeBSValueMapToken,
     edm::EDGetTokenT<edm::ValueMap<float>>& trackTimeBSErrorMapToken,
     edm::EDGetTokenT<edm::ValueMap<float>>& trackTimeBSQualityMapToken,
-    // edm::EDGetTokenT<reco::VertexCollection>& secondaryVerticesMTDPVToken,
-    // edm::EDGetTokenT<edm::ValueMap<float>>& trackTimePVValueMapToken,
-    // edm::EDGetTokenT<edm::ValueMap<float>>& trackTimePVErrorMapToken,
+    edm::EDGetTokenT<reco::VertexCollection>& secondaryVerticesMTDPVToken,
+    edm::EDGetTokenT<edm::ValueMap<float>>& trackTimePVValueMapToken,
+    edm::EDGetTokenT<edm::ValueMap<float>>& trackTimePVErrorMapToken,
     // edm::EDGetTokenT<edm::ValueMap<float>>& trackTimePVQualityMapToken,
     const reco::Vertex& primaryVertex) {
 
   cmsSecondaryVertices_ = iEvent.get(secondaryVerticesToken);
-  // secondaryVerticesMTDBS_ = iEvent.get(secondaryVerticesMTDBSToken);
+  cmsSecondaryVerticesMTDBS_ = iEvent.get(secondaryVerticesMTDBSToken);
   cmsSecondaryVerticesMTDBS4_ = iEvent.get(secondaryVerticesMTDBS4Token);
   trackTimeBSValueMap_ = iEvent.get(trackTimeBSValueMapToken);
   trackTimeBSErrorMap_ = iEvent.get(trackTimeBSErrorMapToken);
   trackTimeBSQualityMap_ = iEvent.get(trackTimeBSQualityMapToken);
-  // cmsSecondaryVerticesMTDPV_ = iEvent.get(secondaryVerticesMTDPVToken);
-  // trackTimePVValueMap_ = iEvent.get(trackTimePVValueMapToken);
-  // trackTimePVErrorMap_ = iEvent.get(trackTimePVErrorMapToken);
+  cmsSecondaryVerticesMTDPV_ = iEvent.get(secondaryVerticesMTDPVToken);
+  trackTimePVValueMap_ = iEvent.get(trackTimePVValueMapToken);
+  trackTimePVErrorMap_ = iEvent.get(trackTimePVErrorMapToken);
   // trackTimePVQualityMap_ = iEvent.get(trackTimePVQualityMapToken);
 
   secondaryVertices_.clear();
-  // secondaryVerticesMTDBS_.clear();
+  secondaryVerticesMTDBS_.clear();
   secondaryVerticesMTDBS4_.clear();
-  // secondaryVerticesMTDPV_.clear();
+  secondaryVerticesMTDPV_.clear();
 
   for (const reco::Vertex& sv : cmsSecondaryVertices_) {
     if (!goodRecoVertex(sv)) continue;
@@ -48,11 +48,11 @@ void SecondaryVertexCollectionBuilder::build(const edm::Event& iEvent,
     secondaryVertices_.push_back(newSV);
   }
 
-  // for (const reco::Vertex& sv : cmsSecondaryVerticesMTDBS_) {
-  //   if (!goodRecoVertex(sv)) continue;
-  //   SecondaryVertex newSV(sv, primaryVertex, trackTimeBSValueMap_, trackTimeBSErrorMap_, trackTimeBSQualityMap_);
-  //   secondaryVerticesMTDBS_.push_back(newSV);
-  // }
+  for (const reco::Vertex& sv : cmsSecondaryVerticesMTDBS_) {
+    if (!goodRecoVertex(sv)) continue;
+    SecondaryVertex newSV(sv, primaryVertex, trackTimeBSValueMap_, trackTimeBSErrorMap_, trackTimeBSQualityMap_);
+    secondaryVerticesMTDBS_.push_back(newSV);
+  }
 
   for (const reco::Vertex& sv : cmsSecondaryVerticesMTDBS4_) {
     if (!goodRecoVertex(sv)) continue;
@@ -60,11 +60,12 @@ void SecondaryVertexCollectionBuilder::build(const edm::Event& iEvent,
     secondaryVerticesMTDBS4_.push_back(newSV);
   }
 
-  // for (const reco::Vertex& sv : cmsSecondaryVerticesMTDPV_) {
-  //   if (!goodRecoVertex(sv)) continue;
-  //   SecondaryVertex newSV(sv, primaryVertex, trackTimePVValueMap_, trackTimePVErrorMap_, trackTimePVQualityMap_);
-  //   secondaryVerticesMTDPV_.push_back(newSV);
-  // }
+  for (const reco::Vertex& sv : cmsSecondaryVerticesMTDPV_) {
+    if (!goodRecoVertex(sv)) continue;
+    // SecondaryVertex newSV(sv, primaryVertex, trackTimePVValueMap_, trackTimePVErrorMap_, trackTimePVQualityMap_);
+    SecondaryVertex newSV(sv, primaryVertex, trackTimePVValueMap_, trackTimePVErrorMap_, trackTimeBSQualityMap_); // Temporary, quality not used yet anyways
+    secondaryVerticesMTDPV_.push_back(newSV);
+  }
 
   // Sort collections
   // std::sort(secondaryVertices_.begin(), secondaryVertices_.end(), compare);

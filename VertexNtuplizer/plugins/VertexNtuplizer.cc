@@ -67,24 +67,25 @@ class VertexNtuplizer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
     void analyze(const edm::Event&, const edm::EventSetup&) override;
     void endJob() override;
 
-    edm::EDGetTokenT<reco::GenParticleCollection> genParticlesToken_;
+    edm::EDGetTokenT<reco::GenParticleCollection> prunedGenParticlesToken_;
+    edm::EDGetTokenT<pat::PackedGenParticleCollection> packedGenParticlesToken_;
     edm::EDGetTokenT<edm::SimTrackContainer> simTracksToken_;
     // edm::EDGetTokenT<TrackingParticleCollection> trackingParticlesToken_;
     edm::EDGetTokenT<TrackingVertexCollection> trackingVerticesToken_;
     edm::EDGetTokenT<reco::VertexCollection> primaryVerticesToken_;
     edm::EDGetTokenT<unsigned int> nIVFClustersToken_;
-    // edm::EDGetTokenT<unsigned int> nIVFClustersMTDBSToken_;
+    edm::EDGetTokenT<unsigned int> nIVFClustersMTDBSToken_;
     edm::EDGetTokenT<unsigned int> nIVFClustersMTDBS4Token_;
-    // edm::EDGetTokenT<unsigned int> nIVFClustersMTDPVToken_;
+    edm::EDGetTokenT<unsigned int> nIVFClustersMTDPVToken_;
     edm::EDGetTokenT<reco::VertexCollection> secondaryVerticesToken_;
-    // edm::EDGetTokenT<reco::VertexCollection> secondaryVerticesMTDBSToken_;
+    edm::EDGetTokenT<reco::VertexCollection> secondaryVerticesMTDBSToken_;
     edm::EDGetTokenT<reco::VertexCollection> secondaryVerticesMTDBS4Token_;
     edm::EDGetTokenT<edm::ValueMap<float>> trackTimeBSValueMapToken_;
     edm::EDGetTokenT<edm::ValueMap<float>> trackTimeBSErrorMapToken_;
     edm::EDGetTokenT<edm::ValueMap<float>> trackTimeBSQualityMapToken_;
-    // edm::EDGetTokenT<reco::VertexCollection> secondaryVerticesMTDPVToken_;
-    // edm::EDGetTokenT<edm::ValueMap<float>> trackTimePVValueMapToken_;
-    // edm::EDGetTokenT<edm::ValueMap<float>> trackTimePVErrorMapToken_;
+    edm::EDGetTokenT<reco::VertexCollection> secondaryVerticesMTDPVToken_;
+    edm::EDGetTokenT<edm::ValueMap<float>> trackTimePVValueMapToken_;
+    edm::EDGetTokenT<edm::ValueMap<float>> trackTimePVErrorMapToken_;
     // edm::EDGetTokenT<edm::ValueMap<float>> trackTimePVQualityMapToken_;
     edm::EDGetTokenT<pat::JetCollection> jetsToken_;
     edm::EDGetTokenT<reco::GenJetCollection> genJetsToken_;
@@ -114,24 +115,25 @@ class VertexNtuplizer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
 
 
 VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
-    genParticlesToken_(consumes<reco::GenParticleCollection>(iConfig.getUntrackedParameter<edm::InputTag>("genParticles"))),
+    prunedGenParticlesToken_(consumes<reco::GenParticleCollection>(iConfig.getUntrackedParameter<edm::InputTag>("prunedGenParticles"))),
+    packedGenParticlesToken_(consumes<pat::PackedGenParticleCollection>(iConfig.getUntrackedParameter<edm::InputTag>("packedGenParticles"))),
     simTracksToken_(consumes<edm::SimTrackContainer>(iConfig.getUntrackedParameter<edm::InputTag>("simTracks"))),
     // trackingParticlesToken_(consumes<TrackingParticleCollection>(iConfig.getUntrackedParameter<edm::InputTag>("trackingParticles"))),
     trackingVerticesToken_(consumes<TrackingVertexCollection>(iConfig.getUntrackedParameter<edm::InputTag>("trackingVertices"))),
     primaryVerticesToken_(consumes<reco::VertexCollection>(iConfig.getUntrackedParameter<edm::InputTag>("primaryVertices"))),
     nIVFClustersToken_(consumes<unsigned int>(iConfig.getUntrackedParameter<edm::InputTag>("nIVFClusters"))),
-    // nIVFClustersMTDBSToken_(consumes<unsigned int>(iConfig.getUntrackedParameter<edm::InputTag>("nIVFClustersMTDBS"))),
+    nIVFClustersMTDBSToken_(consumes<unsigned int>(iConfig.getUntrackedParameter<edm::InputTag>("nIVFClustersMTDBS"))),
     nIVFClustersMTDBS4Token_(consumes<unsigned int>(iConfig.getUntrackedParameter<edm::InputTag>("nIVFClustersMTDBS4"))),
-    // nIVFClustersMTDPVToken_(consumes<unsigned int>(iConfig.getUntrackedParameter<edm::InputTag>("nIVFClustersMTDPV"))),
+    nIVFClustersMTDPVToken_(consumes<unsigned int>(iConfig.getUntrackedParameter<edm::InputTag>("nIVFClustersMTDPV"))),
     secondaryVerticesToken_(consumes<reco::VertexCollection>(iConfig.getUntrackedParameter<edm::InputTag>("secondaryVertices"))),
-    // secondaryVerticesMTDBSToken_(consumes<reco::VertexCollection>(iConfig.getUntrackedParameter<edm::InputTag>("secondaryVerticesMTDBS"))),
+    secondaryVerticesMTDBSToken_(consumes<reco::VertexCollection>(iConfig.getUntrackedParameter<edm::InputTag>("secondaryVerticesMTDBS"))),
     secondaryVerticesMTDBS4Token_(consumes<reco::VertexCollection>(iConfig.getUntrackedParameter<edm::InputTag>("secondaryVerticesMTDBS4"))),
     trackTimeBSValueMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimeBSValueMap"))),
     trackTimeBSErrorMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimeBSErrorMap"))),
     trackTimeBSQualityMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimeBSQualityMap"))),
-    // secondaryVerticesMTDPVToken_(consumes<reco::VertexCollection>(iConfig.getUntrackedParameter<edm::InputTag>("secondaryVerticesMTDPV"))),
-    // trackTimePVValueMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimePVValueMap"))),
-    // trackTimePVErrorMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimePVErrorMap"))),
+    secondaryVerticesMTDPVToken_(consumes<reco::VertexCollection>(iConfig.getUntrackedParameter<edm::InputTag>("secondaryVerticesMTDPV"))),
+    trackTimePVValueMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimePVValueMap"))),
+    trackTimePVErrorMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimePVErrorMap"))),
     // trackTimePVQualityMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimePVQualityMap"))),
     jetsToken_(consumes<pat::JetCollection>(iConfig.getUntrackedParameter<edm::InputTag>("jets"))),
     genJetsToken_(consumes<reco::GenJetCollection>(iConfig.getUntrackedParameter<edm::InputTag>("genJets"))),
@@ -158,9 +160,9 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   gv_names_.push_back("gvtn"); // GenVertex constructed from TrackingVertexs w/out neutrino daughters
 
   sv_names_.push_back("sv"); // SecondaryVertex
-  // sv_names_.push_back("svbs"); // SecondaryVertex w/track time extrapolated to the beam spot
+  sv_names_.push_back("svbs"); // SecondaryVertex w/track time extrapolated to the beam spot
   sv_names_.push_back("svbs4"); // SecondaryVertex w/range cut on track time extrapolated to the beam spot
-  // sv_names_.push_back("svpv"); // SecondaryVertex w/track time extrapolated to the primary vertex
+  sv_names_.push_back("svpv"); // SecondaryVertex w/track time extrapolated to the primary vertex
 
   rj_names_.push_back("rj"); // RecoJet
   rj_names_.push_back("rjg"); // RecoJet w/GEN match
@@ -268,12 +270,12 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   }
   histos1_["nc"] = fs->make<TH1F>("nc", "nc", nsv_, 0, nsv_);
   histos1_["nc"]->Sumw2();
-  // histos1_["ncbs"] = fs->make<TH1F>("ncbs", "ncbs", nsv_, 0, nsv_);
-  // histos1_["ncbs"]->Sumw2();
+  histos1_["ncbs"] = fs->make<TH1F>("ncbs", "ncbs", nsv_, 0, nsv_);
+  histos1_["ncbs"]->Sumw2();
   histos1_["ncbs4"] = fs->make<TH1F>("ncbs4", "ncbs4", nsv_, 0, nsv_);
   histos1_["ncbs4"]->Sumw2();
-  // histos1_["ncpv"] = fs->make<TH1F>("ncpv", "ncpv", nsv_, 0, nsv_);
-  // histos1_["ncpv"]->Sumw2();
+  histos1_["ncpv"] = fs->make<TH1F>("ncpv", "ncpv", nsv_, 0, nsv_);
+  histos1_["ncpv"]->Sumw2();
   for (TString rj_name : rj_names_) {
     TString name = "n" + rj_name;
     histos1_[name] = fs->make<TH1F>(name, name, njet_, 0, njet_);
@@ -345,16 +347,18 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   // Sorting described here: https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideOfflinePrimaryVertexProduction
   const reco::Vertex& primaryVertex = primaryVertices.at(0); // Most likely the signal vertex
 
-  gvc_->build(iEvent, genParticlesToken_, simTracksToken_,
+  gvc_->build(iEvent, prunedGenParticlesToken_, packedGenParticlesToken_,
+    simTracksToken_,
     // trackingParticlesToken_,
     trackingVerticesToken_, primaryVertex);
   svc_->build(iEvent,
       secondaryVerticesToken_,
-      // secondaryVerticesMTDBSToken_,
+      secondaryVerticesMTDBSToken_,
       secondaryVerticesMTDBS4Token_,
       trackTimeBSValueMapToken_, trackTimeBSErrorMapToken_, trackTimeBSQualityMapToken_,
-      // secondaryVerticesMTDPVToken_,
-      // trackTimePVValueMapToken_, trackTimePVErrorMapToken_, trackTimePVQualityMapToken_,
+      secondaryVerticesMTDPVToken_,
+      trackTimePVValueMapToken_, trackTimePVErrorMapToken_,
+      // trackTimePVQualityMapToken_,
       primaryVertex);
   rjc_->build(iEvent, jetsToken_, genJetsFlavourInfoToken_);
   gjc_->build(iEvent, genJetsToken_, genJetsFlavourInfoToken_, jetsToken_);
@@ -380,22 +384,22 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
   std::vector<SecondaryVertexCollection> SVCollections;
   SVCollections.push_back(svc_->getSecondaryVertexCollection());
-  // SVCollections.push_back(svc_->getSecondaryVertexCollectionMTDBS());
+  SVCollections.push_back(svc_->getSecondaryVertexCollectionMTDBS());
   SVCollections.push_back(svc_->getSecondaryVertexCollectionMTDBS4());
-  // SVCollections.push_back(svc_->getSecondaryVertexCollectionMTDPV());
+  SVCollections.push_back(svc_->getSecondaryVertexCollectionMTDPV());
   for (unsigned int iColl = 0; iColl < SVCollections.size(); iColl++) {
     histos1_["n" + sv_names_.at(iColl)]->Fill(SVCollections.at(iColl).size());
     for (SecondaryVertex& sv : SVCollections.at(iColl)) sv.fill(histos1_, histos2_, sv_names_.at(iColl));
   }
 
   unsigned int nC = iEvent.get(nIVFClustersToken_);
-  // unsigned int nCBS = iEvent.get(nIVFClustersMTDBSToken_);
+  unsigned int nCBS = iEvent.get(nIVFClustersMTDBSToken_);
   unsigned int nCBS4 = iEvent.get(nIVFClustersMTDBS4Token_);
-  // unsigned int nCPV = iEvent.get(nIVFClustersMTDPVToken_);
+  unsigned int nCPV = iEvent.get(nIVFClustersMTDPVToken_);
   histos1_["nc"]->Fill(nC);
-  // histos1_["ncbs"]->Fill(nCBS);
+  histos1_["ncbs"]->Fill(nCBS);
   histos1_["ncbs4"]->Fill(nCBS4);
-  // histos1_["ncpv"]->Fill(nCPV);
+  histos1_["ncpv"]->Fill(nCPV);
 
   std::vector<RecoJetCollection> RJCollections;
   RJCollections.push_back(rjc_->getRecoJetCollection());

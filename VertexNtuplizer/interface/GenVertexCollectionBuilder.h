@@ -39,6 +39,9 @@ class GenVertexCollectionBuilder {
     GenVertexCollection getGenVertexSimMatchCollection() { return genVerticesSimMatch_; }
     GenVertexCollection getGenVertexNoNuCollection() { return genVerticesNoNu_; }
     GenVertexCollection getGenVertexNoNuSimMatchCollection() { return genVerticesNoNuSimMatch_; }
+    GenVertexCollection getGenVertexFromPackedGen() { return genVerticesFromPackedGen_; }
+    GenVertexCollection getGenVertexFromPackedGenNoNu() { return genVerticesFromPackedGenNoNu_; }
+    GenVertexCollection getGenVertexFromPackedGenNoNuSimMatch() { return genVerticesFromPackedGenNoNuSimMatch_; }
     GenVertexCollection getGenVertexFromTV() { return genVerticesFromTV_; }
     GenVertexCollection getGenVertexFromTVNoNu() { return genVerticesFromTVNoNu_; }
 

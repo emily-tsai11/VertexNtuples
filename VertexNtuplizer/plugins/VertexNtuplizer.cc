@@ -156,6 +156,9 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   gv_names_.push_back("gvs"); // GenVertex w/SIM match
   gv_names_.push_back("gvn"); // GenVertex w/out neutrino daughters
   gv_names_.push_back("gvns"); // GenVertex w/out neutrino daughters w/SIM match
+  gv_names_.push_back("gvp"); // GenVertex constructed from packed GenParticles
+  gv_names_.push_back("gvpn"); // GenVertex constructed from packed GenParticles w/out neutrino daughters
+  gv_names_.push_back("gvpns"); // GenVertex constructed from packed GenParticles w/out neutrino daughters w/SIM match
   gv_names_.push_back("gvt"); // GenVertex constructed from TrackingVertexs
   gv_names_.push_back("gvtn"); // GenVertex constructed from TrackingVertexs w/out neutrino daughters
 
@@ -368,6 +371,9 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   GVCollections.push_back(gvc_->getGenVertexSimMatchCollection());
   GVCollections.push_back(gvc_->getGenVertexNoNuCollection());
   GVCollections.push_back(gvc_->getGenVertexNoNuSimMatchCollection());
+  GVCollections.push_back(gvc_->getGenVertexFromPackedGen());
+  GVCollections.push_back(gvc_->getGenVertexFromPackedGenNoNu());
+  GVCollections.push_back(gvc_->getGenVertexFromPackedGenNoNuSimMatch());
   GVCollections.push_back(gvc_->getGenVertexFromTV());
   GVCollections.push_back(gvc_->getGenVertexFromTVNoNu());
   for (unsigned int iColl = 0; iColl < GVCollections.size(); iColl++) {
@@ -379,8 +385,11 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   // std::cout << "GVs:  " << GVCollections.at(1).size() << std::endl;
   // std::cout << "GVn:  " << GVCollections.at(2).size() << std::endl;
   // std::cout << "GVns: " << GVCollections.at(3).size() << std::endl;
-  // std::cout << "TV:   " << GVCollections.at(4).size() << std::endl;
-  // std::cout << "TVn:  " << GVCollections.at(5).size() << std::endl;
+  // std::cout << "PG:   " << GVCollections.at(4).size() << std::endl;
+  // std::cout << "PGn:  " << GVCollections.at(5).size() << std::endl;
+  // std::cout << "PGs:  " << GVCollections.at(6).size() << std::endl;
+  // std::cout << "TV:   " << GVCollections.at(7).size() << std::endl;
+  // std::cout << "TVn:  " << GVCollections.at(8).size() << std::endl;
 
   std::vector<SecondaryVertexCollection> SVCollections;
   SVCollections.push_back(svc_->getSecondaryVertexCollection());
@@ -478,13 +487,21 @@ void VertexNtuplizer::endJob() {
     std::cout << "trkMatchDrCut         = " << trkMatchDrCut_ << std::endl;
     std::cout << "trkMatchPtCut         = " << trkMatchPtCut_ << std::endl;
     std::cout << "GV-SV efficiency      = " << histos1_["gv_sv_pt"]->GetEntries() / histos1_["gv_pt"]->GetEntries() << std::endl;
+    std::cout << "GV-SVbs efficiency    = " << histos1_["gv_svbs_pt"]->GetEntries() / histos1_["gv_pt"]->GetEntries() << std::endl;
     std::cout << "GV-SVbs4 efficiency   = " << histos1_["gv_svbs4_pt"]->GetEntries() / histos1_["gv_pt"]->GetEntries() << std::endl;
+    std::cout << "GV-SVpv efficiency    = " << histos1_["gv_svpv_pt"]->GetEntries() / histos1_["gv_pt"]->GetEntries() << std::endl;
     std::cout << "GVs-SV efficiency     = " << histos1_["gvs_sv_pt"]->GetEntries() / histos1_["gvs_pt"]->GetEntries() << std::endl;
+    std::cout << "GVs-SVbs efficiency   = " << histos1_["gvs_svbs_pt"]->GetEntries() / histos1_["gvs_pt"]->GetEntries() << std::endl;
     std::cout << "GVs-SVbs4 efficiency  = " << histos1_["gvs_svbs4_pt"]->GetEntries() / histos1_["gvs_pt"]->GetEntries() << std::endl;
+    std::cout << "GVs-SVpv efficiency   = " << histos1_["gvs_svpv_pt"]->GetEntries() / histos1_["gvs_pt"]->GetEntries() << std::endl;
     std::cout << "GVn-SV efficiency     = " << histos1_["gvn_sv_pt"]->GetEntries() / histos1_["gvn_pt"]->GetEntries() << std::endl;
+    std::cout << "GVn-SVbs efficiency   = " << histos1_["gvn_svbs_pt"]->GetEntries() / histos1_["gvn_pt"]->GetEntries() << std::endl;
     std::cout << "GVn-SVbs4 efficiency  = " << histos1_["gvn_svbs4_pt"]->GetEntries() / histos1_["gvn_pt"]->GetEntries() << std::endl;
+    std::cout << "GVn-SVpv efficiency   = " << histos1_["gvn_svpv_pt"]->GetEntries() / histos1_["gvn_pt"]->GetEntries() << std::endl;
     std::cout << "GVns-SV efficiency    = " << histos1_["gvns_sv_pt"]->GetEntries() / histos1_["gvns_pt"]->GetEntries() << std::endl;
+    std::cout << "GVns-SVbs efficiency  = " << histos1_["gvns_svbs_pt"]->GetEntries() / histos1_["gvns_pt"]->GetEntries() << std::endl;
     std::cout << "GVns-SVbs4 efficiency = " << histos1_["gvns_svbs4_pt"]->GetEntries() / histos1_["gvns_pt"]->GetEntries() << std::endl;
+    std::cout << "GVns-SVpv efficiency  = " << histos1_["gvns_svpv_pt"]->GetEntries() / histos1_["gvns_pt"]->GetEntries() << std::endl;
   }
 
   // Catch under and over flows

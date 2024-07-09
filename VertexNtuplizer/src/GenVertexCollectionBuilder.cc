@@ -17,7 +17,7 @@ GenVertexCollectionBuilder::GenVertexCollectionBuilder(const edm::ParameterSet& 
 // GenVertexCollectionBuilder::~GenVertexCollectionBuilder() {}
 
 
-void GenVertexCollectionBuilder::build(const edm::Event& iEvent,
+unsigned int GenVertexCollectionBuilder::build(const edm::Event& iEvent,
     edm::EDGetTokenT<reco::GenParticleCollection>& prunedGenParticlesToken,
     // edm::EDGetTokenT<pat::PackedGenParticleCollection>& packedGenParticlesToken,
     edm::EDGetTokenT<edm::SimTrackContainer>& simTracksToken,
@@ -92,7 +92,7 @@ void GenVertexCollectionBuilder::build(const edm::Event& iEvent,
   } // End loop over pruned GenParticles
 
   // Construct GenVertexCollections from pruned GenParticles
-  // All stable final state particles
+  unsigned int nPassingPrunedGP = 0;
   for (const reco::GenParticle& gp : prunedGenParticles_) {
     const reco::GenParticle* mother = gp.clone();
 
@@ -108,6 +108,7 @@ void GenVertexCollectionBuilder::build(const edm::Event& iEvent,
       }
     }
     if (!lastInstance) continue;
+    nPassingPrunedGP++;
 
     std::cout << "--------------------- new mother ---------------------" << std::endl;
     std::cout << "mother pdgid = " << mother->pdgId() << std::endl;
@@ -199,6 +200,8 @@ void GenVertexCollectionBuilder::build(const edm::Event& iEvent,
   // std::sort(genVerticesSimMatch_.begin(), genVerticesSimMatch_.end(), compare);
   // std::sort(genVerticesNoNu_.begin(), genVerticesNoNu_.end(), compare);
   // std::sort(genVerticesNoNuSimMatch_.begin(), genVerticesNoNuSimMatch_.end(), compare);
+
+  return nPassingPrunedGP;
 }
 
 

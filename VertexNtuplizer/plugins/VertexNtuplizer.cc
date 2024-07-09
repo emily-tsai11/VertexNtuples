@@ -290,6 +290,8 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
     histos1_[name] = fs->make<TH1F>(name, name, njet_, 0, njet_);
     histos1_[name]->Sumw2();
   }
+  // Do we need this other than for comparison purposes?
+  histos1_["nPrunedGPs"] = fs->make<TH1F>("nPrunedGPs", "nPrunedGPs", 13, 0, 13);
 
   // 1D histograms
   for (TString obj : objs_) {
@@ -351,7 +353,7 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   // Sorting described here: https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideOfflinePrimaryVertexProduction
   const reco::Vertex& primaryVertex = primaryVertices.at(0); // Most likely the signal vertex
 
-  gvc_->build(iEvent, prunedGenParticlesToken_,
+  unsigned int nPassingPrunedGP = gvc_->build(iEvent, prunedGenParticlesToken_,
     // packedGenParticlesToken_,
     simTracksToken_,
     // trackingParticlesToken_,
@@ -383,6 +385,7 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     histos1_["n" + gv_names_.at(iColl)]->Fill(GVCollections.at(iColl).size());
     for (GenVertex& gv : GVCollections.at(iColl)) gv.fill(histos1_, gv_names_.at(iColl));
   }
+  histos1_["nPrunedGPs"]->Fill(nPassingPrunedGP);
 
   std::cout << "GV:   " << GVCollections.at(0).size() << std::endl;
   std::cout << "GVs:  " << GVCollections.at(1).size() << std::endl;
@@ -430,6 +433,7 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     for (GenJet& gj : GJCollections.at(iColl)) gj.fill(histos1_, gj_names_.at(iColl));
   }
 
+  // Matching GV and SV
   for (unsigned int iGVs = 0; iGVs < GVCollections.size(); iGVs++) {
     for (unsigned int iSVs = 0; iSVs < SVCollections.size(); iSVs++) {
       std::vector<bool> SVmatched(SVCollections.at(iSVs).size(), false);

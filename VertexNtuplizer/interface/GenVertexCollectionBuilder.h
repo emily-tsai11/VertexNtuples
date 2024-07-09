@@ -27,7 +27,7 @@ class GenVertexCollectionBuilder {
     GenVertexCollectionBuilder(const edm::ParameterSet& iConfig);
     // ~GenVertexCollectionBuilder();
 
-    void build(const edm::Event& iEvent,
+    unsigned int build(const edm::Event& iEvent,
         edm::EDGetTokenT<reco::GenParticleCollection>& prunedGenParticlesToken,
         // edm::EDGetTokenT<pat::PackedGenParticleCollection>& packedGenParticlesToken,
         edm::EDGetTokenT<edm::SimTrackContainer>& simTracksToken,

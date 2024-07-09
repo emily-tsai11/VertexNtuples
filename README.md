@@ -54,3 +54,9 @@ $$\frac{|\text{GV daughter }p_T - \text{SV track }p_T|}{\text{GV daughter }p_T +
 To find two matching vertices, we require that
 $$\frac{\text{number of matched GV daughters}}{\text{total number of GV daughters}} > 0.66$$
 To perform a scan on the two cuts, set `scanCuts` in `VertexNtuplizer/test/VertexNtuplizer.py` to `True`. You can then plot the effect of varying these cuts using `VertexNtuplizer/test/CutScan/trkDrPtCutScan_eff.py`.
+
+### To update external git repositories
+```
+cd VertexNtuplizer/
+git submodule update --remote
+```

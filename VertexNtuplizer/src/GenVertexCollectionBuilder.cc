@@ -135,7 +135,7 @@ unsigned int GenVertexCollectionBuilder::build(const edm::Event& iEvent,
       }
     }
 
-    if (goodDaughters->size() >= 2) {
+    if (goodDaughters->size() >= 1) {
       GenVertex newGVNoNu(mother, goodDaughters, primaryVertex, motherPartID);
       genVerticesFromPrunedGenNoNu_.push_back(newGVNoNu);
       if (motherPartID == 0 || motherPartID == 1) genVerticesB_.push_back(newGVNoNu);

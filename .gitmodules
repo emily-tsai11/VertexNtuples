@@ -1,3 +1,6 @@
 [submodule "VertexNtuplizer/test/cmsstyle"]
 	path = VertexNtuplizer/test/cmsstyle
 	url = git@github.com:cms-cat/cmsstyle.git
+[submodule "VertexNtuplizer/test/comb-sv-plots"]
+	path = VertexNtuplizer/test/comb-sv-plots
+	url = git@github.com:emily-tsai11/comb-sv-plots.git

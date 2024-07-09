@@ -387,16 +387,16 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   }
   histos1_["nPrunedGPs"]->Fill(nPassingPrunedGP);
 
-  std::cout << "GV:   " << GVCollections.at(0).size() << std::endl;
-  std::cout << "GVs:  " << GVCollections.at(1).size() << std::endl;
-  std::cout << "GVn:  " << GVCollections.at(2).size() << std::endl;
-  std::cout << "GVns: " << GVCollections.at(3).size() << std::endl;
-  std::cout << "PGn:  " << GVCollections.at(4).size() << std::endl;
-  std::cout << "PGnB: " << GVCollections.at(5).size() << std::endl;
-  std::cout << "PGnD: " << GVCollections.at(6).size() << std::endl;
-  std::cout << "PGs:  " << GVCollections.at(7).size() << std::endl;
-  std::cout << "TV:   " << GVCollections.at(8).size() << std::endl;
-  std::cout << "TVn:  " << GVCollections.at(9).size() << std::endl;
+  // std::cout << "GV:   " << GVCollections.at(0).size() << std::endl;
+  // std::cout << "GVs:  " << GVCollections.at(1).size() << std::endl;
+  // std::cout << "GVn:  " << GVCollections.at(2).size() << std::endl;
+  // std::cout << "GVns: " << GVCollections.at(3).size() << std::endl;
+  // std::cout << "PGn:  " << GVCollections.at(4).size() << std::endl;
+  // std::cout << "PGnB: " << GVCollections.at(5).size() << std::endl;
+  // std::cout << "PGnD: " << GVCollections.at(6).size() << std::endl;
+  // std::cout << "PGs:  " << GVCollections.at(7).size() << std::endl;
+  // std::cout << "TV:   " << GVCollections.at(8).size() << std::endl;
+  // std::cout << "TVn:  " << GVCollections.at(9).size() << std::endl;
 
   std::vector<SecondaryVertexCollection> SVCollections;
   SVCollections.push_back(svc_->getSecondaryVertexCollection());

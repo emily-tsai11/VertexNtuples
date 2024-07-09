@@ -7,8 +7,7 @@ This is a ntuple framework for secondary vertexing studies.
 cmsrel CMSSW_14_1_0_pre3
 cd CMSSW_14_1_0_pre3/src
 cmsenv
-git cms-init
-git clone git@github.com:emily-tsai11/VertexNtuples.git
+git clone --recurse-submodules --remote-submodules git@github.com:emily-tsai11/VertexNtuples.git
 scram b -j
 ```
 Or, for debugging with `gdb`, compile with

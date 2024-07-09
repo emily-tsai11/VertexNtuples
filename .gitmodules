@@ -1,0 +1,3 @@
+[submodule "VertexNtuplizer/test/cmsstyle"]
+	path = VertexNtuplizer/test/cmsstyle
+	url = git@github.com:cms-cat/cmsstyle.git

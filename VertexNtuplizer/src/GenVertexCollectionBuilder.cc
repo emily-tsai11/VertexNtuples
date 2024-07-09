@@ -25,7 +25,7 @@ unsigned int GenVertexCollectionBuilder::build(const edm::Event& iEvent,
     edm::EDGetTokenT<TrackingVertexCollection>& trackingVerticesToken,
     const reco::Vertex& primaryVertex) {
 
-  std::cout << "--------------------- NEW EVENT ---------------------" << std::endl;
+  // std::cout << "--------------------- NEW EVENT ---------------------" << std::endl;
 
   prunedGenParticles_ = iEvent.get(prunedGenParticlesToken);
   // packedGenParticles_ = iEvent.get(packedGenParticlesToken);
@@ -110,21 +110,21 @@ unsigned int GenVertexCollectionBuilder::build(const edm::Event& iEvent,
     if (!lastInstance) continue;
     nPassingPrunedGP++;
 
-    std::cout << "--------------------- new mother ---------------------" << std::endl;
-    std::cout << "mother pdgid = " << mother->pdgId() << std::endl;
+    // std::cout << "--------------------- new mother ---------------------" << std::endl;
+    // std::cout << "mother pdgid = " << mother->pdgId() << std::endl;
     std::vector<const reco::Candidate*>* goodDaughters = new std::vector<const reco::Candidate*>;
     for (unsigned int iDau = 0; iDau < mother->numberOfDaughters(); iDau++) {
       const reco::Candidate* dau = mother->daughter(iDau)->clone();
       std::queue<const reco::Candidate*> queue;
       queue.push(dau);
-      std::cout << "------------ new queue ------------" << std::endl;
+      // std::cout << "------------ new queue ------------" << std::endl;
       while(!queue.empty()) {
-        std::cout << "queue size = " << queue.size() << std::endl;
-        std::cout << "front pdgid = " << queue.front()->pdgId() << ", " << queue.front()->numberOfDaughters() << " daughters" << std::endl;
+        // std::cout << "queue size = " << queue.size() << std::endl;
+        // std::cout << "front pdgid = " << queue.front()->pdgId() << ", " << queue.front()->numberOfDaughters() << " daughters" << std::endl;
         if (queue.front()->status() == 1) { // Stable outgoing particle
           if (goodGenParticle(queue.front(), genDaughterPtMin_) && queue.front()->charge() != 0) {
             goodDaughters->push_back(queue.front());
-            std::cout << "stable & pass kinematic cuts pdgid = " << queue.front()->pdgId() << std::endl;
+            // std::cout << "stable & pass kinematic cuts pdgid = " << queue.front()->pdgId() << std::endl;
           }
         } else {
           for (unsigned int iDau = 0; iDau < queue.front()->numberOfDaughters(); iDau++) {

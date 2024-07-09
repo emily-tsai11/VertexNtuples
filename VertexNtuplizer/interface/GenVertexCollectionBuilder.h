@@ -7,7 +7,7 @@
 #include "FWCore/Utilities/interface/EDGetToken.h"
 
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
-#include "DataFormats/PatCandidates/interface/PackedGenParticle.h"
+// #include "DataFormats/PatCandidates/interface/PackedGenParticle.h"
 #include "SimDataFormats/Track/interface/SimTrackContainer.h"
 // #include "SimDataFormats/TrackingAnalysis/interface/TrackingParticle.h"
 #include "SimDataFormats/TrackingAnalysis/interface/TrackingVertexContainer.h"
@@ -29,7 +29,7 @@ class GenVertexCollectionBuilder {
 
     void build(const edm::Event& iEvent,
         edm::EDGetTokenT<reco::GenParticleCollection>& prunedGenParticlesToken,
-        edm::EDGetTokenT<pat::PackedGenParticleCollection>& packedGenParticlesToken,
+        // edm::EDGetTokenT<pat::PackedGenParticleCollection>& packedGenParticlesToken,
         edm::EDGetTokenT<edm::SimTrackContainer>& simTracksToken,
         // edm::EDGetTokenT<TrackingParticleCollection>& trackingParticlesToken,
         edm::EDGetTokenT<TrackingVertexCollection>& trackingVerticesToken,
@@ -39,9 +39,10 @@ class GenVertexCollectionBuilder {
     GenVertexCollection getGenVertexSimMatchCollection() { return genVerticesSimMatch_; }
     GenVertexCollection getGenVertexNoNuCollection() { return genVerticesNoNu_; }
     GenVertexCollection getGenVertexNoNuSimMatchCollection() { return genVerticesNoNuSimMatch_; }
-    GenVertexCollection getGenVertexFromPackedGen() { return genVerticesFromPackedGen_; }
-    GenVertexCollection getGenVertexFromPackedGenNoNu() { return genVerticesFromPackedGenNoNu_; }
-    GenVertexCollection getGenVertexFromPackedGenNoNuSimMatch() { return genVerticesFromPackedGenNoNuSimMatch_; }
+    GenVertexCollection getGenVertexFromPrunedGenNoNu() { return genVerticesFromPrunedGenNoNu_; }
+    GenVertexCollection getGenVertexB() { return genVerticesB_; }
+    GenVertexCollection getGenVertexD() { return genVerticesD_; }
+    GenVertexCollection getGenVertexFromPrunedGenNoNuSimMatch() { return genVerticesFromPrunedGenNoNuSimMatch_; }
     GenVertexCollection getGenVertexFromTV() { return genVerticesFromTV_; }
     GenVertexCollection getGenVertexFromTVNoNu() { return genVerticesFromTVNoNu_; }
 
@@ -70,14 +71,15 @@ class GenVertexCollectionBuilder {
     GenVertexCollection genVerticesSimMatch_;
     GenVertexCollection genVerticesNoNu_;
     GenVertexCollection genVerticesNoNuSimMatch_;
-    GenVertexCollection genVerticesFromPackedGen_;
-    GenVertexCollection genVerticesFromPackedGenNoNu_;
-    GenVertexCollection genVerticesFromPackedGenNoNuSimMatch_;
+    GenVertexCollection genVerticesFromPrunedGenNoNu_;
+    GenVertexCollection genVerticesB_;
+    GenVertexCollection genVerticesD_;
+    GenVertexCollection genVerticesFromPrunedGenNoNuSimMatch_;
     GenVertexCollection genVerticesFromTV_;
     GenVertexCollection genVerticesFromTVNoNu_;
 
     reco::GenParticleCollection prunedGenParticles_;
-    pat::PackedGenParticleCollection packedGenParticles_;
+    // pat::PackedGenParticleCollection packedGenParticles_;
     edm::SimTrackContainer simTracks_;
     // TrackingParticleCollection trackingParticles_;
     TrackingVertexCollection trackingVertices_;

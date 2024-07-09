@@ -68,7 +68,7 @@ class VertexNtuplizer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
     void endJob() override;
 
     edm::EDGetTokenT<reco::GenParticleCollection> prunedGenParticlesToken_;
-    edm::EDGetTokenT<pat::PackedGenParticleCollection> packedGenParticlesToken_;
+    // edm::EDGetTokenT<pat::PackedGenParticleCollection> packedGenParticlesToken_;
     edm::EDGetTokenT<edm::SimTrackContainer> simTracksToken_;
     // edm::EDGetTokenT<TrackingParticleCollection> trackingParticlesToken_;
     edm::EDGetTokenT<TrackingVertexCollection> trackingVerticesToken_;
@@ -116,7 +116,7 @@ class VertexNtuplizer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
 
 VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
     prunedGenParticlesToken_(consumes<reco::GenParticleCollection>(iConfig.getUntrackedParameter<edm::InputTag>("prunedGenParticles"))),
-    packedGenParticlesToken_(consumes<pat::PackedGenParticleCollection>(iConfig.getUntrackedParameter<edm::InputTag>("packedGenParticles"))),
+    // packedGenParticlesToken_(consumes<pat::PackedGenParticleCollection>(iConfig.getUntrackedParameter<edm::InputTag>("packedGenParticles"))),
     simTracksToken_(consumes<edm::SimTrackContainer>(iConfig.getUntrackedParameter<edm::InputTag>("simTracks"))),
     // trackingParticlesToken_(consumes<TrackingParticleCollection>(iConfig.getUntrackedParameter<edm::InputTag>("trackingParticles"))),
     trackingVerticesToken_(consumes<TrackingVertexCollection>(iConfig.getUntrackedParameter<edm::InputTag>("trackingVertices"))),
@@ -156,9 +156,10 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   gv_names_.push_back("gvs"); // GenVertex w/SIM match
   gv_names_.push_back("gvn"); // GenVertex w/out neutrino daughters
   gv_names_.push_back("gvns"); // GenVertex w/out neutrino daughters w/SIM match
-  gv_names_.push_back("gvp"); // GenVertex constructed from packed GenParticles
-  gv_names_.push_back("gvpn"); // GenVertex constructed from packed GenParticles w/out neutrino daughters
-  gv_names_.push_back("gvpns"); // GenVertex constructed from packed GenParticles w/out neutrino daughters w/SIM match
+  gv_names_.push_back("gvpn"); // GenVertex constructed from pruned GenParticles w/out neutrino daughters
+  gv_names_.push_back("gvpnB"); // GenVertex constructed from pruned GenParticles w/out neutrino daughters
+  gv_names_.push_back("gvpnD"); // GenVertex constructed from pruned GenParticles w/out neutrino daughters
+  gv_names_.push_back("gvpns"); // GenVertex constructed from pruned GenParticles w/out neutrino daughters w/SIM match
   gv_names_.push_back("gvt"); // GenVertex constructed from TrackingVertexs
   gv_names_.push_back("gvtn"); // GenVertex constructed from TrackingVertexs w/out neutrino daughters
 
@@ -350,7 +351,8 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   // Sorting described here: https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideOfflinePrimaryVertexProduction
   const reco::Vertex& primaryVertex = primaryVertices.at(0); // Most likely the signal vertex
 
-  gvc_->build(iEvent, prunedGenParticlesToken_, packedGenParticlesToken_,
+  gvc_->build(iEvent, prunedGenParticlesToken_,
+    // packedGenParticlesToken_,
     simTracksToken_,
     // trackingParticlesToken_,
     trackingVerticesToken_, primaryVertex);
@@ -371,9 +373,10 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   GVCollections.push_back(gvc_->getGenVertexSimMatchCollection());
   GVCollections.push_back(gvc_->getGenVertexNoNuCollection());
   GVCollections.push_back(gvc_->getGenVertexNoNuSimMatchCollection());
-  GVCollections.push_back(gvc_->getGenVertexFromPackedGen());
-  GVCollections.push_back(gvc_->getGenVertexFromPackedGenNoNu());
-  GVCollections.push_back(gvc_->getGenVertexFromPackedGenNoNuSimMatch());
+  GVCollections.push_back(gvc_->getGenVertexFromPrunedGenNoNu());
+  GVCollections.push_back(gvc_->getGenVertexB());
+  GVCollections.push_back(gvc_->getGenVertexD());
+  GVCollections.push_back(gvc_->getGenVertexFromPrunedGenNoNuSimMatch());
   GVCollections.push_back(gvc_->getGenVertexFromTV());
   GVCollections.push_back(gvc_->getGenVertexFromTVNoNu());
   for (unsigned int iColl = 0; iColl < GVCollections.size(); iColl++) {
@@ -381,15 +384,16 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     for (GenVertex& gv : GVCollections.at(iColl)) gv.fill(histos1_, gv_names_.at(iColl));
   }
 
-  // std::cout << "GV:   " << GVCollections.at(0).size() << std::endl;
-  // std::cout << "GVs:  " << GVCollections.at(1).size() << std::endl;
-  // std::cout << "GVn:  " << GVCollections.at(2).size() << std::endl;
-  // std::cout << "GVns: " << GVCollections.at(3).size() << std::endl;
-  // std::cout << "PG:   " << GVCollections.at(4).size() << std::endl;
-  // std::cout << "PGn:  " << GVCollections.at(5).size() << std::endl;
-  // std::cout << "PGs:  " << GVCollections.at(6).size() << std::endl;
-  // std::cout << "TV:   " << GVCollections.at(7).size() << std::endl;
-  // std::cout << "TVn:  " << GVCollections.at(8).size() << std::endl;
+  std::cout << "GV:   " << GVCollections.at(0).size() << std::endl;
+  std::cout << "GVs:  " << GVCollections.at(1).size() << std::endl;
+  std::cout << "GVn:  " << GVCollections.at(2).size() << std::endl;
+  std::cout << "GVns: " << GVCollections.at(3).size() << std::endl;
+  std::cout << "PGn:  " << GVCollections.at(4).size() << std::endl;
+  std::cout << "PGnB: " << GVCollections.at(5).size() << std::endl;
+  std::cout << "PGnD: " << GVCollections.at(6).size() << std::endl;
+  std::cout << "PGs:  " << GVCollections.at(7).size() << std::endl;
+  std::cout << "TV:   " << GVCollections.at(8).size() << std::endl;
+  std::cout << "TVn:  " << GVCollections.at(9).size() << std::endl;
 
   std::vector<SecondaryVertexCollection> SVCollections;
   SVCollections.push_back(svc_->getSecondaryVertexCollection());

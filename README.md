@@ -58,5 +58,5 @@ To perform a scan on the two cuts, set `scanCuts` in `VertexNtuplizer/test/Verte
 ### To update external git repositories
 ```
 cd VertexNtuplizer/
-git submodule update --remote
+git submodule update --remote --recursive
 ```

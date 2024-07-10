@@ -2,22 +2,25 @@
 import FWCore.ParameterSet.VarParsing as VarParsing
 options = VarParsing.VarParsing()
 options.register("inputFiles",
-  "file:/eos/user/e/etsai/workspace/TTToHadronic_noPU_CMSSW_13_1_0/src/RecoVertex/AdaptiveVertexFinder/test/TTnoPU_n2000_updated.root",
+  # "file:/eos/user/e/etsai/workspace/TTToHadronic_noPU_CMSSW_13_1_0/src/RecoVertex/AdaptiveVertexFinder/test/TTToHadronic_noPU_slimmed_n2000.root",
+  "file:/eos/user/e/etsai/workspace/TTToHadronic_PU200_CMSSW_13_1_3/src/RecoVertex/AdaptiveVertexFinder/test/TTToHadronic_PU200_slimmed_n299.root",
+  # The below 2 files probably don't work anymore...
   # "file:/eos/cms/store/user/etsai/TT_TuneCP5_14TeV-powheg-pythia8/TTToHadronic_noPU/240429_225553/0000/TTToHadronic_noPU_slimmed_1.root",
   # "file:/eos/cms/store/group/phys_btag/etsai/TT_TuneCP5_14TeV-powheg-pythia8/TTToHadronic_PU200/240429_231224/0000/TTToHadronic_PU200_slimmed_1.root",
   VarParsing.VarParsing.multiplicity.list, VarParsing.VarParsing.varType.string, "Input file(s) (default is ttbar no pileup)")
 options.register("outputFile",  "histo", VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.string, "Output file (w/o .root)")
-options.register("maxEvents",   10,      VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int,    "Maximum number of events")
+options.register("maxEvents",   -1,      VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int,    "Maximum number of events")
 options.register("reportEvery", 100,     VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int,    "Report every N events")
 options.register("run2",        False,   VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool,   "Sets |eta| to max 2.5 for 2018 tracker coverage")
 options.register("scanCuts",    False,   VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool,   "Scan pT and dR cuts")
 options.parseArguments()
+file_path = "/eos/cms/store/group/phys_btag/etsai/VertexNtuples/preliminary/" + options.outputFile + ".root"
 
 
 # Poor man's solution because the "RECREATE" option is not working to delete the output ROOT file for some reason
 import os
-if os.path.exists(options.outputFile + ".root"):
-  os.remove(options.outputFile + ".root")
+if os.path.exists(file_path):
+  os.remove(file_path)
 
 
 # Define process
@@ -26,7 +29,7 @@ process = cms.Process("VertexNtuplizer")
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = options.reportEvery
 process.source = cms.Source("PoolSource", fileNames=cms.untracked.vstring(options.inputFiles))
-process.TFileService = cms.Service("TFileService", fileName=cms.string(options.outputFile + ".root"))
+process.TFileService = cms.Service("TFileService", fileName=cms.string(file_path))
 process.maxEvents = cms.untracked.PSet(input=cms.untracked.int32(options.maxEvents))
 
 

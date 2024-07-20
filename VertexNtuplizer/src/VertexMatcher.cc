@@ -18,9 +18,9 @@ bool VertexMatcher::match(GenVertex& gv, SecondaryVertex& sv, MatchAlgo algo) {
   if (algo == TRACK) {
     return vtxTrackMatch(gv, sv);
   }
-  else if (algo == MATRIX) {
-    return vtxMatrixMatch(gv, sv);
-  }
+  // else if (algo == MATRIX) {
+  //   return vtxMatrixMatch(gv, sv);
+  // }
   std::cout << "WARNING in VertexMatcher::match(gv, sv): No matching algorithm specified. Returning false." << std::endl;
   return false;
 }
@@ -39,8 +39,8 @@ bool VertexMatcher::vtxTrackMatch(GenVertex& gv, SecondaryVertex& sv) {
   for (const reco::Candidate* dau : *(gv.daughters())) {
     for (unsigned int iTrk = 0; iTrk < sv.nTracks(); iTrk++) {
       bool match = true;
-      double matchdR = reco::deltaR(sv.trkEta()->at(iTrk), sv.trkPhi()->at(iTrk), dau->eta(), dau->phi());
-      double matchPtResNorm = abs(dau->pt() - sv.trkPt()->at(iTrk)) / (dau->pt() + sv.trkPt()->at(iTrk));
+      float matchdR = reco::deltaR(sv.trkEta()->at(iTrk), sv.trkPhi()->at(iTrk), dau->eta(), dau->phi());
+      float matchPtResNorm = abs(dau->pt() - sv.trkPt()->at(iTrk)) / (dau->pt() + sv.trkPt()->at(iTrk));
       if (matchdR > trkMatchDrCut_) match = false;
       if (matchPtResNorm > trkMatchPtCut_) match = false;
       if (match && !trkMatched.at(iTrk)) {
@@ -58,28 +58,28 @@ bool VertexMatcher::vtxTrackMatch(GenVertex& gv, SecondaryVertex& sv) {
 }
 
 
-bool VertexMatcher::vtxMatrixMatch(GenVertex& gv, SecondaryVertex& sv) {
+// Not yet implemented
+// bool VertexMatcher::vtxMatrixMatch(GenVertex& gv, SecondaryVertex& sv) {
 
-  // Not yet implemented
-  return false;
-}
+//   return false;
+// }
 
 
 void VertexMatcher::fill(std::map<TString, TH1F*>& histos1, std::map<TString, TH2F*>& histos2,
     TString gvPrefix, TString svPrefix, const GenVertex& gv, const SecondaryVertex& sv) {
 
-  double xres = vertexntuples::xres(gv, sv);
-  double yres = vertexntuples::yres(gv, sv);
-  double zres = vertexntuples::zres(gv, sv);
-  double xpull = vertexntuples::xpull(gv, sv);
-  double ypull = vertexntuples::ypull(gv, sv);
-  double zpull = vertexntuples::zpull(gv, sv);
-  double dxy = vertexntuples::dxy(gv, sv);
-  double d3d = vertexntuples::d3d(gv, sv);
-  double dxyerr = vertexntuples::dxyErr(gv, sv);
-  double d3derr = vertexntuples::d3dErr(gv, sv);
-  double dxysig = dxy / dxyerr;
-  double d3dsig = d3d / d3derr;
+  float xres = vertexntuples::xres(gv, sv);
+  float yres = vertexntuples::yres(gv, sv);
+  float zres = vertexntuples::zres(gv, sv);
+  float xpull = vertexntuples::xpull(gv, sv);
+  float ypull = vertexntuples::ypull(gv, sv);
+  float zpull = vertexntuples::zpull(gv, sv);
+  float dxy = vertexntuples::dxy(gv, sv);
+  float d3d = vertexntuples::d3d(gv, sv);
+  float dxyerr = vertexntuples::dxyErr(gv, sv);
+  float d3derr = vertexntuples::d3dErr(gv, sv);
+  float dxysig = dxy / dxyerr;
+  float d3dsig = d3d / d3derr;
 
   histos1[gvPrefix + "_xres"]->Fill(xres);
   histos1[gvPrefix + "_yres"]->Fill(yres);

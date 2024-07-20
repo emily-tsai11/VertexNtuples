@@ -14,18 +14,17 @@
 #include "RecoJet.h"
 
 
-enum MatchAlgo {
-  TRACK,
-  MATRIX
-};
-
-
 class VertexMatcher {
 
   public:
 
     VertexMatcher(const edm::ParameterSet& iConfig);
     // ~VertexMatcher();
+
+    enum MatchAlgo {
+      TRACK,
+      // MATRIX
+    };
 
     bool match(GenVertex& gv, SecondaryVertex& sv, MatchAlgo algo);
     bool match(SecondaryVertex& sv, RecoJet& rj);
@@ -37,7 +36,7 @@ class VertexMatcher {
 
     bool vtxTrackMatch(GenVertex& gv, SecondaryVertex& sv);
     // Not yet implemented, probably have to change input and return values
-    bool vtxMatrixMatch(GenVertex& gv, SecondaryVertex& sv);
+    // bool vtxMatrixMatch(GenVertex& gv, SecondaryVertex& sv);
 
     double trkMatchDrCut_;
     double trkMatchPtCut_;

@@ -17,84 +17,32 @@ GenVertexCollectionBuilder::GenVertexCollectionBuilder(const edm::ParameterSet& 
 // GenVertexCollectionBuilder::~GenVertexCollectionBuilder() {}
 
 
-unsigned int GenVertexCollectionBuilder::build(const edm::Event& iEvent,
+std::vector<unsigned int> GenVertexCollectionBuilder::build(const edm::Event& iEvent,
     edm::EDGetTokenT<reco::GenParticleCollection>& prunedGenParticlesToken,
-    // edm::EDGetTokenT<pat::PackedGenParticleCollection>& packedGenParticlesToken,
+    edm::EDGetTokenT<reco::GenParticleCollection>& mergedGenParticlesToken,
     edm::EDGetTokenT<edm::SimTrackContainer>& simTracksToken,
-    // edm::EDGetTokenT<TrackingParticleCollection>& trackingParticlesToken,
-    edm::EDGetTokenT<TrackingVertexCollection>& trackingVerticesToken,
     const reco::Vertex& primaryVertex) {
 
-  // std::cout << "--------------------- NEW EVENT ---------------------" << std::endl;
-
   prunedGenParticles_ = iEvent.get(prunedGenParticlesToken);
-  // packedGenParticles_ = iEvent.get(packedGenParticlesToken);
+  mergedGenParticles_ = iEvent.get(mergedGenParticlesToken);
   simTracks_ = iEvent.get(simTracksToken);
-  // trackingParticles_ = iEvent.get(trackingParticlesToken);
-  trackingVertices_ = iEvent.get(trackingVerticesToken);
 
-  genVertices_.clear();
-  genVerticesSimMatch_.clear();
-  genVerticesNoNu_.clear();
-  genVerticesNoNuSimMatch_.clear();
-  genVerticesFromPrunedGenNoNu_.clear();
-  genVerticesB_.clear();
-  genVerticesD_.clear();
-  genVerticesFromPrunedGenNoNuSimMatch_.clear();
-  genVerticesFromTV_.clear();
-  genVerticesFromTVNoNu_.clear();
+  genVerticesFromPruned_.clear();
+  genVerticesFromPrunedB_.clear();
+  genVerticesFromPrunedD_.clear();
+  genVerticesFromPrunedSimMatch_.clear();
+  genVerticesFromMerged_.clear();
+  genVerticesFromMergedB_.clear();
+  genVerticesFromMergedD_.clear();
+  genVerticesFromMergedSimMatch_.clear();
 
-  // Construct GenVertexCollections from pruned GenParticles
-  for (const reco::GenParticle& gp : prunedGenParticles_) {
-    const reco::GenParticle* mother = gp.clone();
-
-    if (mother->numberOfDaughters() < 2) continue; // Not a vertex
-    if (!goodGenParticle(mother, genMotherPtMin_)) continue; // Kinematic cut on mother
-
-    int motherPartID = genPartID(mother->pdgId());
-    if (motherPartID < 0) continue; // Mother is not interesting hadron
-
-    bool lastInstance = true; // Check for last instance of interesting hadron
-    for (unsigned int iDau = 0; iDau < mother->numberOfDaughters(); iDau++) {
-      if (genPartID((mother->daughter(iDau))->pdgId()) == motherPartID) {
-        lastInstance = false; // Not last instance of interesting hadron
-        break;
-      }
-    }
-    if (!lastInstance) continue;
-
-    std::vector<const reco::Candidate*>* goodDaughters = new std::vector<const reco::Candidate*>;
-    std::vector<const reco::Candidate*>* goodDaughtersNoNu = new std::vector<const reco::Candidate*>;
-    for (unsigned int iDau = 0; iDau < mother->numberOfDaughters(); iDau++) {
-      const reco::Candidate* dau = mother->daughter(iDau);
-      if (goodGenParticle(dau, genDaughterPtMin_)) {
-        goodDaughters->push_back(dau->clone());
-        if (abs(dau->pdgId()) != 12 && abs(dau->pdgId()) != 14 && abs(dau->pdgId()) != 16) {
-          goodDaughtersNoNu->push_back(dau->clone());
-        }
-      }
-    }
-
-    if (goodDaughters->size() >= 2) {
-      GenVertex newGV(mother, goodDaughters, primaryVertex, motherPartID);
-      genVertices_.push_back(newGV);
-      if (matchGenToSimVertex(newGV)) {
-        genVerticesSimMatch_.push_back(newGV);
-      }
-    }
-    if (goodDaughtersNoNu->size() >= 2) {
-      GenVertex newGVNoNu(mother, goodDaughtersNoNu, primaryVertex, motherPartID);
-      genVerticesNoNu_.push_back(newGVNoNu);
-      if (matchGenToSimVertex(newGVNoNu)) {
-        genVerticesNoNuSimMatch_.push_back(newGVNoNu);
-      }
-    }
-  } // End loop over pruned GenParticles
+  std::vector<unsigned int> nPassingGPs(2, 0);
+  // 0: number of passing pruned GenParticles
+  // 1: number of passing merged GenParticles
 
   // Construct GenVertexCollections from pruned GenParticles
-  unsigned int nPassingPrunedGP = 0;
-  for (const reco::GenParticle& gp : prunedGenParticles_) {
-    const reco::GenParticle* mother = gp.clone();
+  for (unsigned int iGP = 0; iGP < prunedGenParticles_.size(); iGP++) {
+    const reco::Candidate* mother = &prunedGenParticles_[iGP];
 
     if (!goodGenParticle(mother, genMotherPtMin_)) continue; // Kinematic cut on mother
     int motherPartID = genPartID(mother->pdgId());
@@ -108,23 +56,17 @@ unsigned int GenVertexCollectionBuilder::build(const edm::Event& iEvent,
       }
     }
     if (!lastInstance) continue;
-    nPassingPrunedGP++;
+    nPassingGPs.at(0)++;
 
-    // std::cout << "--------------------- new mother ---------------------" << std::endl;
-    // std::cout << "mother pdgid = " << mother->pdgId() << std::endl;
     std::vector<const reco::Candidate*>* goodDaughters = new std::vector<const reco::Candidate*>;
     for (unsigned int iDau = 0; iDau < mother->numberOfDaughters(); iDau++) {
       const reco::Candidate* dau = mother->daughter(iDau)->clone();
       std::queue<const reco::Candidate*> queue;
       queue.push(dau);
-      // std::cout << "------------ new queue ------------" << std::endl;
       while(!queue.empty()) {
-        // std::cout << "queue size = " << queue.size() << std::endl;
-        // std::cout << "front pdgid = " << queue.front()->pdgId() << ", " << queue.front()->numberOfDaughters() << " daughters" << std::endl;
         if (queue.front()->status() == 1) { // Stable outgoing particle
           if (goodGenParticle(queue.front(), genDaughterPtMin_) && queue.front()->charge() != 0) {
             goodDaughters->push_back(queue.front());
-            // std::cout << "stable & pass kinematic cuts pdgid = " << queue.front()->pdgId() << std::endl;
           }
         } else {
           for (unsigned int iDau = 0; iDau < queue.front()->numberOfDaughters(); iDau++) {
@@ -136,77 +78,89 @@ unsigned int GenVertexCollectionBuilder::build(const edm::Event& iEvent,
     }
 
     if (goodDaughters->size() >= 2) {
-      GenVertex newGVNoNu(mother, goodDaughters, primaryVertex, motherPartID);
-      genVerticesFromPrunedGenNoNu_.push_back(newGVNoNu);
-      if (motherPartID == 0 || motherPartID == 1) genVerticesB_.push_back(newGVNoNu);
-      else if (motherPartID == 2 || motherPartID == 3) genVerticesD_.push_back(newGVNoNu);
-      if (matchGenToSimVertex(newGVNoNu)) {
-        genVerticesFromPrunedGenNoNuSimMatch_.push_back(newGVNoNu);
+      GenVertex newGV(mother, goodDaughters, primaryVertex, motherPartID);
+      genVerticesFromPruned_.push_back(newGV);
+      if (motherPartID == B_MESON || motherPartID == B_BARYON) genVerticesFromPrunedB_.push_back(newGV);
+      if (motherPartID == C_MESON || motherPartID == C_BARYON) genVerticesFromPrunedD_.push_back(newGV);
+      if (matchGenToSimVertex(newGV)) {
+        genVerticesFromPrunedSimMatch_.push_back(newGV);
       }
     }
   }
 
-  // Construct GenVertexCollections from TrackingVertices
-  // Maybe this will give pileup information?
-  for (const TrackingVertex& TV : trackingVertices_) {
-    for (const GenVertexRef gvRef : TV.genVertices()) {
-      if (gvRef->particles_in_size() == 0) continue; // No mother particles
-      if (gvRef->particles_in_size() > 1) continue; // Too many mother particles
-      if (gvRef->particles_out_size() < 2) continue; // Not a vertex
+  // Construct GenVertexCollections from merged GenParticles
+  for (unsigned int iGP = 0; iGP < mergedGenParticles_.size(); iGP++) {
+    const reco::Candidate* mother = &mergedGenParticles_[iGP];
 
-      const HepMC::GenParticle* mother = *(gvRef->particles_in_const_begin());
-      if (!goodHepMCGenParticle(mother, genMotherPtMin_)) continue; // Kinematic cut on mother
+    if (!goodGenParticle(mother, genMotherPtMin_)) continue; // Kinematic cut on mother
+    int motherPartID = genPartID(mother->pdgId());
+    if (motherPartID < 0) continue; // Mother is not interesting hadron
 
-      const int motherPartID = genPartID(mother->pdg_id());
-      if (motherPartID < 0) continue; // Not interesting mother particle
-
-      // Iterator beginning and end for daughters
-      it_out it_begin = gvRef->particles_out_const_begin();
-      it_out it_end = gvRef->particles_out_const_end();
-
-      bool lastInstance = true;
-      for (it_out dau = it_begin; dau != it_end; dau++) {
-        if (genPartID((*dau)->pdg_id()) == motherPartID) {
-          lastInstance = false;
-          break;
-        }
+    bool lastInstance = true; // Check for last instance of interesting hadron
+    for (unsigned int iDau = 0; iDau < mother->numberOfDaughters(); iDau++) {
+      if (genPartID((mother->daughter(iDau))->pdgId()) == motherPartID) {
+        lastInstance = false; // Not last instance of interesting hadron
+        break;
       }
-      if (!lastInstance) continue;
+    }
+    if (!lastInstance) continue;
+    nPassingGPs.at(1)++;
 
-      std::vector<const HepMC::GenParticle*>* goodDaughters = new std::vector<const HepMC::GenParticle*>;
-      std::vector<const HepMC::GenParticle*>* goodDaughtersNoNu = new std::vector<const HepMC::GenParticle*>;
-      for (it_out dau = it_begin; dau != it_end; dau++) {
-        if (goodHepMCGenParticle(*dau, genDaughterPtMin_)) {
-          goodDaughters->push_back(*dau);
-          if (abs((*dau)->pdg_id()) != 12 && abs((*dau)->pdg_id()) != 14 && abs((*dau)->pdg_id()) != 16) {
-            goodDaughtersNoNu->push_back(*dau);
+    std::vector<const reco::Candidate*>* goodDaughters = new std::vector<const reco::Candidate*>;
+    for (unsigned int iDau = 0; iDau < mother->numberOfDaughters(); iDau++) {
+      const reco::Candidate* dau = mother->daughter(iDau)->clone();
+      std::queue<const reco::Candidate*> queue;
+      queue.push(dau);
+      while(!queue.empty()) {
+        if (queue.front()->status() == 1) { // Stable outgoing particle
+          if (goodGenParticle(queue.front(), genDaughterPtMin_) && queue.front()->charge() != 0) {
+            goodDaughters->push_back(queue.front());
+          }
+        } else {
+          for (unsigned int iDau = 0; iDau < queue.front()->numberOfDaughters(); iDau++) {
+            queue.push(queue.front()->daughter(iDau));
           }
         }
+        queue.pop();
       }
+    }
+    // Loop through GPs and add all stable particles with this mother (for broken connections)
+    for (unsigned int iGP = 0; iGP < mergedGenParticles_.size(); iGP++) {
+      const reco::Candidate* possibleDau = &mergedGenParticles_[iGP];
+      if (possibleDau->status() == 1) {
+        const reco::Candidate* possibleMother = possibleDau->mother(0);
+        if (possibleMother != nullptr && isAncestor(mother, possibleMother)) {
+          goodDaughters->push_back(possibleDau->clone());
+        }
+      }
+    }
 
-      if (goodDaughters->size() >= 2) {
-        GenVertex newGV(gvRef->position(), mother, goodDaughters, primaryVertex, motherPartID);
-        genVerticesFromTV_.push_back(newGV);
+    if (goodDaughters->size() >= 2) {
+      GenVertex newGV(mother, goodDaughters, primaryVertex, motherPartID);
+      genVerticesFromMerged_.push_back(newGV);
+      if (motherPartID == B_MESON || motherPartID == B_BARYON) genVerticesFromMergedB_.push_back(newGV);
+      if (motherPartID == C_MESON || motherPartID == C_BARYON) genVerticesFromMergedD_.push_back(newGV);
+      if (matchGenToSimVertex(newGV)) {
+        genVerticesFromMergedSimMatch_.push_back(newGV);
       }
-      if (goodDaughtersNoNu->size() >= 2) {
-        GenVertex newGVNoNu(gvRef->position(), mother, goodDaughtersNoNu, primaryVertex, motherPartID);
-        genVerticesFromTVNoNu_.push_back(newGVNoNu);
-      }
-    } // End loop over HepMC GenVertexs
-  } // End loop over TrackingVertexs
+    }
+  }
 
   // Sort collections
-  // std::sort(genVertices_.begin(), genVertices_.end(), compare);
-  // std::sort(genVerticesSimMatch_.begin(), genVerticesSimMatch_.end(), compare);
-  // std::sort(genVerticesNoNu_.begin(), genVerticesNoNu_.end(), compare);
-  // std::sort(genVerticesNoNuSimMatch_.begin(), genVerticesNoNuSimMatch_.end(), compare);
+  // std::sort(genVerticesFromPruned_.begin(), genVerticesFromPruned_.end(), compare);
+  // std::sort(genVerticesFromPrunedB_.begin(), genVerticesFromPrunedB_.end(), compare);
+  // std::sort(genVerticesFromPrunedD_.begin(), genVerticesFromPrunedD_.end(), compare);
+  // std::sort(genVerticesFromPrunedSimMatch_.begin(), genVerticesFromPrunedSimMatch_.end(), compare);
+  // std::sort(genVerticesFromMerged_.begin(), genVerticesFromMerged_.end(), compare);
+  // std::sort(genVerticesFromMergedB_.begin(), genVerticesFromMergedB_.end(), compare);
+  // std::sort(genVerticesFromMergedD_.begin(), genVerticesFromMergedD_.end(), compare);
+  // std::sort(genVerticesFromMergedSimMatch_.begin(), genVerticesFromMergedSimMatch_.end(), compare);
 
-  return nPassingPrunedGP;
+  return nPassingGPs;
 }
 
 
-template <class P>
-bool GenVertexCollectionBuilder::goodGenParticle(const P* gp, double ptCut) {
+bool GenVertexCollectionBuilder::goodGenParticle(const reco::Candidate* gp, double ptCut) {
 
   bool pass = true;
   if (gp->pt() < ptCut) pass = false;
@@ -215,20 +169,18 @@ bool GenVertexCollectionBuilder::goodGenParticle(const P* gp, double ptCut) {
 }
 
 
-bool GenVertexCollectionBuilder::goodHepMCGenParticle(const HepMC::GenParticle* gp, double ptCut) {
+bool GenVertexCollectionBuilder::isAncestor(const reco::Candidate* mother,
+    const reco::Candidate* possibleMother) {
 
-  bool pass = true;
-  double px = gp->momentum().px();
-  double py = gp->momentum().py();
-  double pt = TMath::Sqrt(px * px + py * py);
-  if (pt < ptCut) pass = false;
-  if (abs(gp->momentum().eta()) > absEtaMax_) pass = false;
-  return pass;
+  if (mother == possibleMother) return true;
+  for (unsigned int iMother = 0; iMother < possibleMother->numberOfMothers(); iMother++) {
+    if (isAncestor(mother, possibleMother->mother(iMother))) return true;
+  }
+  return false;
 }
 
 
-template <class P>
-bool GenVertexCollectionBuilder::matchGenToSimTrack(const P* gp, const SimTrack& st) {
+bool GenVertexCollectionBuilder::matchGenToSimTrack(const reco::Candidate* gp, const SimTrack& st) {
 
   bool match = true;
   if (reco::deltaR(gp->eta(), gp->phi(), st.momentum().Eta(), st.momentum().Phi()) > drCut_) match = false;
@@ -239,7 +191,7 @@ bool GenVertexCollectionBuilder::matchGenToSimTrack(const P* gp, const SimTrack&
 
 bool GenVertexCollectionBuilder::matchGenToSimVertex(const GenVertex& gv) {
 
-  double nmatch = 0;
+  float nmatch = 0;
   std::vector<bool> STmatched(simTracks_.size(), false);
   for (const reco::Candidate* dau : *(gv.daughters())) {
     for (unsigned int iST = 0; iST < simTracks_.size(); iST++) {
@@ -251,19 +203,17 @@ bool GenVertexCollectionBuilder::matchGenToSimVertex(const GenVertex& gv) {
       }
     }
   }
-  return (nmatch / (double) gv.nDaughters()) >= matchFrac_;
+  return (nmatch / (float) gv.nDaughters()) >= matchFrac_;
 }
 
 
 int GenVertexCollectionBuilder::genPartID(int pdgId) {
 
   int checkPdgId = abs(pdgId);
-  // B meson
   if ((checkPdgId == 521) ||
     (checkPdgId == 511) ||
     (checkPdgId == 531) ||
-    (checkPdgId == 541)) return 0;
-  // B baryon
+    (checkPdgId == 541)) return B_MESON;
   else if (
     (checkPdgId == 5122) ||
     (checkPdgId == 5112) ||
@@ -278,13 +228,11 @@ int GenVertexCollectionBuilder::genPartID(int pdgId) {
     (checkPdgId == 5512) ||
     (checkPdgId == 5532) ||
     (checkPdgId == 5542) ||
-    (checkPdgId == 5554)) return 1;
-  // C meson
+    (checkPdgId == 5554)) return B_BARYON;
   else if (
     (checkPdgId == 411) ||
     (checkPdgId == 421) ||
-    (checkPdgId == 431)) return 2;
-  // C baryon
+    (checkPdgId == 431)) return C_MESON;
   else if (
     (checkPdgId == 4122) ||
     (checkPdgId == 4222) ||
@@ -296,8 +244,7 @@ int GenVertexCollectionBuilder::genPartID(int pdgId) {
     (checkPdgId == 4412) ||
     (checkPdgId == 4422) ||
     (checkPdgId == 4432) ||
-    (checkPdgId == 4444)) return 3;
-  // S baryon
+    (checkPdgId == 4444)) return C_BARYON;
   // else if (
   //   (checkPdgId == 3122) ||
   //   (checkPdgId == 3222) ||
@@ -305,7 +252,7 @@ int GenVertexCollectionBuilder::genPartID(int pdgId) {
   //   (checkPdgId == 3112) ||
   //   (checkPdgId == 3322) ||
   //   (checkPdgId == 3312) ||
-  //   (checkPdgId == 3334)) return 4;
+  //   (checkPdgId == 3334)) return S_BARYON;
   return -1;
 }
 

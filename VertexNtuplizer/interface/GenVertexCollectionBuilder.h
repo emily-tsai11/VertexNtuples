@@ -7,10 +7,7 @@
 #include "FWCore/Utilities/interface/EDGetToken.h"
 
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
-// #include "DataFormats/PatCandidates/interface/PackedGenParticle.h"
 #include "SimDataFormats/Track/interface/SimTrackContainer.h"
-// #include "SimDataFormats/TrackingAnalysis/interface/TrackingParticle.h"
-#include "SimDataFormats/TrackingAnalysis/interface/TrackingVertexContainer.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/Math/interface/deltaR.h"
 
@@ -20,6 +17,15 @@
 typedef std::vector<GenVertex> GenVertexCollection;
 
 
+enum HadronType {
+  B_MESON,
+  B_BARYON,
+  C_MESON,
+  C_BARYON,
+  // S_BARYON
+};
+
+
 class GenVertexCollectionBuilder {
 
   public:
@@ -27,35 +33,26 @@ class GenVertexCollectionBuilder {
     GenVertexCollectionBuilder(const edm::ParameterSet& iConfig);
     // ~GenVertexCollectionBuilder();
 
-    unsigned int build(const edm::Event& iEvent,
+    std::vector<unsigned int> build(const edm::Event& iEvent,
         edm::EDGetTokenT<reco::GenParticleCollection>& prunedGenParticlesToken,
-        // edm::EDGetTokenT<pat::PackedGenParticleCollection>& packedGenParticlesToken,
+        edm::EDGetTokenT<reco::GenParticleCollection>& mergedGenParticlesToken,
         edm::EDGetTokenT<edm::SimTrackContainer>& simTracksToken,
-        // edm::EDGetTokenT<TrackingParticleCollection>& trackingParticlesToken,
-        edm::EDGetTokenT<TrackingVertexCollection>& trackingVerticesToken,
         const reco::Vertex& primaryVertex);
 
-    GenVertexCollection getGenVertexCollection() { return genVertices_; }
-    GenVertexCollection getGenVertexSimMatchCollection() { return genVerticesSimMatch_; }
-    GenVertexCollection getGenVertexNoNuCollection() { return genVerticesNoNu_; }
-    GenVertexCollection getGenVertexNoNuSimMatchCollection() { return genVerticesNoNuSimMatch_; }
-    GenVertexCollection getGenVertexFromPrunedGenNoNu() { return genVerticesFromPrunedGenNoNu_; }
-    GenVertexCollection getGenVertexB() { return genVerticesB_; }
-    GenVertexCollection getGenVertexD() { return genVerticesD_; }
-    GenVertexCollection getGenVertexFromPrunedGenNoNuSimMatch() { return genVerticesFromPrunedGenNoNuSimMatch_; }
-    GenVertexCollection getGenVertexFromTV() { return genVerticesFromTV_; }
-    GenVertexCollection getGenVertexFromTVNoNu() { return genVerticesFromTVNoNu_; }
-
-    typedef edm::Ref<edm::HepMCProduct, HepMC::GenVertex> GenVertexRef;
+    GenVertexCollection getGenVertexFromPruned() { return genVerticesFromPruned_; }
+    GenVertexCollection getGenVertexFromPrunedB() { return genVerticesFromPrunedB_; }
+    GenVertexCollection getGenVertexFromPrunedD() { return genVerticesFromPrunedD_; }
+    GenVertexCollection getGenVertexFromPrunedSimMatch() { return genVerticesFromPrunedSimMatch_; }
+    GenVertexCollection getGenVertexFromMerged() { return genVerticesFromMerged_; }
+    GenVertexCollection getGenVertexFromMergedB() { return genVerticesFromMergedB_; }
+    GenVertexCollection getGenVertexFromMergedD() { return genVerticesFromMergedD_; }
+    GenVertexCollection getGenVertexFromMergedSimMatch() { return genVerticesFromMergedSimMatch_; }
 
   private:
 
-    typedef HepMC::GenVertex::particles_in_const_iterator it_in;
-    typedef HepMC::GenVertex::particles_out_const_iterator it_out;
-
-    template <class P> bool goodGenParticle(const P* gp, double ptCut);
-    bool goodHepMCGenParticle(const HepMC::GenParticle* gp, double ptCut);
-    template <class P> bool matchGenToSimTrack(const P* gp, const SimTrack& st);
+    bool goodGenParticle(const reco::Candidate* gp, double ptCut);
+    bool isAncestor(const reco::Candidate* mother, const reco::Candidate* possibleMother);
+    bool matchGenToSimTrack(const reco::Candidate* gp, const SimTrack& st);
     bool matchGenToSimVertex(const GenVertex& gv);
     int genPartID(int pdgId);
     // static bool compare(const GenVertex& gva, const GenVertex& gvb);
@@ -67,22 +64,18 @@ class GenVertexCollectionBuilder {
     double ptCut_;
     double matchFrac_;
 
-    GenVertexCollection genVertices_;
-    GenVertexCollection genVerticesSimMatch_;
-    GenVertexCollection genVerticesNoNu_;
-    GenVertexCollection genVerticesNoNuSimMatch_;
-    GenVertexCollection genVerticesFromPrunedGenNoNu_;
-    GenVertexCollection genVerticesB_;
-    GenVertexCollection genVerticesD_;
-    GenVertexCollection genVerticesFromPrunedGenNoNuSimMatch_;
-    GenVertexCollection genVerticesFromTV_;
-    GenVertexCollection genVerticesFromTVNoNu_;
+    GenVertexCollection genVerticesFromPruned_;
+    GenVertexCollection genVerticesFromPrunedB_;
+    GenVertexCollection genVerticesFromPrunedD_;
+    GenVertexCollection genVerticesFromPrunedSimMatch_;
+    GenVertexCollection genVerticesFromMerged_;
+    GenVertexCollection genVerticesFromMergedB_;
+    GenVertexCollection genVerticesFromMergedD_;
+    GenVertexCollection genVerticesFromMergedSimMatch_;
 
     reco::GenParticleCollection prunedGenParticles_;
-    // pat::PackedGenParticleCollection packedGenParticles_;
+    reco::GenParticleCollection mergedGenParticles_;
     edm::SimTrackContainer simTracks_;
-    // TrackingParticleCollection trackingParticles_;
-    TrackingVertexCollection trackingVertices_;
 };
 
 

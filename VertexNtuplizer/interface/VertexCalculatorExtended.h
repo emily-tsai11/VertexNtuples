@@ -10,19 +10,19 @@
 // Made this extended file to solve circular dependency issues
 namespace vertexntuples {
 
-  const double xres(const GenVertex& gv, const SecondaryVertex& sv);
-  const double yres(const GenVertex& gv, const SecondaryVertex& sv);
-  const double zres(const GenVertex& gv, const SecondaryVertex& sv);
-  const double xpull(const GenVertex& gv, const SecondaryVertex& sv);
-  const double ypull(const GenVertex& gv, const SecondaryVertex& sv);
-  const double zpull(const GenVertex& gv, const SecondaryVertex& sv);
+  const float xres(const GenVertex& gv, const SecondaryVertex& sv);
+  const float yres(const GenVertex& gv, const SecondaryVertex& sv);
+  const float zres(const GenVertex& gv, const SecondaryVertex& sv);
+  const float xpull(const GenVertex& gv, const SecondaryVertex& sv);
+  const float ypull(const GenVertex& gv, const SecondaryVertex& sv);
+  const float zpull(const GenVertex& gv, const SecondaryVertex& sv);
 
-  const double dxy(const GenVertex& gv, const SecondaryVertex& sv);
-  const double dz(const GenVertex& gv, const SecondaryVertex& sv);
-  const double d3d(const GenVertex& gv, const SecondaryVertex& sv);
-  const double dxyErr(const GenVertex& gv, const SecondaryVertex& sv);
-  const double dzErr(const GenVertex& gv, const SecondaryVertex& sv);
-  const double d3dErr(const GenVertex& gv, const SecondaryVertex& sv);
+  const float dxy(const GenVertex& gv, const SecondaryVertex& sv);
+  const float dxyErr(const GenVertex& gv, const SecondaryVertex& sv);
+  const float dz(const GenVertex& gv, const SecondaryVertex& sv);
+  const float dzErr(const GenVertex& gv, const SecondaryVertex& sv);
+  const float d3d(const GenVertex& gv, const SecondaryVertex& sv);
+  const float d3dErr(const GenVertex& gv, const SecondaryVertex& sv);
 }
 
 

@@ -68,6 +68,14 @@ class VertexNtuplizer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
     edm::EDGetTokenT<reco::GenParticleCollection> prunedGenParticlesToken_;
     edm::EDGetTokenT<reco::GenParticleCollection> mergedGenParticlesToken_;
     edm::EDGetTokenT<edm::SimTrackContainer> simTracksToken_;
+    edm::EDGetTokenT<reco::TrackCollection> generalTracksToken_;
+    edm::EDGetTokenT<reco::PFCandidateCollection> PFCandidatesToken_;
+    edm::EDGetTokenT<edm::ValueMap<float>> trackTimeBSValueMapToken_;
+    edm::EDGetTokenT<edm::ValueMap<float>> trackTimeBSErrorMapToken_;
+    edm::EDGetTokenT<edm::ValueMap<float>> trackTimeBSQualityMapToken_;
+    edm::EDGetTokenT<edm::ValueMap<float>> trackTimePVValueMapToken_;
+    edm::EDGetTokenT<edm::ValueMap<float>> trackTimePVErrorMapToken_;
+    // edm::EDGetTokenT<edm::ValueMap<float>> trackTimePVQualityMapToken_;
     edm::EDGetTokenT<reco::VertexCollection> primaryVerticesToken_;
     edm::EDGetTokenT<unsigned int> nIVFClustersToken_;
     edm::EDGetTokenT<unsigned int> nIVFClustersMTDBSToken_;
@@ -77,12 +85,6 @@ class VertexNtuplizer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
     edm::EDGetTokenT<reco::VertexCollection> secondaryVerticesMTDBSToken_;
     edm::EDGetTokenT<reco::VertexCollection> secondaryVerticesMTDBS4Token_;
     edm::EDGetTokenT<reco::VertexCollection> secondaryVerticesMTDPVToken_;
-    edm::EDGetTokenT<edm::ValueMap<float>> trackTimeBSValueMapToken_;
-    edm::EDGetTokenT<edm::ValueMap<float>> trackTimeBSErrorMapToken_;
-    edm::EDGetTokenT<edm::ValueMap<float>> trackTimeBSQualityMapToken_;
-    edm::EDGetTokenT<edm::ValueMap<float>> trackTimePVValueMapToken_;
-    edm::EDGetTokenT<edm::ValueMap<float>> trackTimePVErrorMapToken_;
-    // edm::EDGetTokenT<edm::ValueMap<float>> trackTimePVQualityMapToken_;
     edm::EDGetTokenT<reco::VertexCompositePtrCandidateCollection> slimmedCandSVToken_;
     edm::EDGetTokenT<pat::JetCollection> jetsToken_;
     edm::EDGetTokenT<reco::GenJetCollection> genJetsToken_;
@@ -94,6 +96,8 @@ class VertexNtuplizer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
     float nMergedGVs_;
     float nMergedGVsB_;
     float nMergedGVsD_;
+    float nGeneralTracks_;
+    float nPFCandidates_;
     float nInclusiveSVs_;
     float nSlimmedCandSVs_;
 
@@ -121,6 +125,14 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
     prunedGenParticlesToken_(consumes<reco::GenParticleCollection>(iConfig.getUntrackedParameter<edm::InputTag>("prunedGenParticles"))),
     mergedGenParticlesToken_(consumes<reco::GenParticleCollection>(iConfig.getUntrackedParameter<edm::InputTag>("mergedGenParticles"))),
     simTracksToken_(consumes<edm::SimTrackContainer>(iConfig.getUntrackedParameter<edm::InputTag>("simTracks"))),
+    generalTracksToken_(consumes<reco::TrackCollection>(iConfig.getUntrackedParameter<edm::InputTag>("generalTracks"))),
+    PFCandidatesToken_(consumes<reco::PFCandidateCollection>(iConfig.getUntrackedParameter<edm::InputTag>("particleFlowCandidates"))),
+    trackTimeBSValueMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimeBSValueMap"))),
+    trackTimeBSErrorMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimeBSErrorMap"))),
+    trackTimeBSQualityMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimeBSQualityMap"))),
+    trackTimePVValueMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimePVValueMap"))),
+    trackTimePVErrorMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimePVErrorMap"))),
+    // trackTimePVQualityMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimePVQualityMap"))),
     primaryVerticesToken_(consumes<reco::VertexCollection>(iConfig.getUntrackedParameter<edm::InputTag>("primaryVertices"))),
     nIVFClustersToken_(consumes<unsigned int>(iConfig.getUntrackedParameter<edm::InputTag>("nIVFClusters"))),
     nIVFClustersMTDBSToken_(consumes<unsigned int>(iConfig.getUntrackedParameter<edm::InputTag>("nIVFClustersMTDBS"))),
@@ -130,12 +142,6 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
     secondaryVerticesMTDBSToken_(consumes<reco::VertexCollection>(iConfig.getUntrackedParameter<edm::InputTag>("secondaryVerticesMTDBS"))),
     secondaryVerticesMTDBS4Token_(consumes<reco::VertexCollection>(iConfig.getUntrackedParameter<edm::InputTag>("secondaryVerticesMTDBS4"))),
     secondaryVerticesMTDPVToken_(consumes<reco::VertexCollection>(iConfig.getUntrackedParameter<edm::InputTag>("secondaryVerticesMTDPV"))),
-    trackTimeBSValueMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimeBSValueMap"))),
-    trackTimeBSErrorMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimeBSErrorMap"))),
-    trackTimeBSQualityMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimeBSQualityMap"))),
-    trackTimePVValueMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimePVValueMap"))),
-    trackTimePVErrorMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimePVErrorMap"))),
-    // trackTimePVQualityMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimePVQualityMap"))),
     slimmedCandSVToken_(consumes<reco::VertexCompositePtrCandidateCollection>(iConfig.getUntrackedParameter<edm::InputTag>("slimmedCandSVs"))),
     jetsToken_(consumes<pat::JetCollection>(iConfig.getUntrackedParameter<edm::InputTag>("jets"))),
     genJetsToken_(consumes<reco::GenJetCollection>(iConfig.getUntrackedParameter<edm::InputTag>("genJets"))),
@@ -147,6 +153,8 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   nMergedGVs_ = 0.0;
   nMergedGVsB_ = 0.0;
   nMergedGVsD_ = 0.0;
+  nGeneralTracks_ = 0.0;
+  nPFCandidates_ = 0.0;
   nInclusiveSVs_ = 0.0;
   nSlimmedCandSVs_ = 0.0;
 
@@ -378,13 +386,19 @@ VertexNtuplizer::~VertexNtuplizer() {}
 
 void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
+  // Study of general tracks vs PF candidates
+  const reco::TrackCollection generalTracks = iEvent.get(generalTracksToken_);
+  const reco::PFCandidateCollection PFCandidates = iEvent.get(PFCandidatesToken_);
+  nGeneralTracks_ += generalTracks.size();
+  nPFCandidates_ += PFCandidates.size();
+
   const reco::VertexCollection primaryVertices = iEvent.get(primaryVerticesToken_);
   // Sorting described here: https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideOfflinePrimaryVertexProduction
   const reco::Vertex& primaryVertex = primaryVertices.at(0); // Most likely the signal vertex
 
   std::vector<unsigned int> nPassingGPs = gvc_->build(iEvent,
-    prunedGenParticlesToken_,
-    mergedGenParticlesToken_, simTracksToken_, primaryVertex);
+      prunedGenParticlesToken_,
+      mergedGenParticlesToken_, simTracksToken_, primaryVertex);
   svc_->build(iEvent,
       secondaryVerticesToken_, secondaryVerticesMTDBSToken_, secondaryVerticesMTDBS4Token_, secondaryVerticesMTDPVToken_,
       trackTimeBSValueMapToken_, trackTimeBSErrorMapToken_, trackTimeBSQualityMapToken_,
@@ -547,6 +561,9 @@ void VertexNtuplizer::beginJob() {}
 void VertexNtuplizer::endJob() {
 
   std::cout << "\nnumber of events = " << histos1_["nMergedGPs"]->GetEntries() << std::endl;
+
+  std::cout << "\nthere are " << nGeneralTracks_ / histos1_["nMergedGPs"]->GetEntries() << " general tracks per event." << std::endl;
+  std::cout << "there are " << nPFCandidates_ / histos1_["nMergedGPs"]->GetEntries() << " PF candidates per event." << std::endl;
 
   std::cout << "\nmean number of GVs from pruned               = " << histos1_["ngvPruned"]->GetMean() << "+=" << histos1_["ngvPruned"]->GetStdDev() << std::endl;
   std::cout << "mean number of GVs from pruned with B mother = " << histos1_["ngvPrunedB"]->GetMean() << "+=" << histos1_["ngvPrunedB"]->GetStdDev() << std::endl;

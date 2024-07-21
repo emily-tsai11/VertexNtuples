@@ -4,90 +4,7 @@
 SecondaryVertex::SecondaryVertex(const reco::Vertex& sv,
     const reco::Vertex& primaryVertex) {
 
-  // Track times aren't actually used, just initialized
-  // and filled with dummy values to avoid errors
-  trk_tval_ = new std::vector<float>;
-  trk_terr_ = new std::vector<float>;
-  trk_tsig_ = new std::vector<float>;
-  trk_tqual_ = new std::vector<float>;
-
-  trk_pt_ = new std::vector<float>;
-  trk_pt2_ = new std::vector<float>;
-  trk_eta_ = new std::vector<float>;
-  trk_phi_ = new std::vector<float>;
-  trk_dxy_ = new std::vector<float>;
-  trk_dz_ = new std::vector<float>;
-  trk_d3d_ = new std::vector<float>;
-  trk_dxyerr_ = new std::vector<float>;
-  trk_dzerr_ = new std::vector<float>;
-  trk_d3derr_ = new std::vector<float>;
-  trk_dxysig_ = new std::vector<float>;
-  trk_dzsig_ = new std::vector<float>;
-  trk_d3dsig_ = new std::vector<float>;
-  trk_charge_ = new std::vector<float>;
-  trk_chi2_ = new std::vector<float>;
-  trk_ndof_ = new std::vector<float>;
-  trk_chi2dof_ = new std::vector<float>;
-
-  for (const reco::TrackBaseRef& trkRef : sv.tracks()) {
-    float d3d = vertexntuples::d3d(trkRef);
-    float d3derr = vertexntuples::d3dErr(trkRef);
-
-    trk_tval_->push_back(-1.0); // Dummy value
-    trk_terr_->push_back(-1.0); // Dummy value
-    trk_tsig_->push_back(-1.0); // Dummy value
-    trk_tqual_->push_back(-1.0); // Dummy value
-    trk_pt_->push_back(trkRef->pt());
-    trk_pt2_->push_back(trkRef->pt2());
-    trk_eta_->push_back(trkRef->eta());
-    trk_phi_->push_back(trkRef->phi());
-    trk_dxy_->push_back(trkRef->dxy());
-    trk_dz_->push_back(trkRef->dz());
-    trk_d3d_->push_back(d3d);
-    trk_dxyerr_->push_back(trkRef->dxyError());
-    trk_dzerr_->push_back(trkRef->dzError());
-    trk_d3derr_->push_back(d3derr);
-    trk_dxysig_->push_back(trkRef->dxy() / trkRef->dxyError());
-    trk_dzsig_->push_back(trkRef->dz() / trkRef->dzError());
-    trk_d3dsig_->push_back(d3d / d3derr);
-    trk_charge_->push_back(trkRef->charge());
-    trk_chi2_->push_back(trkRef->chi2());
-    trk_ndof_->push_back(trkRef->ndof());
-    trk_chi2dof_->push_back(trkRef->normalizedChi2());
-  }
-
-  Measurement1D dxy = vertexntuples::dxy(sv, primaryVertex);
-  Measurement1D d3d = vertexntuples::d3d(sv, primaryVertex);
-
-  x_ = sv.x();
-  y_ = sv.y();
-  z_ = sv.z();
-  xerr_ = sv.xError();
-  yerr_ = sv.yError();
-  zerr_ = sv.zError();
-  dxy_ = dxy.value();
-  dz_ = vertexntuples::dz(sv, primaryVertex);
-  d3d_ = d3d.value();
-  dxyerr_ = dxy.error();
-  dzerr_ = vertexntuples::dzErr(sv, primaryVertex);
-  d3derr_ = d3d.error();
-  dxysig_ = dxy.significance();
-  dzsig_ = dz_ / dzerr_;
-  d3dsig_ = d3d.significance();
-  pt_ = sv.p4().Pt();
-  pt2_ = sv.p4().Pt() * sv.p4().Pt();
-  eta_ = sv.p4().Eta();
-  phi_ = sv.p4().Phi();
-  tavg_ = -1.0; // Dummy value
-  trange_ = -1.0; // Dummy value
-  chi2_ = sv.chi2();
-  ndof_ = sv.ndof();
-  chi2dof_ = sv.normalizedChi2();
-  ntrk_ = sv.tracksSize();
-
-  // For matching to a GenVertex
-  trk_deltaR_ = new std::vector<float>;
-  trk_ptResNorm_ = new std::vector<float>;
+  initialize(sv, primaryVertex, false);
 }
 
 
@@ -97,10 +14,32 @@ SecondaryVertex::SecondaryVertex(const reco::Vertex& sv,
     const edm::ValueMap<float>& trackTimeErrorMap,
     const edm::ValueMap<float>& trackTimeQualityMap) {
 
-  trk_tval_ = new std::vector<float>;
-  trk_terr_ = new std::vector<float>;
-  trk_tsig_ = new std::vector<float>;
-  trk_tqual_ = new std::vector<float>;
+  initialize(sv, primaryVertex);
+  initializeTime(sv, trackTimeValueMap, trackTimeErrorMap, trackTimeQualityMap);
+}
+
+
+SecondaryVertex::SecondaryVertex(const reco::VertexCompositePtrCandidate& sv,
+    const reco::Vertex& primaryVertex) {
+
+  initialize(sv, primaryVertex, false);
+}
+
+
+SecondaryVertex::SecondaryVertex(const reco::VertexCompositePtrCandidate& sv,
+    const reco::Vertex& primaryVertex,
+    const edm::ValueMap<float>& trackTimeValueMap,
+    const edm::ValueMap<float>& trackTimeErrorMap,
+    const edm::ValueMap<float>& trackTimeQualityMap) {
+
+  initialize(sv, primaryVertex);
+  initializeTime(sv, trackTimeValueMap, trackTimeErrorMap, trackTimeQualityMap);
+}
+
+
+void SecondaryVertex::initialize(const reco::Vertex& sv,
+    const reco::Vertex& primaryVertex, bool hasTime) {
+
   trk_pt_ = new std::vector<float>;
   trk_pt2_ = new std::vector<float>;
   trk_eta_ = new std::vector<float>;
@@ -119,21 +58,14 @@ SecondaryVertex::SecondaryVertex(const reco::Vertex& sv,
   trk_ndof_ = new std::vector<float>;
   trk_chi2dof_ = new std::vector<float>;
 
-  float tavg = 0.0;
-  float tmin = 99999.9;
-  float tmax = -99999.9;
-  for (const reco::TrackBaseRef& trkRef : sv.tracks()) {
-    tavg += trackTimeValueMap[trkRef];
-    tmin = std::min(tmin, trackTimeValueMap[trkRef]);
-    tmax = std::max(tmax, trackTimeValueMap[trkRef]);
+  trk_tval_ = new std::vector<float>;
+  trk_terr_ = new std::vector<float>;
+  trk_tsig_ = new std::vector<float>;
+  trk_tqual_ = new std::vector<float>;
 
+  for (const reco::TrackBaseRef& trkRef : sv.tracks()) {
     float d3d = vertexntuples::d3d(trkRef);
     float d3derr = vertexntuples::d3dErr(trkRef);
-
-    trk_tval_->push_back(trackTimeValueMap[trkRef]);
-    trk_terr_->push_back(trackTimeErrorMap[trkRef]);
-    trk_tsig_->push_back(trackTimeValueMap[trkRef] / trackTimeErrorMap[trkRef]);
-    trk_tqual_->push_back(trackTimeQualityMap[trkRef]);
     trk_pt_->push_back(trkRef->pt());
     trk_pt2_->push_back(trkRef->pt2());
     trk_eta_->push_back(trkRef->eta());
@@ -151,13 +83,17 @@ SecondaryVertex::SecondaryVertex(const reco::Vertex& sv,
     trk_chi2_->push_back(trkRef->chi2());
     trk_ndof_->push_back(trkRef->ndof());
     trk_chi2dof_->push_back(trkRef->normalizedChi2());
+
+    if (!hasTime) {
+      trk_tval_->push_back(-1.0); // Dummy value
+      trk_terr_->push_back(-1.0); // Dummy value
+      trk_tsig_->push_back(-1.0); // Dummy value
+      trk_tqual_->push_back(-1.0); // Dummy value
+    }
   }
-  tavg /= (float) sv.tracksSize();
-  float trange = tmax - tmin;
 
   Measurement1D dxy = vertexntuples::dxy(sv, primaryVertex);
   Measurement1D d3d = vertexntuples::d3d(sv, primaryVertex);
-
   x_ = sv.x();
   y_ = sv.y();
   z_ = sv.z();
@@ -177,12 +113,15 @@ SecondaryVertex::SecondaryVertex(const reco::Vertex& sv,
   pt2_ = sv.p4().Pt() * sv.p4().Pt();
   eta_ = sv.p4().Eta();
   phi_ = sv.p4().Phi();
-  tavg_ = tavg;
-  trange_ = trange;
   chi2_ = sv.chi2();
   ndof_ = sv.ndof();
   chi2dof_ = sv.normalizedChi2();
   ntrk_ = sv.tracksSize();
+
+  if (!hasTime) {
+    tavg_ = -1.0;
+    trange_ = -1.0;
+  }
 
   // For matching to a GenVertex
   trk_deltaR_ = new std::vector<float>;
@@ -190,16 +129,30 @@ SecondaryVertex::SecondaryVertex(const reco::Vertex& sv,
 }
 
 
-SecondaryVertex::SecondaryVertex(
-    const reco::VertexCompositePtrCandidate& sv,
-    const reco::Vertex& primaryVertex) {
+void SecondaryVertex::initializeTime(const reco::Vertex& sv,
+    const edm::ValueMap<float>& trackTimeValueMap,
+    const edm::ValueMap<float>& trackTimeErrorMap,
+    const edm::ValueMap<float>& trackTimeQualityMap) {
 
-  // Track times aren't actually used, just initialized
-  // and filled with dummy values to avoid errors
-  trk_tval_ = new std::vector<float>;
-  trk_terr_ = new std::vector<float>;
-  trk_tsig_ = new std::vector<float>;
-  trk_tqual_ = new std::vector<float>;
+  float tsum = 0.0;
+  float tmin = 9999.9;
+  float tmax = -9999.9;
+  for (const reco::TrackBaseRef& trkRef : sv.tracks()) {
+    tsum += trackTimeValueMap[trkRef];
+    tmin = std::min(tmin, trackTimeValueMap[trkRef]);
+    tmax = std::max(tmax, trackTimeValueMap[trkRef]);
+    trk_tval_->push_back(trackTimeValueMap[trkRef]);
+    trk_terr_->push_back(trackTimeErrorMap[trkRef]);
+    trk_tsig_->push_back(trackTimeValueMap[trkRef] / trackTimeErrorMap[trkRef]);
+    trk_tqual_->push_back(trackTimeQualityMap[trkRef]);
+  }
+  tavg_ = tsum / (float) sv.tracksSize();
+  trange_ = tmax - tmin;
+}
+
+
+void SecondaryVertex::initialize(const reco::VertexCompositePtrCandidate& sv,
+    const reco::Vertex& primaryVertex, bool hasTime) {
 
   trk_pt_ = new std::vector<float>;
   trk_pt2_ = new std::vector<float>;
@@ -219,6 +172,11 @@ SecondaryVertex::SecondaryVertex(
   trk_ndof_ = new std::vector<float>;
   trk_chi2dof_ = new std::vector<float>;
 
+  trk_tval_ = new std::vector<float>;
+  trk_terr_ = new std::vector<float>;
+  trk_tsig_ = new std::vector<float>;
+  trk_tqual_ = new std::vector<float>;
+
   for (unsigned int iTrk = 0; iTrk < sv.daughterPtrVector().size(); iTrk++) {
     const reco::CandidatePtr& trkPtr = sv.daughterPtr(iTrk);
 
@@ -226,11 +184,6 @@ SecondaryVertex::SecondaryVertex(
     float dz = vertexntuples::dz(trkPtr, primaryVertex);
     float d3d = vertexntuples::d3d(trkPtr, primaryVertex);
     float d3derr = vertexntuples::d3dErr(trkPtr, primaryVertex);
-
-    trk_tval_->push_back(-1.0); // Dummy value
-    trk_terr_->push_back(-1.0); // Dummy value
-    trk_tsig_->push_back(-1.0); // Dummy value
-    trk_tqual_->push_back(-1.0); // Dummy value
     trk_pt_->push_back(trkPtr->pt());
     trk_pt2_->push_back(trkPtr->pt() * trkPtr->pt());
     trk_eta_->push_back(trkPtr->eta());
@@ -245,20 +198,28 @@ SecondaryVertex::SecondaryVertex(
     trk_dzsig_->push_back(dz / trkPtr->dzError());
     trk_d3dsig_->push_back(d3d / d3derr);
     trk_charge_->push_back(trkPtr->charge());
-    trk_chi2_->push_back(-1.0); // Dummy value, the track quality parameters are protected in PackedCandidate.h...
+    // Track quality parameters are protected in PackedCandidate.h...
+    trk_chi2_->push_back(-1.0); // Dummy value
     trk_ndof_->push_back(-1.0); // Dummy value
     trk_chi2dof_->push_back(-1.0); // Dummy value
+
+    if (!hasTime) {
+      trk_tval_->push_back(-1.0); // Dummy value
+      trk_terr_->push_back(-1.0); // Dummy value
+      trk_tsig_->push_back(-1.0); // Dummy value
+      trk_tqual_->push_back(-1.0); // Dummy value
+    }
   }
 
   Measurement1D dxy = vertexntuples::dxy(sv, primaryVertex);
   Measurement1D d3d = vertexntuples::d3d(sv, primaryVertex);
-
   x_ = sv.vx();
   y_ = sv.vy();
   z_ = sv.vz();
-  xerr_ = -1.0; // Dummy value because I don't know how to get this from a VertexCompositePtrCandidate object
-  yerr_ = -1.0; // Dummy value because I don't know how to get this from a VertexCompositePtrCandidate object
-  zerr_ = -1.0; // Dummy value because I don't know how to get this from a VertexCompositePtrCandidate object
+  // Don't know how to get xyz errors from a VertexCompositePtrCandidate object
+  xerr_ = -1.0; // Dummy value
+  yerr_ = -1.0; // Dummy value
+  zerr_ = -1.0; // Dummy value
   dxy_ = dxy.value();
   dz_ = vertexntuples::dz(sv, primaryVertex);
   d3d_ = d3d.value();
@@ -272,16 +233,44 @@ SecondaryVertex::SecondaryVertex(
   pt2_ = sv.pt() * sv.pt();
   eta_ = sv.eta();
   phi_ = sv.phi();
-  tavg_ = -1.0; // Dummy value
-  trange_ = -1.0; // Dummy value
   chi2_ = sv.vertexChi2();
   ndof_ = sv.vertexNdof();
   chi2dof_ = sv.vertexNormalizedChi2();
   ntrk_ = sv.daughterPtrVector().size();
 
+  if (!hasTime) {
+    tavg_ = -1.0;
+    trange_ = -1.0;
+  }
+
   // For matching to a GenVertex
   trk_deltaR_ = new std::vector<float>;
   trk_ptResNorm_ = new std::vector<float>;
+}
+
+
+void SecondaryVertex::initializeTime(const reco::VertexCompositePtrCandidate& sv,
+    const edm::ValueMap<float>& trackTimeValueMap,
+    const edm::ValueMap<float>& trackTimeErrorMap,
+    const edm::ValueMap<float>& trackTimeQualityMap) {
+
+  float tsum = 0.0;
+  float tmin = 9999.9;
+  float tmax = -9999.9;
+  for (unsigned int iTrk = 0; iTrk < sv.daughterPtrVector().size(); iTrk++) {
+    const reco::CandidatePtr& trkPtr = sv.daughterPtr(iTrk);
+
+    // Don't yet know how to access track time values for CandidatePtrs
+    tsum += -1.0;
+    tmin = 0.0;
+    tmax = -1.0;
+    trk_tval_->push_back(-1.0); // Dummy value
+    trk_terr_->push_back(-1.0); // Dummy value
+    trk_tsig_->push_back(-1.0); // Dummy value
+    trk_tqual_->push_back(-1.0); // Dummy value
+  }
+  tavg_ = tsum / (float) sv.daughterPtrVector().size();
+  trange_ = tmax - tmin;
 }
 
 

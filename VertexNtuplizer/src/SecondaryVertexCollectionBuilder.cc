@@ -100,7 +100,7 @@ bool SecondaryVertexCollectionBuilder::goodRecoVertex(const reco::VertexComposit
   bool vtxPass = true;
   if (abs(v.eta()) > absEtaMax_) vtxPass = false;
   if (v.vertexNormalizedChi2() > svChi2dofMax_) vtxPass = false; // Take out poorly fitted vertices
-  if (v.numberOfDaughters() < 2) vtxPass = false; // Not a vertex
+  if (v.daughterPtrVector().size() < 2) vtxPass = false; // Not a vertex
   return vtxPass;
 }
 

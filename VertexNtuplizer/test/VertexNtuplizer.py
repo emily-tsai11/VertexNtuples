@@ -32,7 +32,7 @@ process.maxEvents = cms.untracked.PSet(input=cms.untracked.int32(options.maxEven
 # Load analyzer
 process.load("VertexNtuples.VertexNtuplizer.VertexNtuplizer_cfi")
 if options.run2:
-  process.vertexNtuplizer.etaMax = 2.5
+  process.vertexNtuplizer.absEtaMax = 2.5
 
 
 # Run process

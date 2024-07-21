@@ -24,23 +24,35 @@ class SecondaryVertex {
   public:
 
     SecondaryVertex(const reco::Vertex& sv, const reco::Vertex& primaryVertex);
-    SecondaryVertex(const reco::Vertex& sv,
-        const reco::Vertex& primaryVertex,
+    SecondaryVertex(const reco::Vertex& sv, const reco::Vertex& primaryVertex,
         const edm::ValueMap<float>& trackTimeValueMap,
         const edm::ValueMap<float>& trackTimeErrorMap,
-        const edm::ValueMap<float>& trackTimeQualityMap); // TODO
+        const edm::ValueMap<float>& trackTimeQualityMap);
     SecondaryVertex(const reco::VertexCompositePtrCandidate& sv, const reco::Vertex& primaryVertex);
+    SecondaryVertex(const reco::VertexCompositePtrCandidate& sv, const reco::Vertex& primaryVertex,
+        const edm::ValueMap<float>& trackTimeValueMap,
+        const edm::ValueMap<float>& trackTimeErrorMap,
+        const edm::ValueMap<float>& trackTimeQualityMap);
     // ~SecondaryVertex();
+
+    void initialize(const reco::Vertex& sv, const reco::Vertex& primaryVertex,
+        bool hasTime = true);
+    void initializeTime(const reco::Vertex& sv,
+        const edm::ValueMap<float>& trackTimeValueMap,
+        const edm::ValueMap<float>& trackTimeErrorMap,
+        const edm::ValueMap<float>& trackTimeQualityMap);
+    void initialize(const reco::VertexCompositePtrCandidate& sv, const reco::Vertex& primaryVertex,
+        bool hasTime = true);
+    void initializeTime(const reco::VertexCompositePtrCandidate& sv,
+        const edm::ValueMap<float>& trackTimeValueMap,
+        const edm::ValueMap<float>& trackTimeErrorMap,
+        const edm::ValueMap<float>& trackTimeQualityMap);
 
     void fill(std::map<TString, TH1F*>& histos, std::map<TString, TH2F*>& histos2, TString prefix);
 
     void addDeltaR(float deltaR) { trk_deltaR_->push_back(deltaR); }
     void addPtResNorm(float ptResNorm) { trk_ptResNorm_->push_back(ptResNorm); }
 
-    const std::vector<float>* trkTVal() const { return trk_tval_; }
-    const std::vector<float>* trkTErr() const { return trk_terr_; }
-    const std::vector<float>* trkTSig() const { return trk_tsig_; }
-    const std::vector<float>* trkTQual() const { return trk_tqual_; }
     const std::vector<float>* trkPt() const { return trk_pt_; }
     const std::vector<float>* trkPt2() const { return trk_pt2_; }
     const std::vector<float>* trkEta() const { return trk_eta_; }
@@ -58,6 +70,10 @@ class SecondaryVertex {
     const std::vector<float>* trkChi2() const { return trk_chi2_; }
     const std::vector<float>* trkNDOF() const { return trk_ndof_; }
     const std::vector<float>* trkChi2DOF() const { return trk_chi2dof_; }
+    const std::vector<float>* trkTVal() const { return trk_tval_; }
+    const std::vector<float>* trkTErr() const { return trk_terr_; }
+    const std::vector<float>* trkTSig() const { return trk_tsig_; }
+    const std::vector<float>* trkTQual() const { return trk_tqual_; }
 
     const std::vector<float>* trkMatchDeltaR() const { return trk_deltaR_; }
     const std::vector<float>* trkMatchPtResNorm() const { return trk_ptResNorm_; }
@@ -81,19 +97,15 @@ class SecondaryVertex {
     const float pt2() const { return pt2_; }
     const float eta() const { return eta_; }
     const float phi() const { return phi_; }
-    const float tAvg() const { return tavg_; }
-    const float tRange() const { return trange_; }
     const float chi2() const { return chi2_; }
     const float nDOF() const { return ndof_; }
     const float chi2DOF() const { return chi2dof_; }
     const float nTracks() const { return ntrk_; }
+    const float tAvg() const { return tavg_; }
+    const float tRange() const { return trange_; }
 
   private:
 
-    std::vector<float>* trk_tval_;
-    std::vector<float>* trk_terr_;
-    std::vector<float>* trk_tsig_;
-    std::vector<float>* trk_tqual_;
     std::vector<float>* trk_pt_;
     std::vector<float>* trk_pt2_;
     std::vector<float>* trk_eta_;
@@ -111,6 +123,10 @@ class SecondaryVertex {
     std::vector<float>* trk_chi2_;
     std::vector<float>* trk_ndof_;
     std::vector<float>* trk_chi2dof_;
+    std::vector<float>* trk_tval_;
+    std::vector<float>* trk_terr_;
+    std::vector<float>* trk_tsig_;
+    std::vector<float>* trk_tqual_;
 
     float x_;
     float y_;
@@ -131,12 +147,12 @@ class SecondaryVertex {
     float pt2_;
     float eta_;
     float phi_;
-    float tavg_;
-    float trange_;
     float chi2_;
     float ndof_;
     float chi2dof_;
     unsigned int ntrk_;
+    float tavg_;
+    float trange_;
 
     // Filled when matching to GenVertex
     std::vector<float>* trk_deltaR_;

@@ -65,11 +65,10 @@ class VertexNtuplizer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
     void analyze(const edm::Event&, const edm::EventSetup&) override;
     void endJob() override;
 
-    edm::EDGetTokenT<reco::GenParticleCollection> prunedGenParticlesToken_;
-    edm::EDGetTokenT<reco::GenParticleCollection> mergedGenParticlesToken_;
+    edm::EDGetTokenT<reco::GenParticleCollection> genParticlesToken_;
     edm::EDGetTokenT<edm::SimTrackContainer> simTracksToken_;
     edm::EDGetTokenT<reco::TrackCollection> generalTracksToken_;
-    edm::EDGetTokenT<reco::PFCandidateCollection> PFCandidatesToken_;
+    edm::EDGetTokenT<reco::PFCandidateCollection> pfCandidatesToken_;
     edm::EDGetTokenT<edm::ValueMap<float>> trackTimeBSValueMapToken_;
     edm::EDGetTokenT<edm::ValueMap<float>> trackTimeBSErrorMapToken_;
     edm::EDGetTokenT<edm::ValueMap<float>> trackTimeBSQualityMapToken_;
@@ -90,12 +89,9 @@ class VertexNtuplizer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
     edm::EDGetTokenT<reco::GenJetCollection> genJetsToken_;
     edm::EDGetTokenT<reco::JetFlavourInfoMatchingCollection> genJetsFlavourInfoToken_;
 
-    float nPrunedGVs_;
-    float nPrunedGVsB_;
-    float nPrunedGVsD_;
-    float nMergedGVs_;
-    float nMergedGVsB_;
-    float nMergedGVsD_;
+    float nGVs_;
+    float nGVsB_;
+    float nGVsD_;
     float nGeneralTracks_;
     float nPFCandidates_;
     float nInclusiveSVs_;
@@ -122,11 +118,10 @@ class VertexNtuplizer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
 
 
 VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
-    prunedGenParticlesToken_(consumes<reco::GenParticleCollection>(iConfig.getUntrackedParameter<edm::InputTag>("prunedGenParticles"))),
-    mergedGenParticlesToken_(consumes<reco::GenParticleCollection>(iConfig.getUntrackedParameter<edm::InputTag>("mergedGenParticles"))),
+    genParticlesToken_(consumes<reco::GenParticleCollection>(iConfig.getUntrackedParameter<edm::InputTag>("genParticles"))),
     simTracksToken_(consumes<edm::SimTrackContainer>(iConfig.getUntrackedParameter<edm::InputTag>("simTracks"))),
     generalTracksToken_(consumes<reco::TrackCollection>(iConfig.getUntrackedParameter<edm::InputTag>("generalTracks"))),
-    PFCandidatesToken_(consumes<reco::PFCandidateCollection>(iConfig.getUntrackedParameter<edm::InputTag>("particleFlowCandidates"))),
+    pfCandidatesToken_(consumes<reco::PFCandidateCollection>(iConfig.getUntrackedParameter<edm::InputTag>("particleFlowCandidates"))),
     trackTimeBSValueMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimeBSValueMap"))),
     trackTimeBSErrorMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimeBSErrorMap"))),
     trackTimeBSQualityMapToken_(consumes<edm::ValueMap<float>>(iConfig.getUntrackedParameter<edm::InputTag>("trackTimeBSQualityMap"))),
@@ -147,12 +142,9 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
     genJetsToken_(consumes<reco::GenJetCollection>(iConfig.getUntrackedParameter<edm::InputTag>("genJets"))),
     genJetsFlavourInfoToken_(consumes<reco::JetFlavourInfoMatchingCollection>(iConfig.getUntrackedParameter<edm::InputTag>("genJetsFlavourInfo"))) {
 
-  nPrunedGVs_ = 0.0;
-  nPrunedGVsB_ = 0.0;
-  nPrunedGVsD_ = 0.0;
-  nMergedGVs_ = 0.0;
-  nMergedGVsB_ = 0.0;
-  nMergedGVsD_ = 0.0;
+  nGVs_ = 0.0;
+  nGVsB_ = 0.0;
+  nGVsD_ = 0.0;
   nGeneralTracks_ = 0.0;
   nPFCandidates_ = 0.0;
   nInclusiveSVs_ = 0.0;
@@ -167,27 +159,17 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   usesResource("TFileService");
   edm::Service<TFileService> fs;
 
-  gv_names_.push_back("gvPruned");
-  gv_names_.push_back("gvPrunedB");
-  gv_names_.push_back("gvPrunedD");
-  gv_names_.push_back("gvPruneds"); // w/SIM match
-  gv_names_.push_back("gvMerged");
-  gv_names_.push_back("gvMergedB");
-  gv_names_.push_back("gvMergedD");
-  gv_names_.push_back("gvMergeds"); // w/SIM match
+  gv_names_.push_back("gv");
+  gv_names_.push_back("gvB");
+  gv_names_.push_back("gvD");
+  gv_names_.push_back("gvs"); // w/SIM match
 
-  gv_names_more_.push_back("gvPrunedMatched");
-  gv_names_more_.push_back("gvPrunedBMatched");
-  gv_names_more_.push_back("gvPrunedDMatched");
-  gv_names_more_.push_back("gvPrunedUnmatched");
-  gv_names_more_.push_back("gvPrunedBUnmatched");
-  gv_names_more_.push_back("gvPrunedDUnmatched");
-  gv_names_more_.push_back("gvMergedMatched");
-  gv_names_more_.push_back("gvMergedBMatched");
-  gv_names_more_.push_back("gvMergedDMatched");
-  gv_names_more_.push_back("gvMergedUnmatched");
-  gv_names_more_.push_back("gvMergedBUnmatched");
-  gv_names_more_.push_back("gvMergedDUnmatched");
+  gv_names_more_.push_back("gvMatched");
+  gv_names_more_.push_back("gvBMatched");
+  gv_names_more_.push_back("gvDMatched");
+  gv_names_more_.push_back("gvUnmatched");
+  gv_names_more_.push_back("gvBUnmatched");
+  gv_names_more_.push_back("gvDUnmatched");
 
   sv_names_.push_back("sv"); // From inclusiveVertexFinder
   // sv_names_.push_back("svbs"); // SecondaryVertex w/track time extrapolated to the beam spot
@@ -205,6 +187,8 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   for (TString obj : gv_names_) {
     objs_.push_back(obj);
     objs_.push_back(obj + "_trk");
+    objs_.push_back(obj + "_trk_matchgt");
+    objs_.push_back(obj + "_trk_matchpfc");
   }
   for (TString obj : gv_names_more_) {
     objs_.push_back(obj);
@@ -213,6 +197,8 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   for (TString obj : sv_names_) {
     objs_.push_back(obj);
     objs_.push_back(obj + "_trk");
+    objs_.push_back(obj + "_trk_matchgt");
+    objs_.push_back(obj + "_trk_matchpfc");
   }
   for (TString obj : rj_names_) objs_.push_back(obj);
   for (TString obj : gj_names_) objs_.push_back(obj);
@@ -293,8 +279,7 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   vars2_["deltaR_ptResNorm"] = std::vector<float>{(float) nbins_, 0.0, 4.0, (float) nbins_, 0.0, 1.0};
 
   // Do we need this other than for comparison purposes?
-  histos1_["nPrunedGPs"] = fs->make<TH1F>("nPrunedGPs", "nPrunedGPs", 13, 0, 13);
-  histos1_["nMergedGPs"] = fs->make<TH1F>("nMergedGPs", "nMergedGPs", 13, 0, 13);
+  histos1_["nGPs"] = fs->make<TH1F>("nGPs", "nGPs", 13, 0, 13);
   // Count histograms
   for (TString gv_name : gv_names_) {
     TString name = "n" + gv_name;
@@ -358,8 +343,9 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
       if (obj1.BeginsWith("sv") && obj2.BeginsWith("sv")) continue;
       if (obj1.BeginsWith("rj") && obj2.BeginsWith("rj")) continue;
       if (obj1.BeginsWith("gj") && obj2.BeginsWith("gj")) continue;
-      if (obj1.EndsWith("_trk") && obj2.EndsWith("_trk")) continue;
-      if (obj1.EndsWith("_trk")) continue;
+      if (obj1.Contains("_trk") && obj2.Contains("_trk")) continue;
+      if (obj1.Contains("_trk")) continue;
+      if (obj1.Contains("_match") && obj2.Contains("_match")) continue;
 
       // 1D histograms
       for (const auto& iter : vars1_) {
@@ -386,19 +372,11 @@ VertexNtuplizer::~VertexNtuplizer() {}
 
 void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-  // Study of general tracks vs PF candidates
-  const reco::TrackCollection generalTracks = iEvent.get(generalTracksToken_);
-  const reco::PFCandidateCollection PFCandidates = iEvent.get(PFCandidatesToken_);
-  nGeneralTracks_ += generalTracks.size();
-  nPFCandidates_ += PFCandidates.size();
-
   const reco::VertexCollection primaryVertices = iEvent.get(primaryVerticesToken_);
   // Sorting described here: https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideOfflinePrimaryVertexProduction
   const reco::Vertex& primaryVertex = primaryVertices.at(0); // Most likely the signal vertex
 
-  std::vector<unsigned int> nPassingGPs = gvc_->build(iEvent,
-      prunedGenParticlesToken_,
-      mergedGenParticlesToken_, simTracksToken_, primaryVertex);
+  unsigned int nPassingGPs = gvc_->build(iEvent, genParticlesToken_, simTracksToken_, primaryVertex, matcher_);
   svc_->build(iEvent,
       secondaryVerticesToken_, secondaryVerticesMTDBSToken_, secondaryVerticesMTDBS4Token_, secondaryVerticesMTDPVToken_,
       trackTimeBSValueMapToken_, trackTimeBSErrorMapToken_, trackTimeBSQualityMapToken_,
@@ -407,28 +385,41 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   rjc_->build(iEvent, jetsToken_, genJetsFlavourInfoToken_);
   gjc_->build(iEvent, genJetsToken_, genJetsFlavourInfoToken_, jetsToken_);
 
-  histos1_["nPrunedGPs"]->Fill(nPassingGPs.at(0));
-  histos1_["nMergedGPs"]->Fill(nPassingGPs.at(1));
+  histos1_["nGPs"]->Fill(nPassingGPs);
+
+  const reco::TrackCollection generalTracks = iEvent.get(generalTracksToken_);
+  const reco::PFCandidateCollection pfCandidates = iEvent.get(pfCandidatesToken_);
+  nGeneralTracks_ += generalTracks.size();
+  nPFCandidates_ += pfCandidates.size();
+
+  std::map<TString, std::vector<bool>*> matches_;
+  for (TString gv_name : gv_names_) {
+    matches_[gv_name + "_gt"] = new std::vector<bool>(generalTracks.size(), false);
+    matches_[gv_name + "_pfc"] = new std::vector<bool>(pfCandidates.size(), false);
+    for (TString sv_name : sv_names_) {
+      matches_[gv_name + "_" + sv_name + "_gt"] = new std::vector<bool>(generalTracks.size(), false);
+      matches_[gv_name + "_" + sv_name + "_pfc"] = new std::vector<bool>(pfCandidates.size(), false);
+    }
+  }
+  for (TString gv_name : gv_names_more_) {
+    matches_[gv_name + "_gt"] = new std::vector<bool>(generalTracks.size(), false);
+    matches_[gv_name + "_pfc"] = new std::vector<bool>(pfCandidates.size(), false);
+  }
 
   std::vector<GenVertexCollection> GVCollections;
-  GVCollections.push_back(gvc_->getGenVertexFromPruned());
-  GVCollections.push_back(gvc_->getGenVertexFromPrunedB());
-  GVCollections.push_back(gvc_->getGenVertexFromPrunedD());
-  GVCollections.push_back(gvc_->getGenVertexFromPrunedSimMatch());
-  GVCollections.push_back(gvc_->getGenVertexFromMerged());
-  GVCollections.push_back(gvc_->getGenVertexFromMergedB());
-  GVCollections.push_back(gvc_->getGenVertexFromMergedD());
-  GVCollections.push_back(gvc_->getGenVertexFromMergedSimMatch());
+  GVCollections.push_back(gvc_->getGenVertices());
+  GVCollections.push_back(gvc_->getGenVerticesB());
+  GVCollections.push_back(gvc_->getGenVerticesD());
+  GVCollections.push_back(gvc_->getGenVerticesSimMatch());
   for (unsigned int iColl = 0; iColl < GVCollections.size(); iColl++) {
     histos1_["n" + gv_names_.at(iColl)]->Fill(GVCollections.at(iColl).size());
-    for (GenVertex& gv : GVCollections.at(iColl)) gv.fill(histos1_, gv_names_.at(iColl));
+    for (GenVertex& gv : GVCollections.at(iColl)) {
+      gv.fill(histos1_, gv_names_.at(iColl), matcher_, generalTracks, pfCandidates, matches_);
+    }
   }
-  nPrunedGVs_ += GVCollections.at(0).size();
-  nPrunedGVsB_ += GVCollections.at(1).size();
-  nPrunedGVsD_ += GVCollections.at(2).size();
-  nMergedGVs_ += GVCollections.at(4).size();
-  nMergedGVsB_ += GVCollections.at(5).size();
-  nMergedGVsD_ += GVCollections.at(6).size();
+  nGVs_ += GVCollections.at(0).size();
+  nGVsB_ += GVCollections.at(1).size();
+  nGVsD_ += GVCollections.at(2).size();
 
   unsigned int nC = iEvent.get(nIVFClustersToken_);
   unsigned int nCBS = iEvent.get(nIVFClustersMTDBSToken_);
@@ -470,18 +461,12 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
   // Only for matching to inclusive SVs
   // TODO: expand it to include matching to all SV collections
-  GenVertexCollection prunedMatchedGVs;
-  GenVertexCollection prunedMatchedGVsB;
-  GenVertexCollection prunedMatchedGVsD;
-  GenVertexCollection prunedUnmatchedGVs;
-  GenVertexCollection prunedUnmatchedGVsB;
-  GenVertexCollection prunedUnmatchedGVsD;
-  GenVertexCollection mergedMatchedGVs;
-  GenVertexCollection mergedMatchedGVsB;
-  GenVertexCollection mergedMatchedGVsD;
-  GenVertexCollection mergedUnmatchedGVs;
-  GenVertexCollection mergedUnmatchedGVsB;
-  GenVertexCollection mergedUnmatchedGVsD;
+  GenVertexCollection matchedGVs;
+  GenVertexCollection matchedGVsB;
+  GenVertexCollection matchedGVsD;
+  GenVertexCollection unmatchedGVs;
+  GenVertexCollection unmatchedGVsB;
+  GenVertexCollection unmatchedGVsD;
 
   // Matching GV and SV
   for (unsigned int iGVs = 0; iGVs < GVCollections.size(); iGVs++) {
@@ -497,38 +482,23 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
             GVmatched = true;
             TString gv_name = gv_names_.at(iGVs) + "_" + sv_names_.at(iSVs);
             TString sv_name = sv_names_.at(iSVs) + "_" + gv_names_.at(iGVs);
-            gv.fill(histos1_, gv_name);
+            gv.fill(histos1_, gv_name, matcher_, generalTracks, pfCandidates, matches_);
             sv.fill(histos1_, histos2_, sv_name);
             matcher_->fill(histos1_, histos2_, gv_name, sv_name, gv, sv);
             break; // Restrict to only one match
           } // End if matched
         } // End loop through SVs
 
-        if (sv_names_.at(iSVs).EqualTo("sv")
-            && (gv_names_.at(iGVs).EqualTo("gvPruned") || gv_names_.at(iGVs).EqualTo("gvMerged"))) {
-
-          if (gv_names_.at(iGVs).Contains("Pruned")) {
-            if (GVmatched) {
-              prunedMatchedGVs.push_back(gv);
-              if (gv.pdgIdBin() == B_MESON || gv.pdgIdBin() == B_BARYON) prunedMatchedGVsB.push_back(gv);
-              if (gv.pdgIdBin() == C_MESON || gv.pdgIdBin() == C_BARYON) prunedMatchedGVsD.push_back(gv);
-            } else {
-              prunedUnmatchedGVs.push_back(gv);
-              if (gv.pdgIdBin() == B_MESON || gv.pdgIdBin() == B_BARYON) prunedUnmatchedGVsB.push_back(gv);
-              if (gv.pdgIdBin() == C_MESON || gv.pdgIdBin() == C_BARYON) prunedUnmatchedGVsD.push_back(gv);
-            } // End if GV is matched
-          } // End if GV is from pruned
-          if (gv_names_.at(iGVs).Contains("Merged")) {
-            if (GVmatched) {
-              mergedMatchedGVs.push_back(gv);
-              if (gv.pdgIdBin() == B_MESON || gv.pdgIdBin() == B_BARYON) mergedMatchedGVsB.push_back(gv);
-              if (gv.pdgIdBin() == C_MESON || gv.pdgIdBin() == C_BARYON) mergedMatchedGVsD.push_back(gv);
-            } else {
-              mergedUnmatchedGVs.push_back(gv);
-              if (gv.pdgIdBin() == B_MESON || gv.pdgIdBin() == B_BARYON) mergedUnmatchedGVsB.push_back(gv);
-              if (gv.pdgIdBin() == C_MESON || gv.pdgIdBin() == C_BARYON) mergedUnmatchedGVsD.push_back(gv);
-            } // End if GV is matched
-          } // End if GV is from merged
+        if (sv_names_.at(iSVs).EqualTo("sv") && gv_names_.at(iGVs).EqualTo("gv")) {
+          if (GVmatched) {
+            matchedGVs.push_back(gv);
+            if (gv.pdgIdBin() == B_MESON || gv.pdgIdBin() == B_BARYON) matchedGVsB.push_back(gv);
+            if (gv.pdgIdBin() == C_MESON || gv.pdgIdBin() == C_BARYON) matchedGVsD.push_back(gv);
+          } else {
+            unmatchedGVs.push_back(gv);
+            if (gv.pdgIdBin() == B_MESON || gv.pdgIdBin() == B_BARYON) unmatchedGVsB.push_back(gv);
+            if (gv.pdgIdBin() == C_MESON || gv.pdgIdBin() == C_BARYON) unmatchedGVsD.push_back(gv);
+          } // End if GV is matched
         } // End if SV collection is inclusive SVs
 
       } // End loop through GVs
@@ -536,21 +506,19 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   } // End loop through GV collections
 
   std::vector<GenVertexCollection> GVCollectionsMore;
-  GVCollectionsMore.push_back(prunedMatchedGVs);
-  GVCollectionsMore.push_back(prunedMatchedGVsB);
-  GVCollectionsMore.push_back(prunedMatchedGVsD);
-  GVCollectionsMore.push_back(prunedUnmatchedGVs);
-  GVCollectionsMore.push_back(prunedUnmatchedGVsB);
-  GVCollectionsMore.push_back(prunedUnmatchedGVsD);
-  GVCollectionsMore.push_back(mergedMatchedGVs);
-  GVCollectionsMore.push_back(mergedMatchedGVsB);
-  GVCollectionsMore.push_back(mergedMatchedGVsD);
-  GVCollectionsMore.push_back(mergedUnmatchedGVs);
-  GVCollectionsMore.push_back(mergedUnmatchedGVsB);
-  GVCollectionsMore.push_back(mergedUnmatchedGVsD);
+  GVCollectionsMore.push_back(matchedGVs);
+  GVCollectionsMore.push_back(matchedGVsB);
+  GVCollectionsMore.push_back(matchedGVsD);
+  GVCollectionsMore.push_back(unmatchedGVs);
+  GVCollectionsMore.push_back(unmatchedGVsB);
+  GVCollectionsMore.push_back(unmatchedGVsD);
+  const reco::TrackCollection emptyGTs;
+  const reco::PFCandidateCollection emptyPFCs;
   for (unsigned int iColl = 0; iColl < GVCollectionsMore.size(); iColl++) {
     histos1_["n" + gv_names_more_.at(iColl)]->Fill(GVCollectionsMore.at(iColl).size());
-    for (GenVertex& gv : GVCollectionsMore.at(iColl)) gv.fill(histos1_, gv_names_more_.at(iColl));
+    for (GenVertex& gv : GVCollectionsMore.at(iColl)) {
+      gv.fill(histos1_, gv_names_more_.at(iColl), matcher_, emptyGTs, emptyPFCs, matches_);
+    }
   }
 }
 
@@ -560,40 +528,29 @@ void VertexNtuplizer::beginJob() {}
 
 void VertexNtuplizer::endJob() {
 
-  std::cout << "\nnumber of events = " << histos1_["nMergedGPs"]->GetEntries() << std::endl;
+  std::cout << "\nnumber of events = " << histos1_["nGPs"]->GetEntries() << std::endl;
 
-  std::cout << "\nthere are " << nGeneralTracks_ / histos1_["nMergedGPs"]->GetEntries() << " general tracks per event." << std::endl;
-  std::cout << "there are " << nPFCandidates_ / histos1_["nMergedGPs"]->GetEntries() << " PF candidates per event." << std::endl;
+  std::cout << "\nthere are " << nGeneralTracks_ / histos1_["nGPs"]->GetEntries() << " general tracks per event." << std::endl;
+  std::cout << "there are " << nPFCandidates_ / histos1_["nGPs"]->GetEntries() << " PF candidates per event." << std::endl;
 
-  std::cout << "\nmean number of GVs from pruned               = " << histos1_["ngvPruned"]->GetMean() << "+=" << histos1_["ngvPruned"]->GetStdDev() << std::endl;
-  std::cout << "mean number of GVs from pruned with B mother = " << histos1_["ngvPrunedB"]->GetMean() << "+=" << histos1_["ngvPrunedB"]->GetStdDev() << std::endl;
-  std::cout << "mean number of GVs from pruned with D mother = " << histos1_["ngvPrunedD"]->GetMean() << "+=" << histos1_["ngvPrunedD"]->GetStdDev() << std::endl;
-  std::cout << "mean number of GVs from merged               = " << histos1_["ngvMerged"]->GetMean() << "+=" << histos1_["ngvMerged"]->GetStdDev() << std::endl;
-  std::cout << "mean number of GVs from merged with B mother = " << histos1_["ngvMergedB"]->GetMean() << "+=" << histos1_["ngvMergedB"]->GetStdDev() << std::endl;
-  std::cout << "mean number of GVs from merged with D mother = " << histos1_["ngvMergedD"]->GetMean() << "+=" << histos1_["ngvMergedD"]->GetStdDev() << std::endl;
+  std::cout << "mean number of GVs from               = " << histos1_["ngv"]->GetMean() << "+=" << histos1_["ngv"]->GetStdDev() << std::endl;
+  std::cout << "mean number of GVs from with B mother = " << histos1_["ngvB"]->GetMean() << "+=" << histos1_["ngvB"]->GetStdDev() << std::endl;
+  std::cout << "mean number of GVs from with D mother = " << histos1_["ngvD"]->GetMean() << "+=" << histos1_["ngvD"]->GetStdDev() << std::endl;
 
   std::cout << "\nmean number of inclusive SVs = " << histos1_["nsv"]->GetMean() << "+=" << histos1_["nsv"]->GetStdDev() << std::endl;
   std::cout << "mean number of slimmed SVs   = " << histos1_["nsvSlimmedCand"]->GetMean() << "+=" << histos1_["nsvSlimmedCand"]->GetStdDev() << std::endl;
   std::cout << "slimmed SVs / inclusive SVs  = " << nSlimmedCandSVs_ / nInclusiveSVs_ << std::endl;
 
   std::cout << "\nsv" << std::endl;
-  std::cout << "Integrated efficiency for all pruned GVs                = " << histos1_["gvPruned_sv_pdgIdBin"]->GetEntries() / histos1_["gvPruned_pdgIdBin"]->GetEntries() << std::endl;
-  std::cout << "Integrated efficiency for all pruned GVs with B mother  = " << histos1_["gvPrunedB_sv_pdgIdBin"]->GetEntries() / histos1_["gvPrunedB_pdgIdBin"]->GetEntries() << std::endl;
-  std::cout << "Integrated efficiency for all pruned GVs with D mother  = " << histos1_["gvPrunedD_sv_pdgIdBin"]->GetEntries() / histos1_["gvPrunedD_pdgIdBin"]->GetEntries() << std::endl;
-  std::cout << "Integrated efficiency for all pruned GVs SimTrack match = " << histos1_["gvPruneds_sv_pdgIdBin"]->GetEntries() / histos1_["gvPruneds_pdgIdBin"]->GetEntries() << std::endl;
-  std::cout << "Integrated efficiency for all merged GVs                = " << histos1_["gvMerged_sv_pdgIdBin"]->GetEntries() / histos1_["gvMerged_pdgIdBin"]->GetEntries() << std::endl;
-  std::cout << "Integrated efficiency for all merged GVs with B mother  = " << histos1_["gvMergedB_sv_pdgIdBin"]->GetEntries() / histos1_["gvMergedB_pdgIdBin"]->GetEntries() << std::endl;
-  std::cout << "Integrated efficiency for all merged GVs with D mother  = " << histos1_["gvMergedD_sv_pdgIdBin"]->GetEntries() / histos1_["gvMergedD_pdgIdBin"]->GetEntries() << std::endl;
-  std::cout << "Integrated efficiency for all merged GVs SimTrack match = " << histos1_["gvMergeds_sv_pdgIdBin"]->GetEntries() / histos1_["gvMergeds_pdgIdBin"]->GetEntries() << std::endl;
+  std::cout << "Integrated efficiency for all GVs                = " << histos1_["gv_sv_pdgIdBin"]->GetEntries() / histos1_["gv_pdgIdBin"]->GetEntries() << std::endl;
+  std::cout << "Integrated efficiency for all GVs with B mother  = " << histos1_["gvB_sv_pdgIdBin"]->GetEntries() / histos1_["gvB_pdgIdBin"]->GetEntries() << std::endl;
+  std::cout << "Integrated efficiency for all GVs with D mother  = " << histos1_["gvD_sv_pdgIdBin"]->GetEntries() / histos1_["gvD_pdgIdBin"]->GetEntries() << std::endl;
+  std::cout << "Integrated efficiency for all GVs SimTrack match = " << histos1_["gvs_sv_pdgIdBin"]->GetEntries() / histos1_["gvs_pdgIdBin"]->GetEntries() << std::endl;
   std::cout << "\nsvSlimmedCand" << std::endl;
-  std::cout << "Integrated efficiency for all pruned GVs                = " << histos1_["gvPruned_svSlimmedCand_pdgIdBin"]->GetEntries() / histos1_["gvPruned_pdgIdBin"]->GetEntries() << std::endl;
-  std::cout << "Integrated efficiency for all pruned GVs with B mother  = " << histos1_["gvPrunedB_svSlimmedCand_pdgIdBin"]->GetEntries() / histos1_["gvPrunedB_pdgIdBin"]->GetEntries() << std::endl;
-  std::cout << "Integrated efficiency for all pruned GVs with D mother  = " << histos1_["gvPrunedD_svSlimmedCand_pdgIdBin"]->GetEntries() / histos1_["gvPrunedD_pdgIdBin"]->GetEntries() << std::endl;
-  std::cout << "Integrated efficiency for all pruned GVs SimTrack match = " << histos1_["gvPruneds_svSlimmedCand_pdgIdBin"]->GetEntries() / histos1_["gvPruneds_pdgIdBin"]->GetEntries() << std::endl;
-  std::cout << "Integrated efficiency for all merged GVs                = " << histos1_["gvMerged_svSlimmedCand_pdgIdBin"]->GetEntries() / histos1_["gvMerged_pdgIdBin"]->GetEntries() << std::endl;
-  std::cout << "Integrated efficiency for all merged GVs with B mother  = " << histos1_["gvMergedB_svSlimmedCand_pdgIdBin"]->GetEntries() / histos1_["gvMergedB_pdgIdBin"]->GetEntries() << std::endl;
-  std::cout << "Integrated efficiency for all merged GVs with D mother  = " << histos1_["gvMergedD_svSlimmedCand_pdgIdBin"]->GetEntries() / histos1_["gvMergedD_pdgIdBin"]->GetEntries() << std::endl;
-  std::cout << "Integrated efficiency for all merged GVs SimTrack match = " << histos1_["gvMergeds_svSlimmedCand_pdgIdBin"]->GetEntries() / histos1_["gvMergeds_pdgIdBin"]->GetEntries() << std::endl;
+  std::cout << "Integrated efficiency for all GVs                = " << histos1_["gv_svSlimmedCand_pdgIdBin"]->GetEntries() / histos1_["gv_pdgIdBin"]->GetEntries() << std::endl;
+  std::cout << "Integrated efficiency for all GVs with B mother  = " << histos1_["gvB_svSlimmedCand_pdgIdBin"]->GetEntries() / histos1_["gvB_pdgIdBin"]->GetEntries() << std::endl;
+  std::cout << "Integrated efficiency for all GVs with D mother  = " << histos1_["gvD_svSlimmedCand_pdgIdBin"]->GetEntries() / histos1_["gvD_pdgIdBin"]->GetEntries() << std::endl;
+  std::cout << "Integrated efficiency for all GVs SimTrack match = " << histos1_["gvs_svSlimmedCand_pdgIdBin"]->GetEntries() / histos1_["gvs_pdgIdBin"]->GetEntries() << std::endl;
 
   // Catch under and over flows -- messes with mean and stddev calculations...
   // for (auto iter : histos1_) {

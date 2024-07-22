@@ -2,8 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 vertexNtuplizer = cms.EDAnalyzer("VertexNtuplizer",
   # Collections
-  prunedGenParticles      = cms.untracked.InputTag("prunedGenParticles",            "",                    "BTV"),
-  mergedGenParticles      = cms.untracked.InputTag("mergedGenParticles",            "",                    "BTV"),
+  genParticles            = cms.untracked.InputTag("mergedGenParticles",            "",                    "BTV"),
   simTracks               = cms.untracked.InputTag("g4SimHits",                     "",                    "SIM"),
   generalTracks           = cms.untracked.InputTag("generalTracks",                 "",                    "BTV"),
   particleFlowCandidates  = cms.untracked.InputTag("particleFlow",                  "",                    "BTV"),
@@ -40,10 +39,8 @@ vertexNtuplizer = cms.EDAnalyzer("VertexNtuplizer",
   svChi2dofMax            = cms.untracked.double(10.0),
 
   # Matching cuts
-  simTrkMatchDrCut        = cms.untracked.double(0.05),
-  simTrkMatchPtCut        = cms.untracked.double(0.1),
-  recoTrkMatchDrCut       = cms.untracked.double(0.05),
-  recoTrkMatchPtCut       = cms.untracked.double(0.1),
+  trkMatchDrCut           = cms.untracked.double(0.05),
+  trkMatchPtCut           = cms.untracked.double(0.1),
   vtxMatchFrac            = cms.untracked.double(0.66),
   jetRadius               = cms.untracked.double(0.4),
   jetMatchDrCut           = cms.untracked.double(0.1),

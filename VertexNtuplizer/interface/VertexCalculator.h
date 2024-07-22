@@ -14,6 +14,10 @@
 #include "TMath.h"
 
 
+class GenVertex;
+class SecondaryVertex;
+
+
 namespace vertexntuples {
 
   // const float catchInfsAndBound(float input, float replaceValue,
@@ -44,14 +48,28 @@ namespace vertexntuples {
   const float dz(const reco::VertexCompositePtrCandidate& v1, const reco::Vertex& v2);
   Measurement1D d3d(const reco::VertexCompositePtrCandidate& v1, const reco::Vertex& v2);
 
+  const float xres(const GenVertex& gv, const SecondaryVertex& sv);
+  const float yres(const GenVertex& gv, const SecondaryVertex& sv);
+  const float zres(const GenVertex& gv, const SecondaryVertex& sv);
+  const float xpull(const GenVertex& gv, const SecondaryVertex& sv);
+  const float ypull(const GenVertex& gv, const SecondaryVertex& sv);
+  const float zpull(const GenVertex& gv, const SecondaryVertex& sv);
+
+  const float dxy(const GenVertex& gv, const SecondaryVertex& sv);
+  const float dxyErr(const GenVertex& gv, const SecondaryVertex& sv);
+  const float dz(const GenVertex& gv, const SecondaryVertex& sv);
+  const float dzErr(const GenVertex& gv, const SecondaryVertex& sv);
+  const float d3d(const GenVertex& gv, const SecondaryVertex& sv);
+  const float d3dErr(const GenVertex& gv, const SecondaryVertex& sv);
+
   // Do not use these -- use the above
-  const float dxy(const float x1, const float x2, const float y1, const float y2);
-  const float dxyErr(const float x1, const float x2, const float xerr1, const float xerr2,
-      const float y1, const float y2, const float yerr1, const float yerr2);
-  const float dz(const float z1, const float z2);
-  const float dzErr(const float zerr1, const float zerr2);
-  const float d3d(const float dxy, const float dz);
-  const float d3dErr(const float dxy, const float dxyerr, const float dz, const float dzerr);
+  // const float dxy(const float x1, const float x2, const float y1, const float y2);
+  // const float dxyErr(const float x1, const float x2, const float xerr1, const float xerr2,
+  //     const float y1, const float y2, const float yerr1, const float yerr2);
+  // const float dz(const float z1, const float z2);
+  // const float dzErr(const float zerr1, const float zerr2);
+  // const float d3d(const float dxy, const float dz);
+  // const float d3dErr(const float dxy, const float dxyerr, const float dz, const float dzerr);
 }
 
 

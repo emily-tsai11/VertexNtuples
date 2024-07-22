@@ -4,11 +4,12 @@
 
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 
 #include "TMath.h"
 #include "TH1.h"
 
-#include "VertexCalculator.h"
+#include "VertexMatcher.h"
 
 
 class GenVertex {
@@ -19,10 +20,12 @@ class GenVertex {
         const reco::Vertex& primaryVertex, const int pdgIdBin);
     // ~GenVertex();
 
-    void fill(std::map<TString, TH1F*>& histos, TString prefix);
+    void fill(std::map<TString, TH1F*>& histos, TString prefix, VertexMatcher* matcher,
+        const reco::TrackCollection& generalTracks, const reco::PFCandidateCollection& pfCandidates,
+        std::map<TString, std::vector<bool>*>& matches);
 
-    void addDeltaR(float deltaR) { daughterDeltaR_->push_back(deltaR); }
     void addPtResNorm(float ptresnorm) { daughterPtResNorm_->push_back(ptresnorm); }
+    void addDeltaR(float deltaR) { daughterDeltaR_->push_back(deltaR); }
 
     const float x() const { return x_; }
     const float y() const { return y_; }
@@ -55,8 +58,8 @@ class GenVertex {
 
     const std::vector<const reco::Candidate*>* daughters() const { return daughters_; }
 
-    const std::vector<float>* dauMatchDeltaR() const { return daughterDeltaR_; }
     const std::vector<float>* dauMatchPtResNorm() const { return daughterPtResNorm_; }
+    const std::vector<float>* dauMatchDeltaR() const { return daughterDeltaR_; }
 
   private:
 
@@ -93,8 +96,8 @@ class GenVertex {
     std::vector<const reco::Candidate*>* daughters_;
 
     // Filled when matching to SecondaryVertex tracks
-    std::vector<float>* daughterDeltaR_;
     std::vector<float>* daughterPtResNorm_;
+    std::vector<float>* daughterDeltaR_;
 };
 
 

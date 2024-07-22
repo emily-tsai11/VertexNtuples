@@ -9,9 +9,9 @@
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 #include "SimDataFormats/Track/interface/SimTrackContainer.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
-#include "DataFormats/Math/interface/deltaR.h"
 
 #include "GenVertex.h"
+#include "VertexMatcher.h"
 
 
 typedef std::vector<GenVertex> GenVertexCollection;
@@ -33,48 +33,33 @@ class GenVertexCollectionBuilder {
     GenVertexCollectionBuilder(const edm::ParameterSet& iConfig);
     // ~GenVertexCollectionBuilder();
 
-    std::vector<unsigned int> build(const edm::Event& iEvent,
-        edm::EDGetTokenT<reco::GenParticleCollection>& prunedGenParticlesToken,
-        edm::EDGetTokenT<reco::GenParticleCollection>& mergedGenParticlesToken,
+    unsigned int build(const edm::Event& iEvent,
+        edm::EDGetTokenT<reco::GenParticleCollection>& genParticlesToken,
         edm::EDGetTokenT<edm::SimTrackContainer>& simTracksToken,
-        const reco::Vertex& primaryVertex);
+        const reco::Vertex& primaryVertex, VertexMatcher* matcher);
 
-    GenVertexCollection getGenVertexFromPruned() { return genVerticesFromPruned_; }
-    GenVertexCollection getGenVertexFromPrunedB() { return genVerticesFromPrunedB_; }
-    GenVertexCollection getGenVertexFromPrunedD() { return genVerticesFromPrunedD_; }
-    GenVertexCollection getGenVertexFromPrunedSimMatch() { return genVerticesFromPrunedSimMatch_; }
-    GenVertexCollection getGenVertexFromMerged() { return genVerticesFromMerged_; }
-    GenVertexCollection getGenVertexFromMergedB() { return genVerticesFromMergedB_; }
-    GenVertexCollection getGenVertexFromMergedD() { return genVerticesFromMergedD_; }
-    GenVertexCollection getGenVertexFromMergedSimMatch() { return genVerticesFromMergedSimMatch_; }
+    GenVertexCollection getGenVertices() { return genVertices_; }
+    GenVertexCollection getGenVerticesB() { return genVerticesB_; }
+    GenVertexCollection getGenVerticesD() { return genVerticesD_; }
+    GenVertexCollection getGenVerticesSimMatch() { return genVerticesSimMatch_; }
 
   private:
 
-    bool goodGenParticle(const reco::Candidate* gp, double ptCut);
-    bool isAncestor(const reco::Candidate* mother, const reco::Candidate* possibleMother);
-    bool matchGenToSimTrack(const reco::Candidate* gp, const SimTrack& st);
-    bool matchGenToSimVertex(const GenVertex& gv);
+    bool goodGenPart(const reco::Candidate* gp, double ptCut);
     int genPartID(int pdgId);
+    bool isAncestor(const reco::Candidate* mother, const reco::Candidate* possibleMother);
     // static bool compare(const GenVertex& gva, const GenVertex& gvb);
 
     double absEtaMax_;
     double genMotherPtMin_;
     double genDaughterPtMin_;
-    double drCut_;
-    double ptCut_;
-    double matchFrac_;
 
-    GenVertexCollection genVerticesFromPruned_;
-    GenVertexCollection genVerticesFromPrunedB_;
-    GenVertexCollection genVerticesFromPrunedD_;
-    GenVertexCollection genVerticesFromPrunedSimMatch_;
-    GenVertexCollection genVerticesFromMerged_;
-    GenVertexCollection genVerticesFromMergedB_;
-    GenVertexCollection genVerticesFromMergedD_;
-    GenVertexCollection genVerticesFromMergedSimMatch_;
+    GenVertexCollection genVertices_;
+    GenVertexCollection genVerticesB_;
+    GenVertexCollection genVerticesD_;
+    GenVertexCollection genVerticesSimMatch_;
 
-    reco::GenParticleCollection prunedGenParticles_;
-    reco::GenParticleCollection mergedGenParticles_;
+    reco::GenParticleCollection genParticles_;
     edm::SimTrackContainer simTracks_;
 };
 

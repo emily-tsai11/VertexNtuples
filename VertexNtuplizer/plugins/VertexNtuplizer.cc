@@ -318,6 +318,20 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
     }
   }
 
+  histos1_["genTrk_pt"] = fs->make<TH1F>("genTrk_pt", "genTrk_pt", (float) nbins_, 0.0, 200.0);
+  histos1_["genTrk_eta"] = fs->make<TH1F>("genTrk_eta", "genTrk_eta", (float) nbins_, -3.1, 3.1);
+  histos1_["genTrk_phi"] = fs->make<TH1F>("genTrk_phi", "genTrk_phi", (float) nbins_, -3.15, 3.15);
+  histos1_["genTrk_pt"]->Sumw2();
+  histos1_["genTrk_eta"]->Sumw2();
+  histos1_["genTrk_phi"]->Sumw2();
+
+  histos1_["pfCand_pt"] = fs->make<TH1F>("pfCand_pt", "pfCand_pt", (float) nbins_, 0.0, 200.0);
+  histos1_["pfCand_eta"] = fs->make<TH1F>("pfCand_eta", "pfCand_eta", (float) nbins_, -3.1, 3.1);
+  histos1_["pfCand_phi"] = fs->make<TH1F>("pfCand_phi", "pfCand_phi", (float) nbins_, -3.15, 3.15);
+  histos1_["pfCand_pt"]->Sumw2();
+  histos1_["pfCand_eta"]->Sumw2();
+  histos1_["pfCand_phi"]->Sumw2();
+
   // 2D histograms
   for (TString obj : sv_names_) {
     for (const auto& iter : vars2_) {
@@ -385,6 +399,16 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   const reco::PFCandidateCollection pfCandidates = iEvent.get(pfCandidatesToken_);
   nGeneralTracks_ += generalTracks.size();
   nPFCandidates_ += pfCandidates.size();
+  for (const reco::Track& gt : generalTracks) {
+    histos1_["genTrk_pt"]->Fill(gt.pt());
+    histos1_["genTrk_eta"]->Fill(gt.eta());
+    histos1_["genTrk_phi"]->Fill(gt.phi());
+  }
+  for (const reco::PFCandidate& pfc : pfCandidates) {
+    histos1_["pfCand_pt"]->Fill(pfc.pt());
+    histos1_["pfCand_eta"]->Fill(pfc.eta());
+    histos1_["pfCand_phi"]->Fill(pfc.phi());
+  }
 
   std::map<TString, std::vector<bool>*> matches_;
   for (TString gv_name : gv_names_) {

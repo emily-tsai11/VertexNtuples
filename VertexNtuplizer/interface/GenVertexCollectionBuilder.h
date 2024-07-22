@@ -39,9 +39,9 @@ class GenVertexCollectionBuilder {
         const reco::Vertex& primaryVertex, VertexMatcher* matcher);
 
     GenVertexCollection getGenVertices() { return genVertices_; }
+    GenVertexCollection getGenVerticesSimMatch() { return genVerticesSimMatch_; }
     GenVertexCollection getGenVerticesB() { return genVerticesB_; }
     GenVertexCollection getGenVerticesD() { return genVerticesD_; }
-    GenVertexCollection getGenVerticesSimMatch() { return genVerticesSimMatch_; }
 
   private:
 
@@ -55,9 +55,9 @@ class GenVertexCollectionBuilder {
     double genDaughterPtMin_;
 
     GenVertexCollection genVertices_;
+    GenVertexCollection genVerticesSimMatch_;
     GenVertexCollection genVerticesB_;
     GenVertexCollection genVerticesD_;
-    GenVertexCollection genVerticesSimMatch_;
 
     reco::GenParticleCollection genParticles_;
     edm::SimTrackContainer simTracks_;

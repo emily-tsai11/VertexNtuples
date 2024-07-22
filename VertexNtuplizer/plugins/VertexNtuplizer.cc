@@ -89,9 +89,6 @@ class VertexNtuplizer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
     edm::EDGetTokenT<reco::GenJetCollection> genJetsToken_;
     edm::EDGetTokenT<reco::JetFlavourInfoMatchingCollection> genJetsFlavourInfoToken_;
 
-    float nGVs_;
-    float nGVsB_;
-    float nGVsD_;
     float nGeneralTracks_;
     float nPFCandidates_;
     float nInclusiveSVs_;
@@ -142,9 +139,6 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
     genJetsToken_(consumes<reco::GenJetCollection>(iConfig.getUntrackedParameter<edm::InputTag>("genJets"))),
     genJetsFlavourInfoToken_(consumes<reco::JetFlavourInfoMatchingCollection>(iConfig.getUntrackedParameter<edm::InputTag>("genJetsFlavourInfo"))) {
 
-  nGVs_ = 0.0;
-  nGVsB_ = 0.0;
-  nGVsD_ = 0.0;
   nGeneralTracks_ = 0.0;
   nPFCandidates_ = 0.0;
   nInclusiveSVs_ = 0.0;
@@ -160,9 +154,9 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   edm::Service<TFileService> fs;
 
   gv_names_.push_back("gv");
+  gv_names_.push_back("gvs"); // w/SIM match
   gv_names_.push_back("gvB");
   gv_names_.push_back("gvD");
-  gv_names_.push_back("gvs"); // w/SIM match
 
   gv_names_more_.push_back("gvMatched");
   gv_names_more_.push_back("gvBMatched");
@@ -408,18 +402,15 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
   std::vector<GenVertexCollection> GVCollections;
   GVCollections.push_back(gvc_->getGenVertices());
+  GVCollections.push_back(gvc_->getGenVerticesSimMatch());
   GVCollections.push_back(gvc_->getGenVerticesB());
   GVCollections.push_back(gvc_->getGenVerticesD());
-  GVCollections.push_back(gvc_->getGenVerticesSimMatch());
   for (unsigned int iColl = 0; iColl < GVCollections.size(); iColl++) {
     histos1_["n" + gv_names_.at(iColl)]->Fill(GVCollections.at(iColl).size());
     for (GenVertex& gv : GVCollections.at(iColl)) {
       gv.fill(histos1_, gv_names_.at(iColl), matcher_, generalTracks, pfCandidates, matches_);
     }
   }
-  nGVs_ += GVCollections.at(0).size();
-  nGVsB_ += GVCollections.at(1).size();
-  nGVsD_ += GVCollections.at(2).size();
 
   unsigned int nC = iEvent.get(nIVFClustersToken_);
   unsigned int nCBS = iEvent.get(nIVFClustersMTDBSToken_);
@@ -470,6 +461,7 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
   // Matching GV and SV
   for (unsigned int iGVs = 0; iGVs < GVCollections.size(); iGVs++) {
+    if (gv_names_.at(iGVs).EqualTo("gvB") || gv_names_.at(iGVs).EqualTo("gvD")) continue;
     for (unsigned int iSVs = 0; iSVs < SVCollections.size(); iSVs++) {
       std::vector<bool> SVmatched(SVCollections.at(iSVs).size(), false); // Prevent double matching
       for (GenVertex& gv : GVCollections.at(iGVs)) {
@@ -480,11 +472,24 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
           if (matcher_->match(gv, sv, VertexMatcher::TRACK) && !SVmatched.at(iSV)) {
             SVmatched.at(iSV) = true; // Prevent double matching
             GVmatched = true;
+
             TString gv_name = gv_names_.at(iGVs) + "_" + sv_names_.at(iSVs);
             TString sv_name = sv_names_.at(iSVs) + "_" + gv_names_.at(iGVs);
             gv.fill(histos1_, gv_name, matcher_, generalTracks, pfCandidates, matches_);
             sv.fill(histos1_, histos2_, sv_name);
             matcher_->fill(histos1_, histos2_, gv_name, sv_name, gv, sv);
+
+            if (gv_names_.at(iGVs).EqualTo("gv")) {
+              TString gv_flav = gv_names_.at(iGVs);
+              if (gv.pdgIdBin() == B_MESON || gv.pdgIdBin() == B_BARYON) gv_flav += "B";
+              if (gv.pdgIdBin() == C_MESON || gv.pdgIdBin() == C_BARYON) gv_flav += "D";
+              gv_name = gv_flav + "_" + sv_names_.at(iSVs);
+              sv_name = sv_names_.at(iSVs) + "_" + gv_flav;
+              gv.fill(histos1_, gv_name, matcher_, generalTracks, pfCandidates, matches_);
+              sv.fill(histos1_, histos2_, sv_name);
+              matcher_->fill(histos1_, histos2_, gv_name, sv_name, gv, sv);
+            }
+
             break; // Restrict to only one match
           } // End if matched
         } // End loop through SVs
@@ -534,6 +539,7 @@ void VertexNtuplizer::endJob() {
   std::cout << "there are " << nPFCandidates_ / histos1_["nGPs"]->GetEntries() << " PF candidates per event." << std::endl;
 
   std::cout << "mean number of GVs from               = " << histos1_["ngv"]->GetMean() << "+=" << histos1_["ngv"]->GetStdDev() << std::endl;
+  std::cout << "mean number of GVs from with SIM match = " << histos1_["ngvs"]->GetMean() << "+=" << histos1_["ngvs"]->GetStdDev() << std::endl;
   std::cout << "mean number of GVs from with B mother = " << histos1_["ngvB"]->GetMean() << "+=" << histos1_["ngvB"]->GetStdDev() << std::endl;
   std::cout << "mean number of GVs from with D mother = " << histos1_["ngvD"]->GetMean() << "+=" << histos1_["ngvD"]->GetStdDev() << std::endl;
 
@@ -543,14 +549,30 @@ void VertexNtuplizer::endJob() {
 
   std::cout << "\nsv" << std::endl;
   std::cout << "Integrated efficiency for all GVs                = " << histos1_["gv_sv_pdgIdBin"]->GetEntries() / histos1_["gv_pdgIdBin"]->GetEntries() << std::endl;
+  std::cout << "Integrated efficiency for all GVs SimTrack match = " << histos1_["gvs_sv_pdgIdBin"]->GetEntries() / histos1_["gvs_pdgIdBin"]->GetEntries() << std::endl;
   std::cout << "Integrated efficiency for all GVs with B mother  = " << histos1_["gvB_sv_pdgIdBin"]->GetEntries() / histos1_["gvB_pdgIdBin"]->GetEntries() << std::endl;
   std::cout << "Integrated efficiency for all GVs with D mother  = " << histos1_["gvD_sv_pdgIdBin"]->GetEntries() / histos1_["gvD_pdgIdBin"]->GetEntries() << std::endl;
-  std::cout << "Integrated efficiency for all GVs SimTrack match = " << histos1_["gvs_sv_pdgIdBin"]->GetEntries() / histos1_["gvs_pdgIdBin"]->GetEntries() << std::endl;
+
   std::cout << "\nsvSlimmedCand" << std::endl;
   std::cout << "Integrated efficiency for all GVs                = " << histos1_["gv_svSlimmedCand_pdgIdBin"]->GetEntries() / histos1_["gv_pdgIdBin"]->GetEntries() << std::endl;
+  std::cout << "Integrated efficiency for all GVs SimTrack match = " << histos1_["gvs_svSlimmedCand_pdgIdBin"]->GetEntries() / histos1_["gvs_pdgIdBin"]->GetEntries() << std::endl;
   std::cout << "Integrated efficiency for all GVs with B mother  = " << histos1_["gvB_svSlimmedCand_pdgIdBin"]->GetEntries() / histos1_["gvB_pdgIdBin"]->GetEntries() << std::endl;
   std::cout << "Integrated efficiency for all GVs with D mother  = " << histos1_["gvD_svSlimmedCand_pdgIdBin"]->GetEntries() / histos1_["gvD_pdgIdBin"]->GetEntries() << std::endl;
-  std::cout << "Integrated efficiency for all GVs SimTrack match = " << histos1_["gvs_svSlimmedCand_pdgIdBin"]->GetEntries() / histos1_["gvs_pdgIdBin"]->GetEntries() << std::endl;
+
+  std::cout << "\nhistos1_[\"gv_pdgIdBin\"]->GetEntries() = " << histos1_["gv_pdgIdBin"]->GetEntries() << std::endl;
+  std::cout << "histos1_[\"gvs_pdgIdBin\"]->GetEntries() = " << histos1_["gvs_pdgIdBin"]->GetEntries() << std::endl;
+  std::cout << "histos1_[\"gvB_pdgIdBin\"]->GetEntries() = " << histos1_["gvB_pdgIdBin"]->GetEntries() << std::endl;
+  std::cout << "histos1_[\"gvD_pdgIdBin\"]->GetEntries() = " << histos1_["gvD_pdgIdBin"]->GetEntries() << std::endl;
+
+  std::cout << "histos1_[\"gv_sv_pdgIdBin\"]->GetEntries() = " << histos1_["gv_sv_pdgIdBin"]->GetEntries() << std::endl;
+  std::cout << "histos1_[\"gvs_sv_pdgIdBin\"]->GetEntries() = " << histos1_["gvs_sv_pdgIdBin"]->GetEntries() << std::endl;
+  std::cout << "histos1_[\"gvB_sv_pdgIdBin\"]->GetEntries() = " << histos1_["gvB_sv_pdgIdBin"]->GetEntries() << std::endl;
+  std::cout << "histos1_[\"gvD_sv_pdgIdBin\"]->GetEntries() = " << histos1_["gvD_sv_pdgIdBin"]->GetEntries() << std::endl;
+
+  std::cout << "histos1_[\"gv_svSlimmedCand_pdgIdBin\"]->GetEntries() = " << histos1_["gv_svSlimmedCand_pdgIdBin"]->GetEntries() << std::endl;
+  std::cout << "histos1_[\"gvs_svSlimmedCand_pdgIdBin\"]->GetEntries() = " << histos1_["gvs_svSlimmedCand_pdgIdBin"]->GetEntries() << std::endl;
+  std::cout << "histos1_[\"gvB_svSlimmedCand_pdgIdBin\"]->GetEntries() = " << histos1_["gvB_svSlimmedCand_pdgIdBin"]->GetEntries() << std::endl;
+  std::cout << "histos1_[\"gvD_svSlimmedCand_pdgIdBin\"]->GetEntries() = " << histos1_["gvD_svSlimmedCand_pdgIdBin"]->GetEntries() << std::endl;
 
   // Catch under and over flows -- messes with mean and stddev calculations...
   // for (auto iter : histos1_) {

@@ -172,12 +172,13 @@ bool VertexMatcher::vtxTrackMatch(GenVertex& gv, SecondaryVertex& sv) {
   std::vector<bool> trkMatched(sv.nTracks(), false);
   for (const reco::Candidate* dau : *(gv.daughters())) {
     for (unsigned int iTrk = 0; iTrk < sv.nTracks(); iTrk++) {
+      if (trkMatched.at(iTrk)) continue;
       bool match = true;
       float matchdR = reco::deltaR(sv.trkEta()->at(iTrk), sv.trkPhi()->at(iTrk), dau->eta(), dau->phi());
       float matchPtResNorm = ptResNorm(dau->pt(), sv.trkPt()->at(iTrk));
       if (matchdR > trkMatchDrCut_) match = false;
       if (matchPtResNorm > trkMatchPtCut_) match = false;
-      if (!trkMatched.at(iTrk) && match) {
+      if (match) {
         trkMatched.at(iTrk) = true;
         gv.addPtResNorm(matchPtResNorm);
         gv.addDeltaR(matchdR);

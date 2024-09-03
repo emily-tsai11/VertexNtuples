@@ -114,9 +114,9 @@ int GenVertexCollectionBuilder::genPartID(int pdgId) {
     (checkPdgId == 541)) return B_MESON;
   else if (
     (checkPdgId == 5122) ||
-    (checkPdgId == 5112) ||
-    (checkPdgId == 5212) ||
-    (checkPdgId == 5222) ||
+    // (checkPdgId == 5112) || # lifetime too short
+    // (checkPdgId == 5212) || # lifetime too short
+    // (checkPdgId == 5222) || # lifetime too short
     (checkPdgId == 5132) ||
     (checkPdgId == 5232) ||
     (checkPdgId == 5332) ||
@@ -133,9 +133,9 @@ int GenVertexCollectionBuilder::genPartID(int pdgId) {
     (checkPdgId == 431)) return C_MESON;
   else if (
     (checkPdgId == 4122) ||
-    (checkPdgId == 4222) ||
-    (checkPdgId == 4212) ||
-    (checkPdgId == 4112) ||
+    // (checkPdgId == 4222) || # lifetime too short
+    // (checkPdgId == 4212) || # lifetime too short
+    // (checkPdgId == 4112) || # lifetime too short
     (checkPdgId == 4232) ||
     (checkPdgId == 4132) ||
     (checkPdgId == 4332) ||

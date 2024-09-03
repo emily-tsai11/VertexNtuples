@@ -318,19 +318,75 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
     }
   }
 
-  histos1_["genTrk_pt"] = fs->make<TH1F>("genTrk_pt", "genTrk_pt", (float) nbins_, 0.0, 200.0);
-  histos1_["genTrk_eta"] = fs->make<TH1F>("genTrk_eta", "genTrk_eta", (float) nbins_, -3.1, 3.1);
-  histos1_["genTrk_phi"] = fs->make<TH1F>("genTrk_phi", "genTrk_phi", (float) nbins_, -3.15, 3.15);
+  histos1_["genTrk_pt"] = fs->make<TH1F>("genTrk_pt", "genTrk_pt", 100.0, 0.0, 20.0);
+  histos1_["genTrk_eta"] = fs->make<TH1F>("genTrk_eta", "genTrk_eta", 100.0, -3.1, 3.1);
+  histos1_["genTrk_phi"] = fs->make<TH1F>("genTrk_phi", "genTrk_phi", 100.0, -3.15, 3.15);
   histos1_["genTrk_pt"]->Sumw2();
   histos1_["genTrk_eta"]->Sumw2();
   histos1_["genTrk_phi"]->Sumw2();
 
-  histos1_["pfCand_pt"] = fs->make<TH1F>("pfCand_pt", "pfCand_pt", (float) nbins_, 0.0, 200.0);
-  histos1_["pfCand_eta"] = fs->make<TH1F>("pfCand_eta", "pfCand_eta", (float) nbins_, -3.1, 3.1);
-  histos1_["pfCand_phi"] = fs->make<TH1F>("pfCand_phi", "pfCand_phi", (float) nbins_, -3.15, 3.15);
+  histos1_["genTrk_pt_pt0p8"] = fs->make<TH1F>("genTrk_pt_pt0p8", "genTrk_pt_pt0p8", 100.0, 0.0, 20.0);
+  histos1_["genTrk_eta_pt0p8"] = fs->make<TH1F>("genTrk_eta_pt0p8", "genTrk_eta_pt0p8", 100.0, -3.1, 3.1);
+  histos1_["genTrk_phi_pt0p8"] = fs->make<TH1F>("genTrk_phi_pt0p8", "genTrk_phi_pt0p8", 100.0, -3.15, 3.15);
+  histos1_["genTrk_pt_pt0p8"]->Sumw2();
+  histos1_["genTrk_eta_pt0p8"]->Sumw2();
+  histos1_["genTrk_phi_pt0p8"]->Sumw2();
+
+  histos1_["genTrk_pt_pt1p0"] = fs->make<TH1F>("genTrk_pt_pt1p0", "genTrk_pt_pt1p0", 100.0, 0.0, 20.0);
+  histos1_["genTrk_eta_pt1p0"] = fs->make<TH1F>("genTrk_eta_pt1p0", "genTrk_eta_pt1p0", 100.0, -3.1, 3.1);
+  histos1_["genTrk_phi_pt1p0"] = fs->make<TH1F>("genTrk_phi_pt1p0", "genTrk_phi_pt1p0", 100.0, -3.15, 3.15);
+  histos1_["genTrk_pt_pt1p0"]->Sumw2();
+  histos1_["genTrk_eta_pt1p0"]->Sumw2();
+  histos1_["genTrk_phi_pt1p0"]->Sumw2();
+
+  histos1_["genTrk_pt_pt1p5"] = fs->make<TH1F>("genTrk_pt_pt1p5", "genTrk_pt_pt1p5", 100.0, 0.0, 20.0);
+  histos1_["genTrk_eta_pt1p5"] = fs->make<TH1F>("genTrk_eta_pt1p5", "genTrk_eta_pt1p5", 100.0, -3.1, 3.1);
+  histos1_["genTrk_phi_pt1p5"] = fs->make<TH1F>("genTrk_phi_pt1p5", "genTrk_phi_pt1p5", 100.0, -3.15, 3.15);
+  histos1_["genTrk_pt_pt1p5"]->Sumw2();
+  histos1_["genTrk_eta_pt1p5"]->Sumw2();
+  histos1_["genTrk_phi_pt1p5"]->Sumw2();
+
+  histos1_["genTrk_pt_pt2p0"] = fs->make<TH1F>("genTrk_pt_pt2p0", "genTrk_pt_pt2p0", 100.0, 0.0, 20.0);
+  histos1_["genTrk_eta_pt2p0"] = fs->make<TH1F>("genTrk_eta_pt2p0", "genTrk_eta_pt2p0", 100.0, -3.1, 3.1);
+  histos1_["genTrk_phi_pt2p0"] = fs->make<TH1F>("genTrk_phi_pt2p0", "genTrk_phi_pt2p0", 100.0, -3.15, 3.15);
+  histos1_["genTrk_pt_pt2p0"]->Sumw2();
+  histos1_["genTrk_eta_pt2p0"]->Sumw2();
+  histos1_["genTrk_phi_pt2p0"]->Sumw2();
+
+  histos1_["pfCand_pt"] = fs->make<TH1F>("pfCand_pt", "pfCand_pt", 100.0, 0.0, 20.0);
+  histos1_["pfCand_eta"] = fs->make<TH1F>("pfCand_eta", "pfCand_eta", 100.0, -3.1, 3.1);
+  histos1_["pfCand_phi"] = fs->make<TH1F>("pfCand_phi", "pfCand_phi", 100.0, -3.15, 3.15);
   histos1_["pfCand_pt"]->Sumw2();
   histos1_["pfCand_eta"]->Sumw2();
   histos1_["pfCand_phi"]->Sumw2();
+
+  histos1_["pfCand_pt_pt0p8"] = fs->make<TH1F>("pfCand_pt_pt0p8", "pfCand_pt_pt0p8", 100.0, 0.0, 20.0);
+  histos1_["pfCand_eta_pt0p8"] = fs->make<TH1F>("pfCand_eta_pt0p8", "pfCand_eta_pt0p8", 100.0, -3.1, 3.1);
+  histos1_["pfCand_phi_pt0p8"] = fs->make<TH1F>("pfCand_phi_pt0p8", "pfCand_phi_pt0p8", 100.0, -3.15, 3.15);
+  histos1_["pfCand_pt_pt0p8"]->Sumw2();
+  histos1_["pfCand_eta_pt0p8"]->Sumw2();
+  histos1_["pfCand_phi_pt0p8"]->Sumw2();
+
+  histos1_["pfCand_pt_pt1p0"] = fs->make<TH1F>("pfCand_pt_pt1p0", "pfCand_pt_pt1p0", 100.0, 0.0, 20.0);
+  histos1_["pfCand_eta_pt1p0"] = fs->make<TH1F>("pfCand_eta_pt1p0", "pfCand_eta_pt1p0", 100.0, -3.1, 3.1);
+  histos1_["pfCand_phi_pt1p0"] = fs->make<TH1F>("pfCand_phi_pt1p0", "pfCand_phi_pt1p0", 100.0, -3.15, 3.15);
+  histos1_["pfCand_pt_pt1p0"]->Sumw2();
+  histos1_["pfCand_eta_pt1p0"]->Sumw2();
+  histos1_["pfCand_phi_pt1p0"]->Sumw2();
+
+  histos1_["pfCand_pt_pt1p5"] = fs->make<TH1F>("pfCand_pt_pt1p5", "pfCand_pt_pt1p5", 100.0, 0.0, 20.0);
+  histos1_["pfCand_eta_pt1p5"] = fs->make<TH1F>("pfCand_eta_pt1p5", "pfCand_eta_pt1p5", 100.0, -3.1, 3.1);
+  histos1_["pfCand_phi_pt1p5"] = fs->make<TH1F>("pfCand_phi_pt1p5", "pfCand_phi_pt1p5", 100.0, -3.15, 3.15);
+  histos1_["pfCand_pt_pt1p5"]->Sumw2();
+  histos1_["pfCand_eta_pt1p5"]->Sumw2();
+  histos1_["pfCand_phi_pt1p5"]->Sumw2();
+
+  histos1_["pfCand_pt_pt2p0"] = fs->make<TH1F>("pfCand_pt_pt2p0", "pfCand_pt_pt2p0", 100.0, 0.0, 20.0);
+  histos1_["pfCand_eta_pt2p0"] = fs->make<TH1F>("pfCand_eta_pt2p0", "pfCand_eta_pt2p0", 100.0, -3.1, 3.1);
+  histos1_["pfCand_phi_pt2p0"] = fs->make<TH1F>("pfCand_phi_pt2p0", "pfCand_phi_pt2p0", 100.0, -3.15, 3.15);
+  histos1_["pfCand_pt_pt2p0"]->Sumw2();
+  histos1_["pfCand_eta_pt2p0"]->Sumw2();
+  histos1_["pfCand_phi_pt2p0"]->Sumw2();
 
   // 2D histograms
   for (TString obj : sv_names_) {
@@ -400,11 +456,23 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   nGeneralTracks_ += generalTracks.size();
   nPFCandidates_ += pfCandidates.size();
   for (const reco::Track& gt : generalTracks) {
+    if (gt.hitPattern().numberOfValidHits() < 8) continue;
     histos1_["genTrk_pt"]->Fill(gt.pt());
     histos1_["genTrk_eta"]->Fill(gt.eta());
     histos1_["genTrk_phi"]->Fill(gt.phi());
+    if (gt.pt() > 0.8) {
+      histos1_["genTrk_pt_pt0p8"]->Fill(gt.pt());
+      histos1_["genTrk_eta_pt0p8"]->Fill(gt.eta());
+      histos1_["genTrk_phi_pt0p8"]->Fill(gt.phi());
+    }
+    if (gt.pt() > 1.0) {
+      histos1_["genTrk_pt_pt0p8"]->Fill(gt.pt());
+      histos1_["genTrk_eta_pt0p8"]->Fill(gt.eta());
+      histos1_["genTrk_phi_pt0p8"]->Fill(gt.phi());
+    }
   }
   for (const reco::PFCandidate& pfc : pfCandidates) {
+    if (pfc.hitPattern().numberOfValidHits() < 0) continue;
     histos1_["pfCand_pt"]->Fill(pfc.pt());
     histos1_["pfCand_eta"]->Fill(pfc.eta());
     histos1_["pfCand_phi"]->Fill(pfc.phi());

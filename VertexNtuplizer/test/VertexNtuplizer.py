@@ -8,7 +8,7 @@ options.register("inputFiles",
 options.register("outputFile",  "histo", VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.string, "Output file (w/o .root)")
 options.register("maxEvents",   -1,      VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int,    "Maximum number of events")
 options.register("reportEvery", 100,     VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int,    "Report every N events")
-options.register("run2",        False,   VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool,   "Sets |eta| to max 2.5 for 2018 tracker coverage")
+options.register("run2",        True,    VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool,   "Sets |eta| to max 2.5 for 2018 tracker coverage")
 options.parseArguments()
 file_path = "/eos/cms/store/group/phys_btag/etsai/VertexNtuples/preliminary/" + options.outputFile + ".root"
 

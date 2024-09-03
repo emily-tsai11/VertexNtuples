@@ -16,7 +16,7 @@ config.JobType.maxJobRuntimeMin  = 60
 
 config.Data.splitting            = "FileBased"
 config.Data.unitsPerJob          = 1
-config.Data.outLFNDirBase        = "/store/user/%s" % getUsername()
+config.Data.outLFNDirBase        = "/store/group/phys_btag/%s" % getUsername()
 config.Data.publication          = False
 config.Data.outputDatasetTag     = sample
 config.Data.userInputFiles       = open(sample + ".list").readlines()

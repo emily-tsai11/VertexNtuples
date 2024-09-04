@@ -14,91 +14,101 @@ SecondaryVertexCollectionBuilder::SecondaryVertexCollectionBuilder(const edm::Pa
 
 
 void SecondaryVertexCollectionBuilder::build(const edm::Event& iEvent,
-    edm::EDGetTokenT<reco::VertexCollection>& secondaryVerticesToken,
-    edm::EDGetTokenT<reco::VertexCollection>& secondaryVerticesMTDBSToken,
-    edm::EDGetTokenT<reco::VertexCollection>& secondaryVerticesMTDBS4Token,
-    edm::EDGetTokenT<reco::VertexCollection>& secondaryVerticesMTDPVToken,
-    edm::EDGetTokenT<edm::ValueMap<float>>& trackTimeBSValueMapToken,
-    edm::EDGetTokenT<edm::ValueMap<float>>& trackTimeBSErrorMapToken,
-    edm::EDGetTokenT<edm::ValueMap<float>>& trackTimeBSQualityMapToken,
-    edm::EDGetTokenT<edm::ValueMap<float>>& trackTimePVValueMapToken,
-    edm::EDGetTokenT<edm::ValueMap<float>>& trackTimePVErrorMapToken,
-    // edm::EDGetTokenT<edm::ValueMap<float>>& trackTimePVQualityMapToken,
-    edm::EDGetTokenT<reco::VertexCompositePtrCandidateCollection>& slimmedCandSVToken,
+    edm::EDGetTokenT<reco::VertexCompositePtrCandidateCollection>& inclusiveSecondaryVerticesToken,
+    edm::EDGetTokenT<reco::VertexCompositePtrCandidateCollection>& inclusiveSecondaryVerticesMTDPVToken,
+    edm::EDGetTokenT<reco::VertexCompositePtrCandidateCollection>& mergedSecondaryVerticesToken,
+    edm::EDGetTokenT<reco::VertexCompositePtrCandidateCollection>& mergedSecondaryVerticesMTDPVToken,
+    edm::EDGetTokenT<reco::VertexCompositePtrCandidateCollection>& slimmedSecondaryVerticesToken,
+    edm::EDGetTokenT<reco::VertexCompositePtrCandidateCollection>& slimmedSecondaryVerticesMTDPVToken,
+    edm::EDGetTokenT<reco::TrackCollection>& generalTracksToken,
+    edm::EDGetTokenT<edm::ValueMap<float>>& trackT0FromPVToken,
+    edm::EDGetTokenT<edm::ValueMap<float>>& trackSigmaT0FromPVToken,
+    // edm::EDGetTokenT<edm::ValueMap<float>>& trackQualityFromPVToken,
     const reco::Vertex& primaryVertex) {
 
-  cmsSecondaryVertices_ = iEvent.get(secondaryVerticesToken);
-  cmsSecondaryVerticesMTDBS_ = iEvent.get(secondaryVerticesMTDBSToken);
-  cmsSecondaryVerticesMTDBS4_ = iEvent.get(secondaryVerticesMTDBS4Token);
-  cmsSecondaryVerticesMTDPV_ = iEvent.get(secondaryVerticesMTDPVToken);
-  trackTimeBSValueMap_ = iEvent.get(trackTimeBSValueMapToken);
-  trackTimeBSErrorMap_ = iEvent.get(trackTimeBSErrorMapToken);
-  trackTimeBSQualityMap_ = iEvent.get(trackTimeBSQualityMapToken);
-  trackTimePVValueMap_ = iEvent.get(trackTimePVValueMapToken);
-  trackTimePVErrorMap_ = iEvent.get(trackTimePVErrorMapToken);
-  // trackTimePVQualityMap_ = iEvent.get(trackTimePVQualityMapToken);
-  cmsSlimmedCandSVs_ = iEvent.get(slimmedCandSVToken);
+  iEvent.getByToken(generalTracksToken, generalTracksHandle_);
 
-  secondaryVertices_.clear();
-  secondaryVerticesMTDBS_.clear();
-  secondaryVerticesMTDBS4_.clear();
-  secondaryVerticesMTDPV_.clear();
-  slimmedCandSVs_.clear();
+  inclusiveSecondaryVertices_ = iEvent.get(inclusiveSecondaryVerticesToken);
+  inclusiveSecondaryVerticesMTDPV_ = iEvent.get(inclusiveSecondaryVerticesMTDPVToken);
+  mergedSecondaryVertices_ = iEvent.get(mergedSecondaryVerticesToken);
+  mergedSecondaryVerticesMTDPV_ = iEvent.get(mergedSecondaryVerticesMTDPVToken);
+  slimmedSecondaryVertices_ = iEvent.get(slimmedSecondaryVerticesToken);
+  slimmedSecondaryVerticesMTDPV_ = iEvent.get(slimmedSecondaryVerticesMTDPVToken);
+  // generalTracks_ = iEvent.get(generalTracksToken);
+  trackT0FromPV_ = iEvent.get(trackT0FromPVToken);
+  trackSigmaT0FromPV_ = iEvent.get(trackSigmaT0FromPVToken);
+  // trackQualityFromPV_ = iEvent.get(trackQualityFromPVToken);
 
-  for (const reco::Vertex& sv : cmsSecondaryVertices_) {
+  secVerticesInclusive_.clear();
+  secVerticesInclusiveMTDPV_.clear();
+  secVerticesMerged_.clear();
+  secVerticesMergedMTDPV_.clear();
+  secVerticesSlimmed_.clear();
+  secVerticesSlimmedMTDPV_.clear();
+
+  for (const reco::VertexCompositePtrCandidate& sv : inclusiveSecondaryVertices_) {
     if (!goodRecoVertex(sv)) continue;
     SecondaryVertex newSV(sv, primaryVertex);
-    secondaryVertices_.push_back(newSV);
+    secVerticesInclusive_.push_back(newSV);
   }
 
-  for (const reco::Vertex& sv : cmsSecondaryVerticesMTDBS_) {
+  for (const reco::VertexCompositePtrCandidate& sv : inclusiveSecondaryVerticesMTDPV_) {
     if (!goodRecoVertex(sv)) continue;
-    SecondaryVertex newSV(sv, primaryVertex, trackTimeBSValueMap_, trackTimeBSErrorMap_, trackTimeBSQualityMap_);
-    secondaryVerticesMTDBS_.push_back(newSV);
+    SecondaryVertex newSV(sv, primaryVertex, generalTracksHandle_, trackT0FromPV_, trackSigmaT0FromPV_);
+    // SecondaryVertex newSV(sv, primaryVertex, generalTracksHandle_, trackT0FromPV_, trackSigmaT0FromPV_, trackQualityFromPV_);
+    secVerticesInclusiveMTDPV_.push_back(newSV);
   }
 
-  for (const reco::Vertex& sv : cmsSecondaryVerticesMTDBS4_) {
-    if (!goodRecoVertex(sv)) continue;
-    SecondaryVertex newSV(sv, primaryVertex, trackTimeBSValueMap_, trackTimeBSErrorMap_, trackTimeBSQualityMap_);
-    secondaryVerticesMTDBS4_.push_back(newSV);
-  }
-
-  for (const reco::Vertex& sv : cmsSecondaryVerticesMTDPV_) {
-    if (!goodRecoVertex(sv)) continue;
-    // SecondaryVertex newSV(sv, primaryVertex, trackTimePVValueMap_, trackTimePVErrorMap_, trackTimePVQualityMap_);
-    SecondaryVertex newSV(sv, primaryVertex, trackTimePVValueMap_, trackTimePVErrorMap_, trackTimeBSQualityMap_); // Temporary, quality anyways not used yet
-    secondaryVerticesMTDPV_.push_back(newSV);
-  }
-
-  for (const reco::VertexCompositePtrCandidate& sv : cmsSlimmedCandSVs_) {
+  for (const reco::VertexCompositePtrCandidate& sv : mergedSecondaryVertices_) {
     if (!goodRecoVertex(sv)) continue;
     SecondaryVertex newSV(sv, primaryVertex);
-    slimmedCandSVs_.push_back(newSV);
+    secVerticesMerged_.push_back(newSV);
+  }
+
+  for (const reco::VertexCompositePtrCandidate& sv : mergedSecondaryVerticesMTDPV_) {
+    if (!goodRecoVertex(sv)) continue;
+    SecondaryVertex newSV(sv, primaryVertex, generalTracksHandle_, trackT0FromPV_, trackSigmaT0FromPV_);
+    // SecondaryVertex newSV(sv, primaryVertex, generalTracksHandle_, trackT0FromPV_, trackSigmaT0FromPV_, trackQualityFromPV_);
+    secVerticesMergedMTDPV_.push_back(newSV);
+  }
+
+  for (const reco::VertexCompositePtrCandidate& sv : slimmedSecondaryVertices_) {
+    if (!goodRecoVertex(sv)) continue;
+    SecondaryVertex newSV(sv, primaryVertex);
+    secVerticesSlimmed_.push_back(newSV);
+  }
+
+  for (const reco::VertexCompositePtrCandidate& sv : slimmedSecondaryVerticesMTDPV_) {
+    if (!goodRecoVertex(sv)) continue;
+    SecondaryVertex newSV(sv, primaryVertex, generalTracksHandle_, trackT0FromPV_, trackSigmaT0FromPV_);
+    // SecondaryVertex newSV(sv, primaryVertex, generalTracksHandle_, trackT0FromPV_, trackSigmaT0FromPV_, trackQualityFromPV_);
+    secVerticesSlimmedMTDPV_.push_back(newSV);
   }
 
   // Sort collections
-  // std::sort(secondaryVertices_.begin(), secondaryVertices_.end(), compare);
-  // std::sort(secondaryVerticesMTDBS_.begin(), secondaryVerticesMTDBS_.end(), compare);
-  // std::sort(secondaryVerticesMTDBS4_.begin(), secondaryVerticesMTDBS4_.end(), compare);
-  // std::sort(secondaryVerticesMTDPV_.begin(), secondaryVerticesMTDPV_.end(), compare);
-  // std::sort(slimmedCandSVs_.begin(), slimmedCandSVs_.end(), compare);
+  // std::sort(secVerticesInclusive_.begin(), secVerticesInclusive_.end(), compare);
+  // std::sort(secVerticesInclusiveMTDPV_.begin(), secVerticesInclusiveMTDPV_.end(), compare);
+  // std::sort(secVerticesMerged_.begin(), secVerticesMerged_.end(), compare);
+  // std::sort(secVerticesMergedMTDPV_.begin(), secVerticesMergedMTDPV_.end(), compare);
+  // std::sort(secVerticesSlimmed_.begin(), secVerticesSlimmed_.end(), compare);
+  // std::sort(secVerticesSlimmedMTDPV_.begin(), secVerticesSlimmedMTDPV_.end(), compare);
 }
 
 
-bool SecondaryVertexCollectionBuilder::goodRecoVertex(const reco::Vertex& v) {
+// bool SecondaryVertexCollectionBuilder::goodRecoVertex(const reco::Vertex& v) {
 
-  bool vtxPass = true;
-  if (abs(v.p4().Eta()) > absEtaMax_) vtxPass = false;
-  if (v.normalizedChi2() > svChi2dofMax_) vtxPass = false; // Take out poorly fitted vertices
-  if (v.tracksSize() < 2) vtxPass = false; // Not a vertex
-  return vtxPass;
-}
+//   bool vtxPass = true;
+//   if (abs(v.p4().Eta()) > absEtaMax_) vtxPass = false;
+//   if (v.normalizedChi2() > svChi2dofMax_) vtxPass = false; // Take out poorly fitted vertices
+//   if (v.tracksSize() < 2) vtxPass = false; // Not a vertex
+//   return vtxPass;
+// }
 
 
 bool SecondaryVertexCollectionBuilder::goodRecoVertex(const reco::VertexCompositePtrCandidate& v) {
 
   bool vtxPass = true;
-  if (abs(v.eta()) > absEtaMax_) vtxPass = false;
+  if (abs(v.eta()) > absEtaMax_) vtxPass = false; // TODO: ETA DEFINITION?
   if (v.vertexNormalizedChi2() > svChi2dofMax_) vtxPass = false; // Take out poorly fitted vertices
   if (v.daughterPtrVector().size() < 2) vtxPass = false; // Not a vertex
   return vtxPass;

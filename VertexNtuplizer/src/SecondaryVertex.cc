@@ -283,14 +283,14 @@ void SecondaryVertex::initializeTime(const reco::VertexCompositePtrCandidate& sv
       tsum += trackT0[trkRef];
       tmin = std::min(tmin, trackT0[trkRef]);
       tmax = std::max(tmax, trackT0[trkRef]);
-      trk_tval_->push_back(trackT0[trkRef]);
-      trk_terr_->push_back(trackSigmaT0[trkRef]);
+      trk_tval_->push_back(trackT0[trkRef]*1000.0);
+      trk_terr_->push_back(trackSigmaT0[trkRef]*1000.0);
       trk_tsig_->push_back(trackT0[trkRef] / trackSigmaT0[trkRef]);
       // trk_tqual_->push_back(trackQuality[trkRef]);
     } else { // No best track found
-      trk_tval_->push_back(-1.0);
-      trk_terr_->push_back(-1.0);
-      trk_tsig_->push_back(-1.0);
+      trk_tval_->push_back(-1000.0);
+      trk_terr_->push_back(-1000.0);
+      trk_tsig_->push_back(-100.0);
       // trk_tqual_->push_back(-1.0);
     }
   } // End loop over daughters/tracks

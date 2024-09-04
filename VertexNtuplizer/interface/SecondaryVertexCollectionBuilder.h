@@ -44,7 +44,6 @@ class SecondaryVertexCollectionBuilder {
 
   private:
 
-    // bool goodRecoVertex(const reco::Vertex& v);
     bool goodRecoVertex(const reco::VertexCompositePtrCandidate& v);
     // static bool compare(const SecondaryVertex& sva, const SecondaryVertex& svb);
 
@@ -68,7 +67,6 @@ class SecondaryVertexCollectionBuilder {
     reco::VertexCompositePtrCandidateCollection mergedSecondaryVerticesMTDPV_;
     reco::VertexCompositePtrCandidateCollection slimmedSecondaryVertices_;
     reco::VertexCompositePtrCandidateCollection slimmedSecondaryVerticesMTDPV_;
-    // reco::TrackCollection generalTracks_;
     edm::ValueMap<float> trackT0FromPV_;
     edm::ValueMap<float> trackSigmaT0FromPV_;
     // edm::ValueMap<float> trackQualityFromPV_;

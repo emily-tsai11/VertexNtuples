@@ -23,9 +23,11 @@ unsigned int GenVertexCollectionBuilder::build(const edm::Event& iEvent,
   simTracks_ = iEvent.get(simTracksToken);
 
   genVertices_.clear();
-  genVerticesSimMatch_.clear();
   genVerticesB_.clear();
   genVerticesD_.clear();
+  genVerticesSimMatch_.clear();
+  genVerticesSimMatchB_.clear();
+  genVerticesSimMatchD_.clear();
 
   unsigned int nPassingGPs = 0;
   std::vector<bool> simTrackMatches(simTracks_.size(), false);

@@ -61,15 +61,6 @@ namespace vertexntuples {
   const float dzErr(const GenVertex& gv, const SecondaryVertex& sv);
   const float d3d(const GenVertex& gv, const SecondaryVertex& sv);
   const float d3dErr(const GenVertex& gv, const SecondaryVertex& sv);
-
-  // Do not use these -- use the above
-  // const float dxy(const float x1, const float x2, const float y1, const float y2);
-  // const float dxyErr(const float x1, const float x2, const float xerr1, const float xerr2,
-  //     const float y1, const float y2, const float yerr1, const float yerr2);
-  // const float dz(const float z1, const float z2);
-  // const float dzErr(const float zerr1, const float zerr2);
-  // const float d3d(const float dxy, const float dz);
-  // const float d3dErr(const float dxy, const float dxyerr, const float dz, const float dzerr);
 }
 
 

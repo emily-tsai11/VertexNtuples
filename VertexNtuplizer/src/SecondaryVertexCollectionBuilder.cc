@@ -34,7 +34,6 @@ void SecondaryVertexCollectionBuilder::build(const edm::Event& iEvent,
   mergedSecondaryVerticesMTDPV_ = iEvent.get(mergedSecondaryVerticesMTDPVToken);
   slimmedSecondaryVertices_ = iEvent.get(slimmedSecondaryVerticesToken);
   slimmedSecondaryVerticesMTDPV_ = iEvent.get(slimmedSecondaryVerticesMTDPVToken);
-  // generalTracks_ = iEvent.get(generalTracksToken);
   trackT0FromPV_ = iEvent.get(trackT0FromPVToken);
   trackSigmaT0FromPV_ = iEvent.get(trackSigmaT0FromPVToken);
   // trackQualityFromPV_ = iEvent.get(trackQualityFromPVToken);
@@ -93,16 +92,6 @@ void SecondaryVertexCollectionBuilder::build(const edm::Event& iEvent,
   // std::sort(secVerticesSlimmed_.begin(), secVerticesSlimmed_.end(), compare);
   // std::sort(secVerticesSlimmedMTDPV_.begin(), secVerticesSlimmedMTDPV_.end(), compare);
 }
-
-
-// bool SecondaryVertexCollectionBuilder::goodRecoVertex(const reco::Vertex& v) {
-
-//   bool vtxPass = true;
-//   if (abs(v.p4().Eta()) > absEtaMax_) vtxPass = false;
-//   if (v.normalizedChi2() > svChi2dofMax_) vtxPass = false; // Take out poorly fitted vertices
-//   if (v.tracksSize() < 2) vtxPass = false; // Not a vertex
-//   return vtxPass;
-// }
 
 
 bool SecondaryVertexCollectionBuilder::goodRecoVertex(const reco::VertexCompositePtrCandidate& v) {

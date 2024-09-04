@@ -2,7 +2,7 @@
 
 #include "../interface/GenVertex.h"
 #include "../interface/SecondaryVertex.h"
-#include "../interface/RecoJet.h"
+// #include "../interface/RecoJet.h"
 
 
 VertexMatcher::VertexMatcher(const edm::ParameterSet& iConfig) {
@@ -21,24 +21,6 @@ bool VertexMatcher::match(const reco::Candidate* daughter, const SimTrack& st) {
 
   if (match(daughter->pt(), daughter->eta(), daughter->phi(),
       st.momentum().Pt(), st.momentum().Eta(), st.momentum().Phi())) return true;
-  return false;
-}
-
-
-bool VertexMatcher::match(const reco::Candidate* daughter, const reco::Track& gt) {
-
-  if (match(daughter->pt(), daughter->eta(), daughter->phi(), gt.pt(), gt.eta(), gt.phi())) {
-    return true;
-  }
-  return false;
-}
-
-
-bool VertexMatcher::match(const reco::Candidate* daughter, const reco::PFCandidate& pfc) {
-
-  if (match(daughter->pt(), daughter->eta(), daughter->phi(), pfc.pt(), pfc.eta(), pfc.phi())) {
-    return true;
-  }
   return false;
 }
 
@@ -79,10 +61,10 @@ bool VertexMatcher::match(GenVertex& gv, SecondaryVertex& sv, MatchAlgo algo) {
 }
 
 
-bool VertexMatcher::match(const SecondaryVertex& sv, const RecoJet& rj) {
+// bool VertexMatcher::match(const SecondaryVertex& sv, const RecoJet& rj) {
 
-  return reco::deltaR(sv.eta(), sv.phi(), rj.eta(), rj.phi()) < jetRadius_;
-}
+//   return reco::deltaR(sv.eta(), sv.phi(), rj.eta(), rj.phi()) < jetRadius_;
+// }
 
 
 void VertexMatcher::fill(std::map<TString, TH1F*>& histos1, std::map<TString, TH2F*>& histos2,
@@ -139,13 +121,13 @@ void VertexMatcher::fill(std::map<TString, TH1F*>& histos1, std::map<TString, TH
 
   for (unsigned int iTrk = 0; iTrk < gv.dauMatchDeltaR()->size(); iTrk++) {
     histos1[gvPrefix + "_trk_deltaR"]->Fill(gv.dauMatchDeltaR()->at(iTrk));
-    histos1[gvPrefix + "_trk_ptResNorm"]->Fill(gv.dauMatchPtResNorm()->at(iTrk));
-    histos2[gvPrefix + "_trk_deltaR_ptResNorm"]->Fill(gv.dauMatchDeltaR()->at(iTrk), gv.dauMatchPtResNorm()->at(iTrk));
+    histos1[gvPrefix + "_trk_normPtRes"]->Fill(gv.dauMatchNormPtRes()->at(iTrk));
+    histos2[gvPrefix + "_trk_deltaR_normPtRes"]->Fill(gv.dauMatchDeltaR()->at(iTrk), gv.dauMatchNormPtRes()->at(iTrk));
   }
   for (unsigned int iTrk = 0; iTrk < sv.trkMatchDeltaR()->size(); iTrk++) {
     histos1[svPrefix + "_trk_deltaR"]->Fill(sv.trkMatchDeltaR()->at(iTrk));
-    histos1[svPrefix + "_trk_ptResNorm"]->Fill(sv.trkMatchPtResNorm()->at(iTrk));
-    histos2[svPrefix + "_trk_deltaR_ptResNorm"]->Fill(sv.trkMatchDeltaR()->at(iTrk), sv.trkMatchPtResNorm()->at(iTrk));
+    histos1[svPrefix + "_trk_normPtRes"]->Fill(sv.trkMatchNormPtRes()->at(iTrk));
+    histos2[svPrefix + "_trk_deltaR_normPtRes"]->Fill(sv.trkMatchDeltaR()->at(iTrk), sv.trkMatchNormPtRes()->at(iTrk));
   }
 }
 
@@ -154,13 +136,13 @@ bool VertexMatcher::match(const float pt1, const float eta1, const float phi1,
     const float pt2, const float eta2, const float phi2) {
 
   bool match = true;
-  if (ptResNorm(pt1, pt2) > trkMatchPtCut_) match = false;
+  if (normPtRes(pt1, pt2) > trkMatchPtCut_) match = false;
   if (reco::deltaR(eta1, phi1, eta2, phi2) > trkMatchDrCut_) match = false;
   return match;
 }
 
 
-float VertexMatcher::ptResNorm(const float pt1, const float pt2) {
+float VertexMatcher::normPtRes(const float pt1, const float pt2) {
 
   return abs(pt1 - pt2) / (pt1 + pt2);
 }
@@ -175,14 +157,14 @@ bool VertexMatcher::vtxTrackMatch(GenVertex& gv, SecondaryVertex& sv) {
       if (trkMatched.at(iTrk)) continue;
       bool match = true;
       float matchdR = reco::deltaR(sv.trkEta()->at(iTrk), sv.trkPhi()->at(iTrk), dau->eta(), dau->phi());
-      float matchPtResNorm = ptResNorm(dau->pt(), sv.trkPt()->at(iTrk));
+      float matchNormPtRes = normPtRes(dau->pt(), sv.trkPt()->at(iTrk));
       if (matchdR > trkMatchDrCut_) match = false;
-      if (matchPtResNorm > trkMatchPtCut_) match = false;
+      if (matchNormPtRes > trkMatchPtCut_) match = false;
       if (match) {
         trkMatched.at(iTrk) = true;
-        gv.addPtResNorm(matchPtResNorm);
+        gv.addNormPtRes(matchNormPtRes);
         gv.addDeltaR(matchdR);
-        sv.addPtResNorm(matchPtResNorm);
+        sv.addNormPtRes(matchNormPtRes);
         sv.addDeltaR(matchdR);
         nmatch++;
         break;

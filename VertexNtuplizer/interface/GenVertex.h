@@ -4,7 +4,6 @@
 
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
-#include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 
 #include "TMath.h"
 #include "TH1.h"
@@ -20,13 +19,9 @@ class GenVertex {
         const reco::Vertex& primaryVertex, const int pdgIdBin);
     // ~GenVertex();
 
-    void fill(std::map<TString, TH1F*>& histos, TString prefix
-        // VertexMatcher* matcher,
-        // const reco::TrackCollection& generalTracks, const reco::PFCandidateCollection& pfCandidates,
-        // std::map<TString, std::vector<bool>*>& matches
-    );
+    void fill(std::map<TString, TH1F*>& histos, TString prefix);
 
-    void addPtResNorm(float ptresnorm) { dauMatchNormPtRes_->push_back(ptresnorm); }
+    void addNormPtRes(float normPtRes) { dauMatchNormPtRes_->push_back(normPtRes); }
     void addDeltaR(float deltaR) { dauMatchDeltaR_->push_back(deltaR); }
 
     const float x() const { return x_; }

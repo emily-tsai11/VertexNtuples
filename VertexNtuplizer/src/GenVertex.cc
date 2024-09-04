@@ -52,11 +52,7 @@ GenVertex::GenVertex(const reco::Candidate* mother, std::vector<const reco::Cand
 // GenVertex::~GenVertex() {}
 
 
-void GenVertex::fill(std::map<TString, TH1F*>& histos, TString prefix
-    // VertexMatcher* matcher,
-    // const reco::TrackCollection& generalTracks, const reco::PFCandidateCollection& pfCandidates,
-    // std::map<TString, std::vector<bool>*>& matches
-) {
+void GenVertex::fill(std::map<TString, TH1F*>& histos, TString prefix) {
 
   for (unsigned int iDau = 0; iDau < nDaughters_; iDau++) {
     histos[prefix + "_trk_pt"]->Fill(daughterPt_->at(iDau));
@@ -65,36 +61,6 @@ void GenVertex::fill(std::map<TString, TH1F*>& histos, TString prefix
     histos[prefix + "_trk_phi"]->Fill(daughterPhi_->at(iDau));
     histos[prefix + "_trk_charge"]->Fill(daughterCharge_->at(iDau));
     histos[prefix + "_trk_pdgIdBin"]->Fill(pdgIdBin_);
-
-    // const reco::Candidate* dau = daughters_->at(iDau);
-
-    // for (unsigned int iGT = 0; iGT < generalTracks.size(); iGT++) {
-    //   const reco::Track gt = generalTracks.at(iGT);
-    //   if (!matches[prefix + "_gt"]->at(iGT) && matcher->match(dau, gt)) {
-    //     matches[prefix + "_gt"]->at(iGT) = true;
-    //     histos[prefix + "_trk_matchgt_pt"]->Fill(daughterPt_->at(iDau));
-    //     histos[prefix + "_trk_matchgt_pt2"]->Fill(daughterPt2_->at(iDau));
-    //     histos[prefix + "_trk_matchgt_eta"]->Fill(daughterEta_->at(iDau));
-    //     histos[prefix + "_trk_matchgt_phi"]->Fill(daughterPhi_->at(iDau));
-    //     histos[prefix + "_trk_matchgt_charge"]->Fill(daughterCharge_->at(iDau));
-    //     histos[prefix + "_trk_matchgt_pdgIdBin"]->Fill(pdgIdBin_);
-    //     break;
-    //   }
-    // }
-
-    // for (unsigned int iPFC = 0; iPFC < pfCandidates.size(); iPFC++) {
-    //   const reco::PFCandidate pfc = pfCandidates.at(iPFC);
-    //   if (!matches[prefix + "_pfc"]->at(iPFC) && matcher->match(dau, pfc)) {
-    //     matches[prefix + "_pfc"]->at(iPFC) = true;
-    //     histos[prefix + "_trk_matchpfc_pt"]->Fill(daughterPt_->at(iDau));
-    //     histos[prefix + "_trk_matchpfc_pt2"]->Fill(daughterPt2_->at(iDau));
-    //     histos[prefix + "_trk_matchpfc_eta"]->Fill(daughterEta_->at(iDau));
-    //     histos[prefix + "_trk_matchpfc_phi"]->Fill(daughterPhi_->at(iDau));
-    //     histos[prefix + "_trk_matchpfc_charge"]->Fill(daughterCharge_->at(iDau));
-    //     histos[prefix + "_trk_matchpfc_pdgIdBin"]->Fill(pdgIdBin_);
-    //     break;
-    //   }
-    // }
   }
 
   histos[prefix + "_x"]->Fill(x_);

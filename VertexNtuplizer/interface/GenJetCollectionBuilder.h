@@ -2,8 +2,6 @@
 #define VertexNtuples_VertexNtuplizer_GenJetCollectionBuilder_h
 
 
-#include <algorithm>
-
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Utilities/interface/EDGetToken.h"

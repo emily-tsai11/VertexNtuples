@@ -35,9 +35,6 @@ if options.run2:
   process.vertexNtuplizer.absEtaMax = 2.5
 
 
-# TODO: add analyzer with no matching cut on ntrks
-
-
 # Run process
 release = os.environ["CMSSW_VERSION"][6:]
 print("Using release " + release)

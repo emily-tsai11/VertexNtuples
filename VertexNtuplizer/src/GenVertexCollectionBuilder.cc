@@ -86,16 +86,22 @@ unsigned int GenVertexCollectionBuilder::build(const edm::Event& iEvent,
     nPassingGPs++;
     GenVertex newGV(mother, goodDaughters, primaryVertex, motherPartID);
     genVertices_.push_back(newGV);
-    if (matcher->match(newGV, simTracks_, simTrackMatches)) genVerticesSimMatch_.push_back(newGV);
     if (motherPartID == B_MESON || motherPartID == B_BARYON) genVerticesB_.push_back(newGV);
     if (motherPartID == C_MESON || motherPartID == C_BARYON) genVerticesD_.push_back(newGV);
+    if (matcher->match(newGV, simTracks_, simTrackMatches)) {
+      genVerticesSimMatch_.push_back(newGV);
+      if (motherPartID == B_MESON || motherPartID == B_BARYON) genVerticesSimMatchB_.push_back(newGV);
+      if (motherPartID == C_MESON || motherPartID == C_BARYON) genVerticesSimMatchD_.push_back(newGV);
+    }
   }
 
   // Sort collections
   // std::sort(genVertices_.begin(), genVertices_.end(), compare);
-  // std::sort(genVerticesSimMatch_.begin(), genVerticesSimMatch_.end(), compare);
   // std::sort(genVerticesB_.begin(), genVerticesB_.end(), compare);
   // std::sort(genVerticesD_.begin(), genVerticesD_.end(), compare);
+  // std::sort(genVerticesSimMatch_.begin(), genVerticesSimMatch_.end(), compare);
+  // std::sort(genVerticesSimMatchB_.begin(), genVerticesSimMatchB_.end(), compare);
+  // std::sort(genVerticesSimMatchD_.begin(), genVerticesSimMatchD_.end(), compare);
 
   return nPassingGPs;
 }

@@ -1,154 +1,157 @@
 #include "../interface/SecondaryVertex.h"
 
 
-SecondaryVertex::SecondaryVertex(const reco::Vertex& sv,
+// SecondaryVertex::SecondaryVertex(const reco::Vertex& sv,
+//     const reco::Vertex& primaryVertex) {
+
+//   initialize(sv, primaryVertex, false);
+// }
+
+
+// SecondaryVertex::SecondaryVertex(const reco::Vertex& sv,
+//     const reco::Vertex& primaryVertex,
+//     const edm::ValueMap<float>& trackTimeValueMap,
+//     const edm::ValueMap<float>& trackTimeErrorMap,
+//     const edm::ValueMap<float>& trackTimeQualityMap) {
+
+//   initialize(sv, primaryVertex);
+//   initializeTime(sv, trackTimeValueMap, trackTimeErrorMap, trackTimeQualityMap);
+// }
+
+
+SecondaryVertex::SecondaryVertex(const reco::VertexCompositePtrCandidate& sv,
     const reco::Vertex& primaryVertex) {
 
   initialize(sv, primaryVertex, false);
 }
 
 
-SecondaryVertex::SecondaryVertex(const reco::Vertex& sv,
-    const reco::Vertex& primaryVertex,
-    const edm::ValueMap<float>& trackTimeValueMap,
-    const edm::ValueMap<float>& trackTimeErrorMap,
-    const edm::ValueMap<float>& trackTimeQualityMap) {
-
-  initialize(sv, primaryVertex);
-  initializeTime(sv, trackTimeValueMap, trackTimeErrorMap, trackTimeQualityMap);
-}
-
-
-SecondaryVertex::SecondaryVertex(const reco::VertexCompositePtrCandidate& sv,
-    const reco::Vertex& primaryVertex) {
-
-  initialize(sv, primaryVertex, false);
-}
-
-
 SecondaryVertex::SecondaryVertex(const reco::VertexCompositePtrCandidate& sv,
     const reco::Vertex& primaryVertex,
-    const edm::ValueMap<float>& trackTimeValueMap,
-    const edm::ValueMap<float>& trackTimeErrorMap,
-    const edm::ValueMap<float>& trackTimeQualityMap) {
+    edm::Handle<reco::TrackCollection> generalTracksHandle,
+    const edm::ValueMap<float>& trackT0,
+    const edm::ValueMap<float>& trackSigmaT0
+    // , const edm::ValueMap<float>& trackQuality
+    ) {
 
   initialize(sv, primaryVertex);
-  initializeTime(sv, trackTimeValueMap, trackTimeErrorMap, trackTimeQualityMap);
+  initializeTime(sv, generalTracksHandle, trackT0, trackSigmaT0);
+  // initializeTime(sv, trackT0, trackSigmaT0, trackQuality);
 }
 
 
-void SecondaryVertex::initialize(const reco::Vertex& sv,
-    const reco::Vertex& primaryVertex, bool hasTime) {
+// void SecondaryVertex::initialize(const reco::Vertex& sv,
+//     const reco::Vertex& primaryVertex, bool hasTime) {
 
-  trk_pt_ = new std::vector<float>;
-  trk_pt2_ = new std::vector<float>;
-  trk_eta_ = new std::vector<float>;
-  trk_phi_ = new std::vector<float>;
-  trk_dxy_ = new std::vector<float>;
-  trk_dz_ = new std::vector<float>;
-  trk_d3d_ = new std::vector<float>;
-  trk_dxyerr_ = new std::vector<float>;
-  trk_dzerr_ = new std::vector<float>;
-  trk_d3derr_ = new std::vector<float>;
-  trk_dxysig_ = new std::vector<float>;
-  trk_dzsig_ = new std::vector<float>;
-  trk_d3dsig_ = new std::vector<float>;
-  trk_charge_ = new std::vector<float>;
-  trk_chi2_ = new std::vector<float>;
-  trk_ndof_ = new std::vector<float>;
-  trk_chi2dof_ = new std::vector<float>;
+//   trk_pt_ = new std::vector<float>;
+//   trk_pt2_ = new std::vector<float>;
+//   trk_eta_ = new std::vector<float>;
+//   trk_phi_ = new std::vector<float>;
+//   trk_dxy_ = new std::vector<float>;
+//   trk_dz_ = new std::vector<float>;
+//   trk_d3d_ = new std::vector<float>;
+//   trk_dxyerr_ = new std::vector<float>;
+//   trk_dzerr_ = new std::vector<float>;
+//   trk_d3derr_ = new std::vector<float>;
+//   trk_dxysig_ = new std::vector<float>;
+//   trk_dzsig_ = new std::vector<float>;
+//   trk_d3dsig_ = new std::vector<float>;
+//   trk_charge_ = new std::vector<float>;
+//   trk_chi2_ = new std::vector<float>;
+//   trk_ndof_ = new std::vector<float>;
+//   trk_chi2dof_ = new std::vector<float>;
 
-  trk_tval_ = new std::vector<float>;
-  trk_terr_ = new std::vector<float>;
-  trk_tsig_ = new std::vector<float>;
-  trk_tqual_ = new std::vector<float>;
+//   trk_tval_ = new std::vector<float>;
+//   trk_terr_ = new std::vector<float>;
+//   trk_tsig_ = new std::vector<float>;
+//   trk_tqual_ = new std::vector<float>;
 
-  for (const reco::TrackBaseRef& trkRef : sv.tracks()) {
-    float d3d = vertexntuples::d3d(trkRef);
-    float d3derr = vertexntuples::d3dErr(trkRef);
-    trk_pt_->push_back(trkRef->pt());
-    trk_pt2_->push_back(trkRef->pt2());
-    trk_eta_->push_back(trkRef->eta());
-    trk_phi_->push_back(trkRef->phi());
-    trk_dxy_->push_back(trkRef->dxy());
-    trk_dz_->push_back(trkRef->dz());
-    trk_d3d_->push_back(d3d);
-    trk_dxyerr_->push_back(trkRef->dxyError());
-    trk_dzerr_->push_back(trkRef->dzError());
-    trk_d3derr_->push_back(d3derr);
-    trk_dxysig_->push_back(trkRef->dxy() / trkRef->dxyError());
-    trk_dzsig_->push_back(trkRef->dz() / trkRef->dzError());
-    trk_d3dsig_->push_back(d3d / d3derr);
-    trk_charge_->push_back(trkRef->charge());
-    trk_chi2_->push_back(trkRef->chi2());
-    trk_ndof_->push_back(trkRef->ndof());
-    trk_chi2dof_->push_back(trkRef->normalizedChi2());
+//   for (const reco::TrackBaseRef& trkRef : sv.tracks()) {
+//     float d3d = vertexntuples::d3d(trkRef);
+//     float d3derr = vertexntuples::d3dErr(trkRef);
+//     trk_pt_->push_back(trkRef->pt());
+//     trk_pt2_->push_back(trkRef->pt2());
+//     trk_eta_->push_back(trkRef->eta());
+//     trk_phi_->push_back(trkRef->phi());
+//     trk_dxy_->push_back(trkRef->dxy());
+//     trk_dz_->push_back(trkRef->dz());
+//     trk_d3d_->push_back(d3d);
+//     trk_dxyerr_->push_back(trkRef->dxyError());
+//     trk_dzerr_->push_back(trkRef->dzError());
+//     trk_d3derr_->push_back(d3derr);
+//     trk_dxysig_->push_back(trkRef->dxy() / trkRef->dxyError());
+//     trk_dzsig_->push_back(trkRef->dz() / trkRef->dzError());
+//     trk_d3dsig_->push_back(d3d / d3derr);
+//     trk_charge_->push_back(trkRef->charge());
+//     trk_chi2_->push_back(trkRef->chi2());
+//     trk_ndof_->push_back(trkRef->ndof());
+//     trk_chi2dof_->push_back(trkRef->normalizedChi2());
 
-    if (!hasTime) {
-      trk_tval_->push_back(-1.0); // Dummy value
-      trk_terr_->push_back(-1.0); // Dummy value
-      trk_tsig_->push_back(-1.0); // Dummy value
-      trk_tqual_->push_back(-1.0); // Dummy value
-    }
-  }
+//     if (!hasTime) {
+//       trk_tval_->push_back(-1.0); // Dummy value
+//       trk_terr_->push_back(-1.0); // Dummy value
+//       trk_tsig_->push_back(-1.0); // Dummy value
+//       trk_tqual_->push_back(-1.0); // Dummy value
+//     }
+//   }
 
-  Measurement1D dxy = vertexntuples::dxy(sv, primaryVertex);
-  Measurement1D d3d = vertexntuples::d3d(sv, primaryVertex);
-  x_ = sv.x();
-  y_ = sv.y();
-  z_ = sv.z();
-  xerr_ = sv.xError();
-  yerr_ = sv.yError();
-  zerr_ = sv.zError();
-  dxy_ = dxy.value();
-  dz_ = vertexntuples::dz(sv, primaryVertex);
-  d3d_ = d3d.value();
-  dxyerr_ = dxy.error();
-  dzerr_ = vertexntuples::dzErr(sv, primaryVertex);
-  d3derr_ = d3d.error();
-  dxysig_ = dxy.significance();
-  dzsig_ = dz_ / dzerr_;
-  d3dsig_ = d3d.significance();
-  pt_ = sv.p4().Pt();
-  pt2_ = sv.p4().Pt() * sv.p4().Pt();
-  eta_ = sv.p4().Eta();
-  phi_ = sv.p4().Phi();
-  chi2_ = sv.chi2();
-  ndof_ = sv.ndof();
-  chi2dof_ = sv.normalizedChi2();
-  ntrk_ = sv.tracksSize();
+//   Measurement1D dxy = vertexntuples::dxy(sv, primaryVertex);
+//   Measurement1D d3d = vertexntuples::d3d(sv, primaryVertex);
+//   x_ = sv.x();
+//   y_ = sv.y();
+//   z_ = sv.z();
+//   xerr_ = sv.xError();
+//   yerr_ = sv.yError();
+//   zerr_ = sv.zError();
+//   dxy_ = dxy.value();
+//   dz_ = vertexntuples::dz(sv, primaryVertex);
+//   d3d_ = d3d.value();
+//   dxyerr_ = dxy.error();
+//   dzerr_ = vertexntuples::dzErr(sv, primaryVertex);
+//   d3derr_ = d3d.error();
+//   dxysig_ = dxy.significance();
+//   dzsig_ = dz_ / dzerr_;
+//   d3dsig_ = d3d.significance();
+//   pt_ = sv.p4().Pt();
+//   pt2_ = sv.p4().Pt() * sv.p4().Pt();
+//   eta_ = sv.p4().Eta();
+//   phi_ = sv.p4().Phi();
+//   chi2_ = sv.chi2();
+//   ndof_ = sv.ndof();
+//   chi2dof_ = sv.normalizedChi2();
+//   ntrk_ = sv.tracksSize();
 
-  if (!hasTime) {
-    tavg_ = -1.0;
-    trange_ = -1.0;
-  }
+//   if (!hasTime) {
+//     tavg_ = -1.0;
+//     trange_ = -1.0;
+//   }
 
-  // For matching to a GenVertex
-  trk_deltaR_ = new std::vector<float>;
-  trk_ptResNorm_ = new std::vector<float>;
-}
+//   // For matching to a GenVertex
+//   trk_deltaR_ = new std::vector<float>;
+//   trk_ptResNorm_ = new std::vector<float>;
+// }
 
 
-void SecondaryVertex::initializeTime(const reco::Vertex& sv,
-    const edm::ValueMap<float>& trackTimeValueMap,
-    const edm::ValueMap<float>& trackTimeErrorMap,
-    const edm::ValueMap<float>& trackTimeQualityMap) {
+// void SecondaryVertex::initializeTime(const reco::Vertex& sv,
+//     const edm::ValueMap<float>& trackTimeValueMap,
+//     const edm::ValueMap<float>& trackTimeErrorMap,
+//     const edm::ValueMap<float>& trackTimeQualityMap) {
 
-  float tsum = 0.0;
-  float tmin = 9999.9;
-  float tmax = -9999.9;
-  for (const reco::TrackBaseRef& trkRef : sv.tracks()) {
-    tsum += trackTimeValueMap[trkRef];
-    tmin = std::min(tmin, trackTimeValueMap[trkRef]);
-    tmax = std::max(tmax, trackTimeValueMap[trkRef]);
-    trk_tval_->push_back(trackTimeValueMap[trkRef]);
-    trk_terr_->push_back(trackTimeErrorMap[trkRef]);
-    trk_tsig_->push_back(trackTimeValueMap[trkRef] / trackTimeErrorMap[trkRef]);
-    trk_tqual_->push_back(trackTimeQualityMap[trkRef]);
-  }
-  tavg_ = tsum / (float) sv.tracksSize();
-  trange_ = tmax - tmin;
-}
+//   float tsum = 0.0;
+//   float tmin = 9999.9;
+//   float tmax = -9999.9;
+//   for (const reco::TrackBaseRef& trkRef : sv.tracks()) {
+//     tsum += trackTimeValueMap[trkRef];
+//     tmin = std::min(tmin, trackTimeValueMap[trkRef]);
+//     tmax = std::max(tmax, trackTimeValueMap[trkRef]);
+//     trk_tval_->push_back(trackTimeValueMap[trkRef]);
+//     trk_terr_->push_back(trackTimeErrorMap[trkRef]);
+//     trk_tsig_->push_back(trackTimeValueMap[trkRef] / trackTimeErrorMap[trkRef]);
+//     trk_tqual_->push_back(trackTimeQualityMap[trkRef]);
+//   }
+//   tavg_ = tsum / (float) sv.tracksSize();
+//   trange_ = tmax - tmin;
+// }
 
 
 void SecondaryVertex::initialize(const reco::VertexCompositePtrCandidate& sv,
@@ -175,7 +178,7 @@ void SecondaryVertex::initialize(const reco::VertexCompositePtrCandidate& sv,
   trk_tval_ = new std::vector<float>;
   trk_terr_ = new std::vector<float>;
   trk_tsig_ = new std::vector<float>;
-  trk_tqual_ = new std::vector<float>;
+  // trk_tqual_ = new std::vector<float>;
 
   for (unsigned int iTrk = 0; iTrk < sv.daughterPtrVector().size(); iTrk++) {
     const reco::CandidatePtr& trkPtr = sv.daughterPtr(iTrk);
@@ -207,7 +210,7 @@ void SecondaryVertex::initialize(const reco::VertexCompositePtrCandidate& sv,
       trk_tval_->push_back(-1.0); // Dummy value
       trk_terr_->push_back(-1.0); // Dummy value
       trk_tsig_->push_back(-1.0); // Dummy value
-      trk_tqual_->push_back(-1.0); // Dummy value
+      // trk_tqual_->push_back(-1.0); // Dummy value
     }
   }
 
@@ -250,9 +253,11 @@ void SecondaryVertex::initialize(const reco::VertexCompositePtrCandidate& sv,
 
 
 void SecondaryVertex::initializeTime(const reco::VertexCompositePtrCandidate& sv,
-    const edm::ValueMap<float>& trackTimeValueMap,
-    const edm::ValueMap<float>& trackTimeErrorMap,
-    const edm::ValueMap<float>& trackTimeQualityMap) {
+    edm::Handle<reco::TrackCollection> generalTracksHandle,
+    const edm::ValueMap<float>& trackT0,
+    const edm::ValueMap<float>& trackSigmaT0
+    // , const edm::ValueMap<float>& trackQuality
+    ) {
 
   float tsum = 0.0;
   float tmin = 9999.9;
@@ -260,15 +265,36 @@ void SecondaryVertex::initializeTime(const reco::VertexCompositePtrCandidate& sv
   for (unsigned int iTrk = 0; iTrk < sv.daughterPtrVector().size(); iTrk++) {
     const reco::CandidatePtr& trkPtr = sv.daughterPtr(iTrk);
 
-    // Don't yet know how to access track time values for CandidatePtrs
-    tsum += -1.0;
-    tmin = 0.0;
-    tmax = -1.0;
-    trk_tval_->push_back(-1.0); // Dummy value
-    trk_terr_->push_back(-1.0); // Dummy value
-    trk_tsig_->push_back(-1.0); // Dummy value
-    trk_tqual_->push_back(-1.0); // Dummy value
-  }
+    const reco::Track* bestTrk = trkPtr->bestTrack();
+    int matchIdx = -1;
+    if (bestTrk) {
+      const reco::TrackCollection generalTracks = *generalTracksHandle;
+      for (unsigned int iTrk = 0; iTrk < generalTracks.size(); iTrk++) {
+        const reco::Track& trk = generalTracks.at(iTrk);
+        if (trk.pt() != bestTrk->pt()
+            || trk.eta() != bestTrk->eta()
+            || trk.eta() != bestTrk->eta()) continue;
+        matchIdx = iTrk;
+      }
+    }
+
+    if (matchIdx >= 0) { // Found best track
+      reco::TrackRef trkRef(generalTracksHandle, (unsigned int) matchIdx);
+      tsum += trackT0[trkRef];
+      tmin = std::min(tmin, trackT0[trkRef]);
+      tmax = std::max(tmax, trackT0[trkRef]);
+      trk_tval_->push_back(trackT0[trkRef]);
+      trk_terr_->push_back(trackSigmaT0[trkRef]);
+      trk_tsig_->push_back(trackT0[trkRef] / trackSigmaT0[trkRef]);
+      // trk_tqual_->push_back(trackQuality[trkRef]);
+    } else { // No best track found
+      trk_tval_->push_back(-1.0);
+      trk_terr_->push_back(-1.0);
+      trk_tsig_->push_back(-1.0);
+      // trk_tqual_->push_back(-1.0);
+    }
+  } // End loop over daughters/tracks
+
   tavg_ = tsum / (float) sv.daughterPtrVector().size();
   trange_ = tmax - tmin;
 }
@@ -284,7 +310,7 @@ void SecondaryVertex::fill(std::map<TString, TH1F*>& histos1,
     histos1[prefix + "_trk_tval"]->Fill(trk_tval_->at(iTrk));
     histos1[prefix + "_trk_terr"]->Fill(trk_terr_->at(iTrk));
     histos1[prefix + "_trk_tsig"]->Fill(trk_tsig_->at(iTrk));
-    histos1[prefix + "_trk_tqual"]->Fill(trk_tqual_->at(iTrk));
+    // histos1[prefix + "_trk_tqual"]->Fill(trk_tqual_->at(iTrk));
     histos1[prefix + "_trk_pt"]->Fill(trk_pt_->at(iTrk));
     histos1[prefix + "_trk_pt2"]->Fill(trk_pt2_->at(iTrk));
     histos1[prefix + "_trk_eta"]->Fill(trk_eta_->at(iTrk));
@@ -306,7 +332,7 @@ void SecondaryVertex::fill(std::map<TString, TH1F*>& histos1,
     histos2[prefix + "_trk_eta_tval"]->Fill(trk_eta_->at(iTrk), trk_tval_->at(iTrk));
     histos2[prefix + "_trk_eta_terr"]->Fill(trk_eta_->at(iTrk), trk_terr_->at(iTrk));
     histos2[prefix + "_trk_eta_tsig"]->Fill(trk_eta_->at(iTrk), trk_tsig_->at(iTrk));
-    histos2[prefix + "_trk_eta_tqual"]->Fill(trk_eta_->at(iTrk), trk_tqual_->at(iTrk));
+    // histos2[prefix + "_trk_eta_tqual"]->Fill(trk_eta_->at(iTrk), trk_tqual_->at(iTrk));
   }
 
   histos1[prefix + "_x"]->Fill(x_);

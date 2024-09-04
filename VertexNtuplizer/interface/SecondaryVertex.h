@@ -11,6 +11,7 @@
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/Candidate/interface/VertexCompositePtrCandidate.h"
 #include "DataFormats/Candidate/interface/CandidateFwd.h"
+#include "DataFormats/RecoCandidate/interface/RecoCandidate.h"
 
 #include "TMath.h"
 #include "TH1.h"
@@ -23,30 +24,34 @@ class SecondaryVertex {
 
   public:
 
-    SecondaryVertex(const reco::Vertex& sv, const reco::Vertex& primaryVertex);
-    SecondaryVertex(const reco::Vertex& sv, const reco::Vertex& primaryVertex,
-        const edm::ValueMap<float>& trackTimeValueMap,
-        const edm::ValueMap<float>& trackTimeErrorMap,
-        const edm::ValueMap<float>& trackTimeQualityMap);
+    // SecondaryVertex(const reco::Vertex& sv, const reco::Vertex& primaryVertex);
+    // SecondaryVertex(const reco::Vertex& sv, const reco::Vertex& primaryVertex,
+    //     const edm::ValueMap<float>& trackTimeValueMap,
+    //     const edm::ValueMap<float>& trackTimeErrorMap,
+    //     const edm::ValueMap<float>& trackTimeQualityMap);
     SecondaryVertex(const reco::VertexCompositePtrCandidate& sv, const reco::Vertex& primaryVertex);
     SecondaryVertex(const reco::VertexCompositePtrCandidate& sv, const reco::Vertex& primaryVertex,
-        const edm::ValueMap<float>& trackTimeValueMap,
-        const edm::ValueMap<float>& trackTimeErrorMap,
-        const edm::ValueMap<float>& trackTimeQualityMap);
+        edm::Handle<reco::TrackCollection> generalTracksHandle,
+        const edm::ValueMap<float>& trackT0,
+        const edm::ValueMap<float>& trackSigmaT0
+        // , const edm::ValueMap<float>& trackQuality
+    );
     // ~SecondaryVertex();
 
-    void initialize(const reco::Vertex& sv, const reco::Vertex& primaryVertex,
-        bool hasTime = true);
-    void initializeTime(const reco::Vertex& sv,
-        const edm::ValueMap<float>& trackTimeValueMap,
-        const edm::ValueMap<float>& trackTimeErrorMap,
-        const edm::ValueMap<float>& trackTimeQualityMap);
+    // void initialize(const reco::Vertex& sv, const reco::Vertex& primaryVertex,
+    //     bool hasTime = true);
+    // void initializeTime(const reco::Vertex& sv,
+    //     const edm::ValueMap<float>& trackTimeValueMap,
+    //     const edm::ValueMap<float>& trackTimeErrorMap,
+    //     const edm::ValueMap<float>& trackTimeQualityMap);
     void initialize(const reco::VertexCompositePtrCandidate& sv, const reco::Vertex& primaryVertex,
         bool hasTime = true);
     void initializeTime(const reco::VertexCompositePtrCandidate& sv,
-        const edm::ValueMap<float>& trackTimeValueMap,
-        const edm::ValueMap<float>& trackTimeErrorMap,
-        const edm::ValueMap<float>& trackTimeQualityMap);
+        edm::Handle<reco::TrackCollection> generalTracksHandle,
+        const edm::ValueMap<float>& trackT0,
+        const edm::ValueMap<float>& trackSigmaT0
+        // , const edm::ValueMap<float>& trackQuality
+    );
 
     void fill(std::map<TString, TH1F*>& histos, std::map<TString, TH2F*>& histos2, TString prefix);
 
@@ -73,7 +78,7 @@ class SecondaryVertex {
     const std::vector<float>* trkTVal() const { return trk_tval_; }
     const std::vector<float>* trkTErr() const { return trk_terr_; }
     const std::vector<float>* trkTSig() const { return trk_tsig_; }
-    const std::vector<float>* trkTQual() const { return trk_tqual_; }
+    // const std::vector<float>* trkTQual() const { return trk_tqual_; }
 
     const std::vector<float>* trkMatchDeltaR() const { return trk_deltaR_; }
     const std::vector<float>* trkMatchPtResNorm() const { return trk_ptResNorm_; }
@@ -126,7 +131,7 @@ class SecondaryVertex {
     std::vector<float>* trk_tval_;
     std::vector<float>* trk_terr_;
     std::vector<float>* trk_tsig_;
-    std::vector<float>* trk_tqual_;
+    // std::vector<float>* trk_tqual_;
 
     float x_;
     float y_;

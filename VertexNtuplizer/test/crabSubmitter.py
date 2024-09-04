@@ -12,7 +12,7 @@ config.JobType.pluginName        = "Analysis"
 config.JobType.psetName          = "VertexNtuplizer.py"
 config.JobType.maxMemoryMB       = 3000
 config.JobType.maxJobRuntimeMin  = 60
-# config.JobType.pyCfgParams       = ["run2=True"]
+config.JobType.pyCfgParams       = ["run2=True"]
 
 config.Data.splitting            = "FileBased"
 config.Data.unitsPerJob          = 1

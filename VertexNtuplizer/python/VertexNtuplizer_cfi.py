@@ -26,12 +26,11 @@ vertexNtuplizer = cms.EDAnalyzer("VertexNtuplizer",
   genJetsFlavourInfo              = cms.untracked.InputTag("slimmedGenJetsFlavourInfos",               "",                    "BTV"),
 
   # Kinematic cuts
-  absEtaMax                       = cms.untracked.double(3.0), # 2.5: 2018 coverage, 3.0: MTD coverage
   genMotherPtMin                  = cms.untracked.double(10.0),
-  genDaughterPtMin                = cms.untracked.double(0.8),
-  trkPtMin                        = cms.untracked.double(0.8),
+  trkPtMin                        = cms.untracked.double(0.8), # also for daughters
   jetPtMin                        = cms.untracked.double(20.0),
   jetPtMax                        = cms.untracked.double(1000.0),
+  absEtaMax                       = cms.untracked.double(3.0), # 2.5: 2018 coverage, 3.0: MTD coverage
 
   # Fit cuts
   trkTimeQualityCut               = cms.untracked.double(0.5), # (Verbally) Recommended by the MTD DPG

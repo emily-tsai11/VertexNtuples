@@ -3,8 +3,8 @@
 
 SecondaryVertexCollectionBuilder::SecondaryVertexCollectionBuilder(const edm::ParameterSet& iConfig) {
 
-  absEtaMax_ = iConfig.getUntrackedParameter<double>("absEtaMax");
   trkPtMin_ = iConfig.getUntrackedParameter<double>("trkPtMin");
+  absEtaMax_ = iConfig.getUntrackedParameter<double>("absEtaMax");
   trkTimeQualityCut_ = iConfig.getUntrackedParameter<double>("trkTimeQualityCut");
   svChi2dofMax_ = iConfig.getUntrackedParameter<double>("svChi2dofMax");
 }

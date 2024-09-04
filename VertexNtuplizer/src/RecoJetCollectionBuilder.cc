@@ -3,9 +3,9 @@
 
 RecoJetCollectionBuilder::RecoJetCollectionBuilder(const edm::ParameterSet& iConfig) {
 
-  absEtaMax_ = iConfig.getUntrackedParameter<double>("absEtaMax");
   jetPtMin_ = iConfig.getUntrackedParameter<double>("jetPtMin");
   jetPtMax_ = iConfig.getUntrackedParameter<double>("jetPtMax");
+  absEtaMax_ = iConfig.getUntrackedParameter<double>("absEtaMax");
   drCut_ = iConfig.getUntrackedParameter<double>("jetMatchDrCut");
 }
 

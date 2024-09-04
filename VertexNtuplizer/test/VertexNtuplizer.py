@@ -6,8 +6,8 @@ options.register("inputFiles",
   # "file:/eos/user/e/etsai/workspace/CMSSW_13_1_3/src/RecoVertex/AdaptiveVertexFinder/test/TTToHadronic_PU200_slimmed.root",
   VarParsing.VarParsing.multiplicity.list, VarParsing.VarParsing.varType.string, "Input file(s) (default is ttbar no pileup)")
 options.register("outputFile",  "histo", VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.string, "Output file (w/o .root)")
-options.register("maxEvents",   -1,      VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int,    "Maximum number of events")
-options.register("reportEvery", 100,     VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int,    "Report every N events")
+options.register("maxEvents",   100,      VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int,    "Maximum number of events")
+options.register("reportEvery", 10,     VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int,    "Report every N events")
 options.register("run2",        True,    VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool,   "Sets |eta| to max 2.5 for 2018 tracker coverage")
 options.parseArguments()
 file_path = "/eos/cms/store/group/phys_btag/etsai/VertexNtuples/preliminary/" + options.outputFile + ".root"
@@ -33,6 +33,9 @@ process.maxEvents = cms.untracked.PSet(input=cms.untracked.int32(options.maxEven
 process.load("VertexNtuples.VertexNtuplizer.VertexNtuplizer_cfi")
 if options.run2:
   process.vertexNtuplizer.absEtaMax = 2.5
+
+
+# TODO: add analyzer with no matching cut on ntrks
 
 
 # Run process

@@ -5,9 +5,9 @@
 
 GenVertexCollectionBuilder::GenVertexCollectionBuilder(const edm::ParameterSet& iConfig) {
 
-  absEtaMax_ = iConfig.getUntrackedParameter<double>("absEtaMax");
   genMotherPtMin_ = iConfig.getUntrackedParameter<double>("genMotherPtMin");
-  genDaughterPtMin_ = iConfig.getUntrackedParameter<double>("genDaughterPtMin");
+  genDaughterPtMin_ = iConfig.getUntrackedParameter<double>("trkPtMin");
+  absEtaMax_ = iConfig.getUntrackedParameter<double>("absEtaMax");
 }
 
 
@@ -33,11 +33,15 @@ unsigned int GenVertexCollectionBuilder::build(const edm::Event& iEvent,
   for (unsigned int iGP = 0; iGP < genParticles_.size(); iGP++) {
     const reco::Candidate* mother = &genParticles_[iGP];
 
-    if (!goodGenPart(mother, genMotherPtMin_)) continue; // Kinematic cut on mother
-    int motherPartID = genPartID(mother->pdgId());
-    if (motherPartID < 0) continue; // Mother is not interesting hadron
+    // Kinematic cuts on mother
+    if (!goodGenPart(mother, genMotherPtMin_)) continue;
 
-    bool lastInstance = true; // Check for last instance of interesting hadron
+    // Mother is not interesting hadron
+    int motherPartID = genPartID(mother->pdgId());
+    if (motherPartID < 0) continue;
+
+    // Check for last instance of interesting hadron
+    bool lastInstance = true;
     for (unsigned int iDau = 0; iDau < mother->numberOfDaughters(); iDau++) {
       if (genPartID((mother->daughter(iDau))->pdgId()) == motherPartID) {
         lastInstance = false; // Not last instance of interesting hadron
@@ -45,9 +49,10 @@ unsigned int GenVertexCollectionBuilder::build(const edm::Event& iEvent,
       }
     }
     if (!lastInstance) continue;
-    nPassingGPs++;
 
+    // Find at least two reconstructable daughters to form a vertex with
     std::vector<const reco::Candidate*>* goodDaughters = new std::vector<const reco::Candidate*>;
+    // Loop through GPs and add all stable daughters
     for (unsigned int iDau = 0; iDau < mother->numberOfDaughters(); iDau++) {
       const reco::Candidate* dau = mother->daughter(iDau)->clone();
       std::queue<const reco::Candidate*> queue;
@@ -75,14 +80,15 @@ unsigned int GenVertexCollectionBuilder::build(const edm::Event& iEvent,
         }
       }
     }
+    // Cut on number of good daughters
+    if (goodDaughters->size() < 2) continue;
 
-    if (goodDaughters->size() >= 2) {
-      GenVertex newGV(mother, goodDaughters, primaryVertex, motherPartID);
-      genVertices_.push_back(newGV);
-      if (matcher->match(newGV, simTracks_, simTrackMatches)) genVerticesSimMatch_.push_back(newGV);
-      if (motherPartID == B_MESON || motherPartID == B_BARYON) genVerticesB_.push_back(newGV);
-      if (motherPartID == C_MESON || motherPartID == C_BARYON) genVerticesD_.push_back(newGV);
-    }
+    nPassingGPs++;
+    GenVertex newGV(mother, goodDaughters, primaryVertex, motherPartID);
+    genVertices_.push_back(newGV);
+    if (matcher->match(newGV, simTracks_, simTrackMatches)) genVerticesSimMatch_.push_back(newGV);
+    if (motherPartID == B_MESON || motherPartID == B_BARYON) genVerticesB_.push_back(newGV);
+    if (motherPartID == C_MESON || motherPartID == C_BARYON) genVerticesD_.push_back(newGV);
   }
 
   // Sort collections

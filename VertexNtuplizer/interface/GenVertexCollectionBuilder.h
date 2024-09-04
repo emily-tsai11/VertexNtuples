@@ -50,9 +50,9 @@ class GenVertexCollectionBuilder {
     bool isAncestor(const reco::Candidate* mother, const reco::Candidate* possibleMother);
     // static bool compare(const GenVertex& gva, const GenVertex& gvb);
 
-    double absEtaMax_;
     double genMotherPtMin_;
     double genDaughterPtMin_;
+    double absEtaMax_;
 
     GenVertexCollection genVertices_;
     GenVertexCollection genVerticesSimMatch_;

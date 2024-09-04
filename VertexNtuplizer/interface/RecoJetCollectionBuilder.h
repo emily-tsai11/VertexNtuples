@@ -33,9 +33,9 @@ class RecoJetCollectionBuilder {
 
     template <class J> bool goodJet(const J& j);
 
-    double absEtaMax_;
     double jetPtMin_;
     double jetPtMax_;
+    double absEtaMax_;
     double drCut_;
 
     RecoJetCollection recoJets_;

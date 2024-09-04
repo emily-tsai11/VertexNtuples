@@ -20,12 +20,14 @@ class GenVertex {
         const reco::Vertex& primaryVertex, const int pdgIdBin);
     // ~GenVertex();
 
-    void fill(std::map<TString, TH1F*>& histos, TString prefix, VertexMatcher* matcher,
-        const reco::TrackCollection& generalTracks, const reco::PFCandidateCollection& pfCandidates,
-        std::map<TString, std::vector<bool>*>& matches);
+    void fill(std::map<TString, TH1F*>& histos, TString prefix
+        // VertexMatcher* matcher,
+        // const reco::TrackCollection& generalTracks, const reco::PFCandidateCollection& pfCandidates,
+        // std::map<TString, std::vector<bool>*>& matches
+    );
 
-    void addPtResNorm(float ptresnorm) { daughterPtResNorm_->push_back(ptresnorm); }
-    void addDeltaR(float deltaR) { daughterDeltaR_->push_back(deltaR); }
+    void addPtResNorm(float ptresnorm) { dauMatchNormPtRes_->push_back(ptresnorm); }
+    void addDeltaR(float deltaR) { dauMatchDeltaR_->push_back(deltaR); }
 
     const float x() const { return x_; }
     const float y() const { return y_; }
@@ -58,8 +60,8 @@ class GenVertex {
 
     const std::vector<const reco::Candidate*>* daughters() const { return daughters_; }
 
-    const std::vector<float>* dauMatchPtResNorm() const { return daughterPtResNorm_; }
-    const std::vector<float>* dauMatchDeltaR() const { return daughterDeltaR_; }
+    const std::vector<float>* dauMatchNormPtRes() const { return dauMatchNormPtRes_; }
+    const std::vector<float>* dauMatchDeltaR() const { return dauMatchDeltaR_; }
 
   private:
 
@@ -86,6 +88,7 @@ class GenVertex {
     int pdgIdBin_;
     unsigned int nDaughters_;
 
+    // TODO: ADD MORE PARAMETERS?
     std::vector<float>* daughterPt_;
     std::vector<float>* daughterPt2_;
     std::vector<float>* daughterEta_;
@@ -96,8 +99,8 @@ class GenVertex {
     std::vector<const reco::Candidate*>* daughters_;
 
     // Filled when matching to SecondaryVertex tracks
-    std::vector<float>* daughterPtResNorm_;
-    std::vector<float>* daughterDeltaR_;
+    std::vector<float>* dauMatchNormPtRes_;
+    std::vector<float>* dauMatchDeltaR_;
 };
 
 

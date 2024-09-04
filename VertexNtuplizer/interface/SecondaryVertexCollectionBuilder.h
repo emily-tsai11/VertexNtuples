@@ -48,8 +48,8 @@ class SecondaryVertexCollectionBuilder {
     bool goodRecoVertex(const reco::VertexCompositePtrCandidate& v);
     // static bool compare(const SecondaryVertex& sva, const SecondaryVertex& svb);
 
-    double absEtaMax_;
     double trkPtMin_;
+    double absEtaMax_;
     double trkTimeQualityCut_;
     double svChi2dofMax_;
 

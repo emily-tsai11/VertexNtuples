@@ -19,14 +19,15 @@ GenVertex::GenVertex(const reco::Candidate* mother, std::vector<const reco::Cand
   xerr_ = 0.0;
   yerr_ = 0.0;
   zerr_ = 0.0;
-  pt_ = mother->pt();
-  pt2_ = mother->pt() * mother->pt();
-  eta_ = mother->eta();
-  phi_ = mother->phi();
+  pt_ = mother->pt(); // TODO: FIX?
+  pt2_ = mother->pt() * mother->pt(); // TODO: FIX?
+  eta_ = mother->eta(); // TODO: FIX?
+  phi_ = mother->phi(); // TODO: FIX?
   motherPdgId_ = mother->pdgId();
   pdgIdBin_ = pdgIdBin;
   nDaughters_ = daughters->size();
 
+  // TODO: ADD MORE PARAMETERS?
   daughterPt_ = new std::vector<float>;
   daughterPt2_ = new std::vector<float>;
   daughterEta_ = new std::vector<float>;
@@ -43,17 +44,19 @@ GenVertex::GenVertex(const reco::Candidate* mother, std::vector<const reco::Cand
   }
 
   // For matching to SecondaryVertex tracks
-  daughterPtResNorm_ = new std::vector<float>;
-  daughterDeltaR_ = new std::vector<float>;
+  dauMatchNormPtRes_ = new std::vector<float>;
+  dauMatchDeltaR_ = new std::vector<float>;
 }
 
 
 // GenVertex::~GenVertex() {}
 
 
-void GenVertex::fill(std::map<TString, TH1F*>& histos, TString prefix, VertexMatcher* matcher,
-    const reco::TrackCollection& generalTracks, const reco::PFCandidateCollection& pfCandidates,
-    std::map<TString, std::vector<bool>*>& matches) {
+void GenVertex::fill(std::map<TString, TH1F*>& histos, TString prefix
+    // VertexMatcher* matcher,
+    // const reco::TrackCollection& generalTracks, const reco::PFCandidateCollection& pfCandidates,
+    // std::map<TString, std::vector<bool>*>& matches
+) {
 
   for (unsigned int iDau = 0; iDau < nDaughters_; iDau++) {
     histos[prefix + "_trk_pt"]->Fill(daughterPt_->at(iDau));
@@ -63,35 +66,35 @@ void GenVertex::fill(std::map<TString, TH1F*>& histos, TString prefix, VertexMat
     histos[prefix + "_trk_charge"]->Fill(daughterCharge_->at(iDau));
     histos[prefix + "_trk_pdgIdBin"]->Fill(pdgIdBin_);
 
-    const reco::Candidate* dau = daughters_->at(iDau);
+    // const reco::Candidate* dau = daughters_->at(iDau);
 
-    for (unsigned int iGT = 0; iGT < generalTracks.size(); iGT++) {
-      const reco::Track gt = generalTracks.at(iGT);
-      if (!matches[prefix + "_gt"]->at(iGT) && matcher->match(dau, gt)) {
-        matches[prefix + "_gt"]->at(iGT) = true;
-        histos[prefix + "_trk_matchgt_pt"]->Fill(daughterPt_->at(iDau));
-        histos[prefix + "_trk_matchgt_pt2"]->Fill(daughterPt2_->at(iDau));
-        histos[prefix + "_trk_matchgt_eta"]->Fill(daughterEta_->at(iDau));
-        histos[prefix + "_trk_matchgt_phi"]->Fill(daughterPhi_->at(iDau));
-        histos[prefix + "_trk_matchgt_charge"]->Fill(daughterCharge_->at(iDau));
-        histos[prefix + "_trk_matchgt_pdgIdBin"]->Fill(pdgIdBin_);
-        break;
-      }
-    }
+    // for (unsigned int iGT = 0; iGT < generalTracks.size(); iGT++) {
+    //   const reco::Track gt = generalTracks.at(iGT);
+    //   if (!matches[prefix + "_gt"]->at(iGT) && matcher->match(dau, gt)) {
+    //     matches[prefix + "_gt"]->at(iGT) = true;
+    //     histos[prefix + "_trk_matchgt_pt"]->Fill(daughterPt_->at(iDau));
+    //     histos[prefix + "_trk_matchgt_pt2"]->Fill(daughterPt2_->at(iDau));
+    //     histos[prefix + "_trk_matchgt_eta"]->Fill(daughterEta_->at(iDau));
+    //     histos[prefix + "_trk_matchgt_phi"]->Fill(daughterPhi_->at(iDau));
+    //     histos[prefix + "_trk_matchgt_charge"]->Fill(daughterCharge_->at(iDau));
+    //     histos[prefix + "_trk_matchgt_pdgIdBin"]->Fill(pdgIdBin_);
+    //     break;
+    //   }
+    // }
 
-    for (unsigned int iPFC = 0; iPFC < pfCandidates.size(); iPFC++) {
-      const reco::PFCandidate pfc = pfCandidates.at(iPFC);
-      if (!matches[prefix + "_pfc"]->at(iPFC) && matcher->match(dau, pfc)) {
-        matches[prefix + "_pfc"]->at(iPFC) = true;
-        histos[prefix + "_trk_matchpfc_pt"]->Fill(daughterPt_->at(iDau));
-        histos[prefix + "_trk_matchpfc_pt2"]->Fill(daughterPt2_->at(iDau));
-        histos[prefix + "_trk_matchpfc_eta"]->Fill(daughterEta_->at(iDau));
-        histos[prefix + "_trk_matchpfc_phi"]->Fill(daughterPhi_->at(iDau));
-        histos[prefix + "_trk_matchpfc_charge"]->Fill(daughterCharge_->at(iDau));
-        histos[prefix + "_trk_matchpfc_pdgIdBin"]->Fill(pdgIdBin_);
-        break;
-      }
-    }
+    // for (unsigned int iPFC = 0; iPFC < pfCandidates.size(); iPFC++) {
+    //   const reco::PFCandidate pfc = pfCandidates.at(iPFC);
+    //   if (!matches[prefix + "_pfc"]->at(iPFC) && matcher->match(dau, pfc)) {
+    //     matches[prefix + "_pfc"]->at(iPFC) = true;
+    //     histos[prefix + "_trk_matchpfc_pt"]->Fill(daughterPt_->at(iDau));
+    //     histos[prefix + "_trk_matchpfc_pt2"]->Fill(daughterPt2_->at(iDau));
+    //     histos[prefix + "_trk_matchpfc_eta"]->Fill(daughterEta_->at(iDau));
+    //     histos[prefix + "_trk_matchpfc_phi"]->Fill(daughterPhi_->at(iDau));
+    //     histos[prefix + "_trk_matchpfc_charge"]->Fill(daughterCharge_->at(iDau));
+    //     histos[prefix + "_trk_matchpfc_pdgIdBin"]->Fill(pdgIdBin_);
+    //     break;
+    //   }
+    // }
   }
 
   histos[prefix + "_x"]->Fill(x_);

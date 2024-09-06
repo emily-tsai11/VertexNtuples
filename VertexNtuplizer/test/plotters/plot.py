@@ -95,7 +95,11 @@ for name in sv_names:
       getName = name + "MTDPV_" + var
     n[histName] = dir_TTnoPU.Get(getName).Clone()
     p[histName] = dir_TTPU200.Get(getName).Clone()
-    p[histName].Scale(ratio)
+    if n[histName].Integral() != 0:
+      n[histName].Scale(1.0 / n[histName].Integral())
+    if p[histName].Integral() != 0:
+      p[histName].Scale(1.0 / p[histName].Integral())
+    # p[histName].Scale(ratio)
     # p[histName].SetEntries(p[histName].GetEntries() * ratio)
 start = time.time()
 for iVar, var in enumerate(sv_vars):
@@ -105,8 +109,8 @@ for iVar, var in enumerate(sv_vars):
   ratio_labels = ["inclusive", "slimmed"]
   colors = [COLORS[0], COLORS[2], COLORS[0], COLORS[2]]
   styles = [ROOT.kSolid, ROOT.kSolid, ROOT.kDashed, ROOT.kDashed]
-  ylabel = "Secondary Vertices"
-  if "trk_" in var: ylabel = "Secondary Vertex Tracks"
+  ylabel = "Normalized Secondary Vertices"
+  if "trk_" in var: ylabel = "Normalized Secondary Vertex Tracks"
   if "tval" in var or "terr" in var or "tsig" in var:
     hists = [n["svInclusive"+suffix], n["svMerged"+suffix], p["svInclusive"+suffix], p["svMerged"+suffix]]
   plot(hists, labels, colors, styles, sv_var_labels[iVar], ylabel, save_path+"SecondaryVertex", var)

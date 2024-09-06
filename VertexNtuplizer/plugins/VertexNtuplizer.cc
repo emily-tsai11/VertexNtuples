@@ -114,7 +114,7 @@ class VertexNtuplizer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
 
     std::map<TString, std::vector<float>> vars1_trks_;
     std::map<TString, std::vector<float>> vars1_trks_sv_;
-    std::map<TString, std::vector<float>> vars1_vtxs_;
+    std::map<TString, std::vector<float>> vars1_vtxs_gv_;
     std::map<TString, std::vector<float>> vars1_vtxs_sv_;
     std::map<TString, std::vector<float>> vars1_jets_;
     std::map<TString, std::vector<float>> vars1_trkVtxMatch_;
@@ -229,6 +229,9 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   vars1_vtx_["pt"] = std::vector<float>{(float) nbins_, vtxPtMin, vtxPtMax};
   vars1_vtx_["pt2"] = std::vector<float>{(float) nbins_, vtxPtMin*vtxPtMin, vtxPtMax*vtxPtMax};
   vars1_vtx_["ntrk"] = std::vector<float>{10.0, 0.0, 10.0}; // daughters for GenVertex
+  std::map<TString, std::vector<float>> vars1_vtx_gv_;
+  vars1_vtx_gv_["nImmediateDau"] = std::vector<float>{10.0, 0.0, 10.0};
+  vars1_vtx_gv_["nFinalDau"] = std::vector<float>{10.0, 0.0, 10.0};
   std::map<TString, std::vector<float>> vars1_vtx_sv_;
   vars1_vtx_sv_["tavg"] = std::vector<float>{(float) nbins_, -800.0, 1000.0}; // in ps
   vars1_vtx_sv_["trange"] = std::vector<float>{(float) nbins_, 0.0, 1600.0}; // in ps
@@ -298,9 +301,10 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   vars1_trks_sv_.insert(vars1_trkVtx_sv_.begin(), vars1_trkVtx_sv_.end());
   vars1_trks_sv_.insert(vars1_trkVtxJet_.begin(), vars1_trkVtxJet_.end());
 
-  vars1_vtxs_.insert(vars1_vtx_.begin(), vars1_vtx_.end());
-  vars1_vtxs_.insert(vars1_trkVtx_.begin(), vars1_trkVtx_.end());
-  vars1_vtxs_.insert(vars1_trkVtxJet_.begin(), vars1_trkVtxJet_.end());
+  vars1_vtxs_gv_.insert(vars1_vtx_.begin(), vars1_vtx_.end());
+  vars1_vtxs_gv_.insert(vars1_vtx_gv_.begin(), vars1_vtx_gv_.end());
+  vars1_vtxs_gv_.insert(vars1_trkVtx_.begin(), vars1_trkVtx_.end());
+  vars1_vtxs_gv_.insert(vars1_trkVtxJet_.begin(), vars1_trkVtxJet_.end());
 
   vars1_vtxs_sv_.insert(vars1_vtx_.begin(), vars1_vtx_.end());
   vars1_vtxs_sv_.insert(vars1_vtx_sv_.begin(), vars1_vtx_sv_.end());
@@ -316,6 +320,10 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   // ----------------------------------------------------------------------- //
 
   // -------- Tracks only -------- //
+  vars2_trks_["pt_tval"] = std::vector<float>{(float) nbins_, trkPtMin_, trkPtMax, (float) nbins_, -800.0, 1000.0}; // in ps
+  vars2_trks_["pt_terr"] = std::vector<float>{(float) nbins_, trkPtMin_, trkPtMax, (float) nbins_, 0.0, 200.0}; // in ps
+  vars2_trks_["pt_tsig"] = std::vector<float>{(float) nbins_, trkPtMin_, trkPtMax, (float) nbins_, -20.0, 20.0};
+  // vars2_trks_["pt_tqual"] = std::vector<float>{(float) nbins_, trkPtMin_, trkPtMax, (float) nbins_, 0.0, 1.0};
   vars2_trks_["eta_tval"] = std::vector<float>{(float) nbins_, -absEtaMax_, absEtaMax_, (float) nbins_, -800.0, 1000.0}; // in ps
   vars2_trks_["eta_terr"] = std::vector<float>{(float) nbins_, -absEtaMax_, absEtaMax_, (float) nbins_, 0.0, 200.0}; // in ps
   vars2_trks_["eta_tsig"] = std::vector<float>{(float) nbins_, -absEtaMax_, absEtaMax_, (float) nbins_, -20.0, 20.0};
@@ -399,7 +407,7 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
       if (obj.Contains("_trk"))
         book1DHistograms(fs, vars1_trks_, obj, histos1_);
       else
-        book1DHistograms(fs, vars1_vtxs_, obj, histos1_);
+        book1DHistograms(fs, vars1_vtxs_gv_, obj, histos1_);
     }
     else if (obj.BeginsWith("sv")) {
       if (obj.Contains("_trk"))
@@ -423,7 +431,7 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
       TString matchobjs = objgv + "_" + objsv;
       book1DHistograms(fs, vars1_trks_, matchobjs + "_trk", histos1_);
       book1DHistograms(fs, vars1_trkVtxMatch_, matchobjs + "_trk", histos1_);
-      book1DHistograms(fs, vars1_vtxs_, matchobjs, histos1_);
+      book1DHistograms(fs, vars1_vtxs_gv_, matchobjs, histos1_);
       book1DHistograms(fs, vars1_trkVtxMatch_, matchobjs, histos1_);
       book2DHistograms(fs, vars2_trks_, matchobjs + "_trk", histos2_);
       book2DHistograms(fs, vars2_trkVtxMatch_, matchobjs + "_trk", histos2_);
@@ -464,32 +472,6 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
       primaryVertex);
   rjc_->build(iEvent, jetsToken_, genJetsFlavourInfoToken_);
   gjc_->build(iEvent, genJetsToken_, genJetsFlavourInfoToken_, jetsToken_);
-
-  // Fill standalone histograms
-  histos1_["nGPs"]->Fill(nPassingGPs);
-  const reco::PFCandidateCollection pfCandidates = iEvent.get(pfCandidatesToken_);
-  edm::ValueMap<float> trackT0FromBS_ = iEvent.get(trackT0FromBSToken_);
-  edm::ValueMap<float> trackSigmaT0FromBS_ = iEvent.get(trackSigmaT0FromBSToken_);
-  // edm::ValueMap<float> trackQualityFromBS_ = iEvent.get(trackQualityFromBSToken_);
-  edm::ValueMap<float> trackT0FromPV_ = iEvent.get(trackT0FromPVToken_);
-  edm::ValueMap<float> trackSigmaT0FromPV_ = iEvent.get(trackSigmaT0FromPVToken_);
-  // edm::ValueMap<float> trackQualityFromPV_ = iEvent.get(trackQualityFromPVToken_);
-  for (const reco::PFCandidate& pfc : pfCandidates) {
-    const reco::TrackRef& trkRef = pfc.trackRef();
-    if (!trkRef) continue;
-    if (trackT0FromBS_[trkRef] != 0.0 && trackSigmaT0FromBS_[trkRef] != -1.0) {
-      histos1_["pfCandidate_bs_tval"]->Fill(trackT0FromBS_[trkRef]*1000.0);
-      histos1_["pfCandidate_bs_terr"]->Fill(trackSigmaT0FromBS_[trkRef]*1000.0);
-      histos1_["pfCandidate_bs_tsig"]->Fill(trackT0FromBS_[trkRef] / trackSigmaT0FromBS_[trkRef]);
-      // histos1_["pfCandidate_bs_tqual"]->Fill(trackQualityFromBS_[trkRef]);
-    }
-    if (trackT0FromPV_[trkRef] != 0.0 && trackSigmaT0FromPV_[trkRef] != -1.0) {
-      histos1_["pfCandidate_pv_tval"]->Fill(trackT0FromPV_[trkRef]*1000.0);
-      histos1_["pfCandidate_pv_terr"]->Fill(trackSigmaT0FromPV_[trkRef]*1000.0);
-      histos1_["pfCandidate_pv_tsig"]->Fill(trackT0FromPV_[trkRef] / trackSigmaT0FromPV_[trkRef]);
-      // histos1_["pfCandidate_pv_tqual"]->Fill(trackQualityFromPV_[trkRef]);
-    }
-  }
 
   std::vector<GenVertexCollection> GVCollections;
   GVCollections.push_back(gvc_->getGenVertices());
@@ -540,19 +522,19 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
   // Matching GV and SV
   for (unsigned int iGVs = 0; iGVs < GVCollections.size(); iGVs++) {
-    if (gv_names_.at(iGVs).EqualTo("gvB") || gv_names_.at(iGVs).EqualTo("gvD")) continue;
-    if (gv_names_.at(iGVs).EqualTo("gvsB") || gv_names_.at(iGVs).EqualTo("gvsD")) continue;
+    if (gv_names_.at(iGVs).EndsWith("B") || gv_names_.at(iGVs).EndsWith("D")) continue;
     for (unsigned int iSVs = 0; iSVs < SVCollections.size(); iSVs++) {
       std::vector<bool> SVmatched(SVCollections.at(iSVs).size(), false); // Prevent double matching
       for (GenVertex& gv : GVCollections.at(iGVs)) {
         for (unsigned int iSV = 0; iSV < SVCollections.at(iSVs).size(); iSV++) {
           SecondaryVertex& sv = SVCollections.at(iSVs).at(iSV);
 
+          TString gv_name, sv_name;
           if (!SVmatched.at(iSV) && matcher_->match(gv, sv, VertexMatcher::TRACK)) {
             SVmatched.at(iSV) = true; // Prevent double matching
 
-            TString gv_name = gv_names_.at(iGVs) + "_" + sv_names_.at(iSVs);
-            TString sv_name = sv_names_.at(iSVs) + "_" + gv_names_.at(iGVs);
+            gv_name = gv_names_.at(iGVs) + "_" + sv_names_.at(iSVs);
+            sv_name = sv_names_.at(iSVs) + "_" + gv_names_.at(iGVs);
             gv.fill(histos1_, gv_name);
             sv.fill(histos1_, histos2_, sv_name);
             matcher_->fill(histos1_, histos2_, gv_name, sv_name, gv, sv);
@@ -572,6 +554,32 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
       } // End loop through GVs
     } // End loop through SV collections
   } // End loop through GV collections
+
+  // Fill standalone histograms
+  histos1_["nGPs"]->Fill(nPassingGPs);
+  const reco::PFCandidateCollection pfCandidates = iEvent.get(pfCandidatesToken_);
+  edm::ValueMap<float> trackT0FromBS_ = iEvent.get(trackT0FromBSToken_);
+  edm::ValueMap<float> trackSigmaT0FromBS_ = iEvent.get(trackSigmaT0FromBSToken_);
+  // edm::ValueMap<float> trackQualityFromBS_ = iEvent.get(trackQualityFromBSToken_);
+  edm::ValueMap<float> trackT0FromPV_ = iEvent.get(trackT0FromPVToken_);
+  edm::ValueMap<float> trackSigmaT0FromPV_ = iEvent.get(trackSigmaT0FromPVToken_);
+  // edm::ValueMap<float> trackQualityFromPV_ = iEvent.get(trackQualityFromPVToken_);
+  for (const reco::PFCandidate& pfc : pfCandidates) {
+    const reco::TrackRef& trkRef = pfc.trackRef();
+    if (!trkRef) continue;
+    if (trackT0FromBS_[trkRef] != 0.0 && trackSigmaT0FromBS_[trkRef] != -1.0) {
+      histos1_["pfCandidate_bs_tval"]->Fill(trackT0FromBS_[trkRef]*1000.0);
+      histos1_["pfCandidate_bs_terr"]->Fill(trackSigmaT0FromBS_[trkRef]*1000.0);
+      histos1_["pfCandidate_bs_tsig"]->Fill(trackT0FromBS_[trkRef] / trackSigmaT0FromBS_[trkRef]);
+      // histos1_["pfCandidate_bs_tqual"]->Fill(trackQualityFromBS_[trkRef]);
+    }
+    if (trackT0FromPV_[trkRef] != 0.0 && trackSigmaT0FromPV_[trkRef] != -1.0) {
+      histos1_["pfCandidate_pv_tval"]->Fill(trackT0FromPV_[trkRef]*1000.0);
+      histos1_["pfCandidate_pv_terr"]->Fill(trackSigmaT0FromPV_[trkRef]*1000.0);
+      histos1_["pfCandidate_pv_tsig"]->Fill(trackT0FromPV_[trkRef] / trackSigmaT0FromPV_[trkRef]);
+      // histos1_["pfCandidate_pv_tqual"]->Fill(trackQualityFromPV_[trkRef]);
+    }
+  }
 }
 
 

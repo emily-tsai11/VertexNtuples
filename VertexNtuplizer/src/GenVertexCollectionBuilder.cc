@@ -53,6 +53,8 @@ unsigned int GenVertexCollectionBuilder::build(const edm::Event& iEvent,
     if (!lastInstance) continue;
 
     // Find at least two reconstructable daughters to form a vertex with
+    unsigned int nImmediateDaughters = mother->numberOfDaughters();
+    unsigned int nFinalDaughters = 0;
     std::vector<const reco::Candidate*>* goodDaughters = new std::vector<const reco::Candidate*>;
     // Loop through GPs and add all stable daughters
     for (unsigned int iDau = 0; iDau < mother->numberOfDaughters(); iDau++) {
@@ -61,8 +63,9 @@ unsigned int GenVertexCollectionBuilder::build(const edm::Event& iEvent,
       queue.push(dau);
       while(!queue.empty()) {
         if (queue.front()->status() == 1) { // Stable outgoing particle
-          if (goodGenPart(queue.front(), genDaughterPtMin_) && queue.front()->charge() != 0) {
-            goodDaughters->push_back(queue.front());
+          if (goodGenPart(queue.front(), genDaughterPtMin_)) {
+            nFinalDaughters++;
+            if (queue.front()->charge() != 0) goodDaughters->push_back(queue.front());
           }
         } else {
           for (unsigned int iDau = 0; iDau < queue.front()->numberOfDaughters(); iDau++) {
@@ -86,7 +89,7 @@ unsigned int GenVertexCollectionBuilder::build(const edm::Event& iEvent,
     if (goodDaughters->size() < 2) continue;
 
     nPassingGPs++;
-    GenVertex newGV(mother, goodDaughters, primaryVertex, motherPartID);
+    GenVertex newGV(mother, nImmediateDaughters, nFinalDaughters, goodDaughters, primaryVertex, motherPartID);
     genVertices_.push_back(newGV);
     if (motherPartID == B_MESON || motherPartID == B_BARYON) genVerticesB_.push_back(newGV);
     if (motherPartID == C_MESON || motherPartID == C_BARYON) genVerticesD_.push_back(newGV);

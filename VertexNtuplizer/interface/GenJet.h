@@ -2,10 +2,6 @@
 #define VertexNtuples_VertexNtuplizer_GenJet_h
 
 
-#include "FWCore/ParameterSet/interface/ParameterSet.h"
-#include "FWCore/Framework/interface/Event.h"
-#include "FWCore/Utilities/interface/EDGetToken.h"
-
 #include "DataFormats/JetReco/interface/GenJet.h"
 #include "DataFormats/JetMatching/interface/JetFlavourInfoMatching.h"
 #include "DataFormats/Math/interface/deltaR.h"

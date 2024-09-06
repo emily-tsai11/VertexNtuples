@@ -15,7 +15,9 @@ class GenVertex {
 
   public:
 
-    GenVertex(const reco::Candidate* mother, std::vector<const reco::Candidate*>* daughters,
+    GenVertex(const reco::Candidate* mother,
+        unsigned int nImmediateDaughters, unsigned int nFinalDaughters,
+        std::vector<const reco::Candidate*>* daughters,
         const reco::Vertex& primaryVertex, const int pdgIdBin);
     // ~GenVertex();
 
@@ -45,7 +47,9 @@ class GenVertex {
     const float d3dSig() const { return d3dsig_; }
     const int motherPdgId() const { return motherPdgId_; }
     const int pdgIdBin() const { return pdgIdBin_; }
-    const unsigned int nDaughters() const { return nDaughters_; }
+    const unsigned int nImmediateDaughters() const { return nImmediateDaughters_; }
+    const unsigned int nFinalDaughters() const { return nFinalDaughters_; }
+    const unsigned int nDaughters() const { return nGoodDaughters_; }
 
     const std::vector<float>* daughterPt() const { return daughterPt_; }
     const std::vector<float>* daughterPt2() const { return daughterPt2_; }
@@ -81,7 +85,9 @@ class GenVertex {
     float d3dsig_;
     int motherPdgId_;
     int pdgIdBin_;
-    unsigned int nDaughters_;
+    unsigned int nImmediateDaughters_; // immediate daughters
+    unsigned int nFinalDaughters_; // stable, all generations
+    unsigned int nGoodDaughters_; // stable, charged, all generations
 
     // TODO: ADD MORE PARAMETERS?
     std::vector<float>* daughterPt_;

@@ -203,6 +203,10 @@ void SecondaryVertex::fill(std::map<TString, TH1F*>& histos1,
     histos1[prefix + "_trk_ndof"]->Fill(trk_ndof_->at(iTrk));
     histos1[prefix + "_trk_chi2dof"]->Fill(trk_chi2dof_->at(iTrk));
 
+    histos2[prefix + "_trk_pt_tval"]->Fill(trk_pt_->at(iTrk), trk_tval_->at(iTrk));
+    histos2[prefix + "_trk_pt_terr"]->Fill(trk_pt_->at(iTrk), trk_terr_->at(iTrk));
+    histos2[prefix + "_trk_pt_tsig"]->Fill(trk_pt_->at(iTrk), trk_tsig_->at(iTrk));
+    // histos2[prefix + "_trk_pt_tqual"]->Fill(trk_pt_->at(iTrk), trk_tqual_->at(iTrk));
     histos2[prefix + "_trk_eta_tval"]->Fill(trk_eta_->at(iTrk), trk_tval_->at(iTrk));
     histos2[prefix + "_trk_eta_terr"]->Fill(trk_eta_->at(iTrk), trk_terr_->at(iTrk));
     histos2[prefix + "_trk_eta_tsig"]->Fill(trk_eta_->at(iTrk), trk_tsig_->at(iTrk));

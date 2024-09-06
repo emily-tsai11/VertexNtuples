@@ -1,8 +1,13 @@
 #include "../interface/GenVertex.h"
 
 
-GenVertex::GenVertex(const reco::Candidate* mother, std::vector<const reco::Candidate*>* daughters,
-    const reco::Vertex& primaryVertex, const int pdgIdBin) : daughters_(daughters) {
+GenVertex::GenVertex(const reco::Candidate* mother,
+    unsigned int nImmediateDaughters, unsigned int nFinalDaughters,
+    std::vector<const reco::Candidate*>* daughters,
+    const reco::Vertex& primaryVertex, const int pdgIdBin) :
+  nImmediateDaughters_(nImmediateDaughters),
+  nFinalDaughters_(nFinalDaughters),
+  daughters_(daughters) {
 
   x_ = mother->daughter(0)->vx();
   y_ = mother->daughter(0)->vy();
@@ -25,7 +30,7 @@ GenVertex::GenVertex(const reco::Candidate* mother, std::vector<const reco::Cand
   phi_ = mother->phi(); // TODO: FIX?
   motherPdgId_ = mother->pdgId();
   pdgIdBin_ = pdgIdBin;
-  nDaughters_ = daughters->size();
+  nGoodDaughters_ = daughters->size();
 
   // TODO: ADD MORE PARAMETERS?
   daughterPt_ = new std::vector<float>;
@@ -54,7 +59,7 @@ GenVertex::GenVertex(const reco::Candidate* mother, std::vector<const reco::Cand
 
 void GenVertex::fill(std::map<TString, TH1F*>& histos, TString prefix) {
 
-  for (unsigned int iDau = 0; iDau < nDaughters_; iDau++) {
+  for (unsigned int iDau = 0; iDau < nGoodDaughters_; iDau++) {
     histos[prefix + "_trk_pt"]->Fill(daughterPt_->at(iDau));
     histos[prefix + "_trk_pt2"]->Fill(daughterPt2_->at(iDau));
     histos[prefix + "_trk_eta"]->Fill(daughterEta_->at(iDau));
@@ -81,5 +86,7 @@ void GenVertex::fill(std::map<TString, TH1F*>& histos, TString prefix) {
   histos[prefix + "_d3dsig"]->Fill(d3dsig_);
   histos[prefix + "_motherPdgId"]->Fill(motherPdgId_);
   histos[prefix + "_pdgIdBin"]->Fill(pdgIdBin_);
-  histos[prefix + "_ntrk"]->Fill(nDaughters_);
+  histos[prefix + "_nImmediateDau"]->Fill(nImmediateDaughters_);
+  histos[prefix + "_nFinalDau"]->Fill(nFinalDaughters_);
+  histos[prefix + "_ntrk"]->Fill(nGoodDaughters_);
 }

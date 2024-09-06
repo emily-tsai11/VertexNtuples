@@ -4,10 +4,6 @@
 
 #include <algorithm>
 
-#include "FWCore/ParameterSet/interface/ParameterSet.h"
-#include "FWCore/Framework/interface/Event.h"
-#include "FWCore/Utilities/interface/EDGetToken.h"
-
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/Candidate/interface/VertexCompositePtrCandidate.h"
 #include "DataFormats/Candidate/interface/CandidateFwd.h"

@@ -2,10 +2,6 @@
 #define VertexNtuples_VertexNtuplizer_RecoJet_h
 
 
-#include "FWCore/ParameterSet/interface/ParameterSet.h"
-#include "FWCore/Framework/interface/Event.h"
-#include "FWCore/Utilities/interface/EDGetToken.h"
-
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
 #include "DataFormats/JetMatching/interface/JetFlavourInfoMatching.h"

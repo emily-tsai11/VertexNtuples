@@ -33,10 +33,11 @@ class GenVertexCollectionBuilder {
     GenVertexCollectionBuilder(const edm::ParameterSet& iConfig);
     // ~GenVertexCollectionBuilder();
 
-    unsigned int build(const edm::Event& iEvent,
+    void build(const edm::Event& iEvent,
         edm::EDGetTokenT<reco::GenParticleCollection>& genParticlesToken,
         edm::EDGetTokenT<edm::SimTrackContainer>& simTracksToken,
-        const reco::Vertex& primaryVertex, VertexMatcher* matcher);
+        const reco::Vertex& primaryVertex, VertexMatcher* matcher,
+        unsigned int nPassingGVs[3]);
 
     GenVertexCollection getGenVertices() { return genVertices_; }
     GenVertexCollection getGenVerticesB() { return genVerticesB_; }

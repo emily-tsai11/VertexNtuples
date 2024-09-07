@@ -14,10 +14,11 @@ GenVertexCollectionBuilder::GenVertexCollectionBuilder(const edm::ParameterSet& 
 // GenVertexCollectionBuilder::~GenVertexCollectionBuilder() {}
 
 
-unsigned int GenVertexCollectionBuilder::build(const edm::Event& iEvent,
+void GenVertexCollectionBuilder::build(const edm::Event& iEvent,
     edm::EDGetTokenT<reco::GenParticleCollection>& genParticlesToken,
     edm::EDGetTokenT<edm::SimTrackContainer>& simTracksToken,
-    const reco::Vertex& primaryVertex, VertexMatcher* matcher) {
+    const reco::Vertex& primaryVertex, VertexMatcher* matcher,
+    unsigned int nPassingGVs[3]) { // 0:All, 1:B, 2:D
 
   genParticles_ = iEvent.get(genParticlesToken);
   simTracks_ = iEvent.get(simTracksToken);
@@ -29,7 +30,6 @@ unsigned int GenVertexCollectionBuilder::build(const edm::Event& iEvent,
   genVerticesSimMatchB_.clear();
   genVerticesSimMatchD_.clear();
 
-  unsigned int nPassingGPs = 0;
   std::vector<bool> simTrackMatches(simTracks_.size(), false);
 
   for (unsigned int iGP = 0; iGP < genParticles_.size(); iGP++) {
@@ -85,10 +85,14 @@ unsigned int GenVertexCollectionBuilder::build(const edm::Event& iEvent,
         }
       }
     }
+
+    nPassingGVs[0]++;
+    if (motherPartID == B_MESON || motherPartID == B_BARYON) nPassingGVs[1]++;
+    if (motherPartID == C_MESON || motherPartID == C_BARYON) nPassingGVs[2]++;
+
     // Cut on number of good daughters
     if (goodDaughters->size() < 2) continue;
 
-    nPassingGPs++;
     GenVertex newGV(mother, nImmediateDaughters, nFinalDaughters, goodDaughters, primaryVertex, motherPartID);
     genVertices_.push_back(newGV);
     if (motherPartID == B_MESON || motherPartID == B_BARYON) genVerticesB_.push_back(newGV);
@@ -107,8 +111,6 @@ unsigned int GenVertexCollectionBuilder::build(const edm::Event& iEvent,
   // std::sort(genVerticesSimMatch_.begin(), genVerticesSimMatch_.end(), compare);
   // std::sort(genVerticesSimMatchB_.begin(), genVerticesSimMatchB_.end(), compare);
   // std::sort(genVerticesSimMatchD_.begin(), genVerticesSimMatchD_.end(), compare);
-
-  return nPassingGPs;
 }
 
 

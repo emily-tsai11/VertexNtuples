@@ -18,6 +18,7 @@
 
 
 #include <memory>
+#include <algorithm>
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/one/EDAnalyzer.h"
@@ -86,11 +87,11 @@ class VertexNtuplizer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
     edm::EDGetTokenT<unsigned int> nIVFClustersToken_;
     edm::EDGetTokenT<unsigned int> nIVFClustersMTDPVToken_;
     edm::EDGetTokenT<reco::VertexCompositePtrCandidateCollection> inclusiveSecondaryVerticesToken_;
-    edm::EDGetTokenT<reco::VertexCompositePtrCandidateCollection> inclusiveSecondaryVerticesMTDPVToken_;
+    // edm::EDGetTokenT<reco::VertexCompositePtrCandidateCollection> inclusiveSecondaryVerticesMTDPVToken_;
     edm::EDGetTokenT<reco::VertexCompositePtrCandidateCollection> mergedSecondaryVerticesToken_;
-    edm::EDGetTokenT<reco::VertexCompositePtrCandidateCollection> mergedSecondaryVerticesMTDPVToken_;
+    // edm::EDGetTokenT<reco::VertexCompositePtrCandidateCollection> mergedSecondaryVerticesMTDPVToken_;
     edm::EDGetTokenT<reco::VertexCompositePtrCandidateCollection> slimmedSecondaryVerticesToken_;
-    edm::EDGetTokenT<reco::VertexCompositePtrCandidateCollection> slimmedSecondaryVerticesMTDPVToken_;
+    // edm::EDGetTokenT<reco::VertexCompositePtrCandidateCollection> slimmedSecondaryVerticesMTDPVToken_;
     edm::EDGetTokenT<pat::JetCollection> jetsToken_;
     edm::EDGetTokenT<reco::GenJetCollection> genJetsToken_;
     edm::EDGetTokenT<reco::JetFlavourInfoMatchingCollection> genJetsFlavourInfoToken_;
@@ -146,11 +147,11 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
     nIVFClustersToken_(consumes<unsigned int>(iConfig.getUntrackedParameter<edm::InputTag>("nIVFClusters"))),
     nIVFClustersMTDPVToken_(consumes<unsigned int>(iConfig.getUntrackedParameter<edm::InputTag>("nIVFClustersMTDPV"))),
     inclusiveSecondaryVerticesToken_(consumes<reco::VertexCompositePtrCandidateCollection>(iConfig.getUntrackedParameter<edm::InputTag>("inclusiveSecondaryVertices"))),
-    inclusiveSecondaryVerticesMTDPVToken_(consumes<reco::VertexCompositePtrCandidateCollection>(iConfig.getUntrackedParameter<edm::InputTag>("inclusiveSecondaryVerticesMTDPV"))),
+    // inclusiveSecondaryVerticesMTDPVToken_(consumes<reco::VertexCompositePtrCandidateCollection>(iConfig.getUntrackedParameter<edm::InputTag>("inclusiveSecondaryVerticesMTDPV"))),
     mergedSecondaryVerticesToken_(consumes<reco::VertexCompositePtrCandidateCollection>(iConfig.getUntrackedParameter<edm::InputTag>("mergedSecondaryVertices"))),
-    mergedSecondaryVerticesMTDPVToken_(consumes<reco::VertexCompositePtrCandidateCollection>(iConfig.getUntrackedParameter<edm::InputTag>("mergedSecondaryVerticesMTDPV"))),
+    // mergedSecondaryVerticesMTDPVToken_(consumes<reco::VertexCompositePtrCandidateCollection>(iConfig.getUntrackedParameter<edm::InputTag>("mergedSecondaryVerticesMTDPV"))),
     slimmedSecondaryVerticesToken_(consumes<reco::VertexCompositePtrCandidateCollection>(iConfig.getUntrackedParameter<edm::InputTag>("slimmedSecondaryVertices"))),
-    slimmedSecondaryVerticesMTDPVToken_(consumes<reco::VertexCompositePtrCandidateCollection>(iConfig.getUntrackedParameter<edm::InputTag>("slimmedSecondaryVerticesMTDPV"))),
+    // slimmedSecondaryVerticesMTDPVToken_(consumes<reco::VertexCompositePtrCandidateCollection>(iConfig.getUntrackedParameter<edm::InputTag>("slimmedSecondaryVerticesMTDPV"))),
     jetsToken_(consumes<pat::JetCollection>(iConfig.getUntrackedParameter<edm::InputTag>("jets"))),
     genJetsToken_(consumes<reco::GenJetCollection>(iConfig.getUntrackedParameter<edm::InputTag>("genJets"))),
     genJetsFlavourInfoToken_(consumes<reco::JetFlavourInfoMatchingCollection>(iConfig.getUntrackedParameter<edm::InputTag>("genJetsFlavourInfo"))) {
@@ -172,15 +173,15 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   gv_names_.push_back("gv");
   gv_names_.push_back("gvB");
   gv_names_.push_back("gvD");
-  gv_names_.push_back("gvs"); // w/SIM match
-  gv_names_.push_back("gvsB"); // w/SIM match
-  gv_names_.push_back("gvsD"); // w/SIM match
+  // gv_names_.push_back("gvs"); // w/SIM match
+  // gv_names_.push_back("gvsB"); // w/SIM match
+  // gv_names_.push_back("gvsD"); // w/SIM match
 
   sv_names_.push_back("svInclusive");
+  sv_names_.push_back("svInclusiveMTDBS");
   sv_names_.push_back("svInclusiveMTDPV");
-  sv_names_.push_back("svMerged");
-  sv_names_.push_back("svMergedMTDPV");
   sv_names_.push_back("svSlimmed");
+  sv_names_.push_back("svSlimmedMTDBS");
   sv_names_.push_back("svSlimmedMTDPV");
 
   rj_names_.push_back("rj"); // RecoJet
@@ -209,7 +210,7 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
 
   const float trkPtMax = 50.0;
   const float vtxPtMin = trkPtMin_;
-  const float vtxPtMax = 200.0;
+  const float vtxPtMax = 150.0;
 
   // ----------------------------------------------------------------------- //
   // 1D histograms                                                           //
@@ -220,10 +221,14 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   vars1_trk_["pt"] = std::vector<float>{(float) nbins_, trkPtMin_, trkPtMax};
   vars1_trk_["pt2"] = std::vector<float>{(float) nbins_, trkPtMin_*trkPtMin_, trkPtMax*trkPtMax};
   std::map<TString, std::vector<float>> vars1_trk_sv_;
-  vars1_trk_sv_["tval"] = std::vector<float>{(float) nbins_, -800.0, 1000.0}; // in ps
-  vars1_trk_sv_["terr"] = std::vector<float>{(float) nbins_, 0.0, 200.0}; // in ps
-  vars1_trk_sv_["tsig"] = std::vector<float>{(float) nbins_, -20.0, 20.0};
-  // vars1_trk_sv_["tqual"] = std::vector<float>{(float) nbins_, 0.0, 1.0};
+  vars1_trk_sv_["tvalBTL"] = std::vector<float>{(float) nbins_, -800.0, 1000.0}; // in ps
+  vars1_trk_sv_["terrBTL"] = std::vector<float>{(float) nbins_, 0.0, 80.0}; // in ps
+  vars1_trk_sv_["tsigBTL"] = std::vector<float>{(float) nbins_, -20.0, 20.0};
+  // vars1_trk_sv_["tqualBTL"] = std::vector<float>{(float) nbins_, 0.0, 1.0};
+  vars1_trk_sv_["tvalETL"] = std::vector<float>{(float) nbins_, -800.0, 1000.0}; // in ps
+  vars1_trk_sv_["terrETL"] = std::vector<float>{(float) nbins_, 0.0, 80.0}; // in ps
+  vars1_trk_sv_["tsigETL"] = std::vector<float>{(float) nbins_, -20.0, 20.0};
+  // vars1_trk_sv_["tqualETL"] = std::vector<float>{(float) nbins_, 0.0, 1.0};
 
   // -------- Vertices only -------- //
   std::map<TString, std::vector<float>> vars1_vtx_;
@@ -259,9 +264,9 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   vars1_trkVtx_["dxy"] = std::vector<float>{(float) nbins_, 0.0, 4.0};
   vars1_trkVtx_["dz"] = std::vector<float>{(float) nbins_, 0.0, 10.0};
   vars1_trkVtx_["d3d"] = std::vector<float>{(float) nbins_, 0.0, 10.0};
-  vars1_trkVtx_["dxyerr"] = std::vector<float>{(float) nbins_, 0.0, 0.01};
-  vars1_trkVtx_["dzerr"] = std::vector<float>{(float) nbins_, 0.0, 0.02};
-  vars1_trkVtx_["d3derr"] = std::vector<float>{(float) nbins_, 0.0, 0.02};
+  vars1_trkVtx_["dxyerr"] = std::vector<float>{(float) nbins_, 0.0, 0.0025};
+  vars1_trkVtx_["dzerr"] = std::vector<float>{(float) nbins_, 0.0, 0.005};
+  vars1_trkVtx_["d3derr"] = std::vector<float>{(float) nbins_, 0.0, 0.005};
   vars1_trkVtx_["dxysig"] = std::vector<float>{(float) nbins_, 0.0, 80.0};
   vars1_trkVtx_["dzsig"] = std::vector<float>{(float) nbins_, 0.0, 200.0};
   vars1_trkVtx_["d3dsig"] = std::vector<float>{(float) nbins_, 0.0, 200.0};
@@ -322,11 +327,11 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
 
   // -------- Tracks only -------- //
   vars2_trks_["pt_tval"] = std::vector<float>{(float) nbins_, trkPtMin_, trkPtMax, (float) nbins_, -800.0, 1000.0}; // in ps
-  vars2_trks_["pt_terr"] = std::vector<float>{(float) nbins_, trkPtMin_, trkPtMax, (float) nbins_, 0.0, 200.0}; // in ps
+  vars2_trks_["pt_terr"] = std::vector<float>{(float) nbins_, trkPtMin_, trkPtMax, (float) nbins_, 0.0, 80.0}; // in ps
   vars2_trks_["pt_tsig"] = std::vector<float>{(float) nbins_, trkPtMin_, trkPtMax, (float) nbins_, -20.0, 20.0};
   // vars2_trks_["pt_tqual"] = std::vector<float>{(float) nbins_, trkPtMin_, trkPtMax, (float) nbins_, 0.0, 1.0};
   vars2_trks_["eta_tval"] = std::vector<float>{(float) nbins_, -absEtaMax_, absEtaMax_, (float) nbins_, -800.0, 1000.0}; // in ps
-  vars2_trks_["eta_terr"] = std::vector<float>{(float) nbins_, -absEtaMax_, absEtaMax_, (float) nbins_, 0.0, 200.0}; // in ps
+  vars2_trks_["eta_terr"] = std::vector<float>{(float) nbins_, -absEtaMax_, absEtaMax_, (float) nbins_, 0.0, 80.0}; // in ps
   vars2_trks_["eta_tsig"] = std::vector<float>{(float) nbins_, -absEtaMax_, absEtaMax_, (float) nbins_, -20.0, 20.0};
   // vars2_trks_["eta_tqual"] = std::vector<float>{(float) nbins_, -absEtaMax_, absEtaMax_, (float) nbins_, 0.0, 1.0};
 
@@ -355,37 +360,58 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   histos1_["nGPs"] = fs->make<TH1F>("nGPs", "nGPs", 13, 0, 13);
   histos1_["nGPsB"] = fs->make<TH1F>("nGPsB", "nGPsB", 13, 0, 13);
   histos1_["nGPsD"] = fs->make<TH1F>("nGPsD", "nGPsD", 13, 0, 13);
-  histos1_["fracReconstructableGVs"] = fs->make<TH1F>("fracReconstructableGVs", "fracReconstructableGVs", nbins_ + 1, 0.0, 1.0 + 1.0 / ((float) nbins_));
-  histos1_["fracReconstructableGVsB"] = fs->make<TH1F>("fracReconstructableGVsB", "fracReconstructableGVsB", nbins_ + 1, 0.0, 1.0 + 1.0 / ((float) nbins_));
-  histos1_["fracReconstructableGVsD"] = fs->make<TH1F>("fracReconstructableGVsD", "fracReconstructableGVsD", nbins_ + 1, 0.0, 1.0 + 1.0 / ((float) nbins_));
-  histos1_["maxMatchEffInclusive"] = fs->make<TH1F>("maxMatchEffInclusive", "maxMatchEffInclusive", nbins_ + 1, 0.0, 1.0 + 1.0 / ((float) nbins_));
-  histos1_["maxMatchEffMerged"] = fs->make<TH1F>("maxMatchEffMerged", "maxMatchEffMerged", nbins_ + 1, 0.0, 1.0 + 1.0 / ((float) nbins_));
-  histos1_["maxMatchEffSlimmed"] = fs->make<TH1F>("maxMatchEffSlimmed", "maxMatchEffSlimmed", nbins_ + 1, 0.0, 1.0 + 1.0 / ((float) nbins_));
-  histos1_["pfCandidate_bs_tval"] = fs->make<TH1F>("pfCandidate_bs_tval", "pfCandidate_bs_tval", nbins_, -800.0, 1000.0); // in ps
-  histos1_["pfCandidate_bs_terr"] = fs->make<TH1F>("pfCandidate_bs_terr", "pfCandidate_bs_terr", nbins_, 0.0, 200.0); // in ps
-  histos1_["pfCandidate_bs_tsig"] = fs->make<TH1F>("pfCandidate_bs_tsig", "pfCandidate_bs_tsig", nbins_, -20.0, 20.0);
-  // histos1_["pfCandidate_bs_tqual"] = fs->make<TH1F>("pfCandidate_bs_tqual", "pfCandidate_bs_tqual", nbins_, 0.0, 1.0);
-  histos1_["pfCandidate_pv_tval"] = fs->make<TH1F>("pfCandidate_pv_tval", "pfCandidate_pv_tval", nbins_, -800.0, 1000.0); // in ps
-  histos1_["pfCandidate_pv_terr"] = fs->make<TH1F>("pfCandidate_pv_terr", "pfCandidate_pv_terr", nbins_, 0.0, 200.0); // in ps
-  histos1_["pfCandidate_pv_tsig"] = fs->make<TH1F>("pfCandidate_pv_tsig", "pfCandidate_pv_tsig", nbins_, -20.0, 20.0);
-  // histos1_["pfCandidate_pv_tqual"] = fs->make<TH1F>("pfCandidate_pv_tqual", "pfCandidate_pv_tqual", nbins_, 0.0, 1.0);
   histos1_["nGPs"]->Sumw2();
   histos1_["nGPsB"]->Sumw2();
   histos1_["nGPsD"]->Sumw2();
+
+  histos1_["fracReconstructableGVs"] = fs->make<TH1F>("fracReconstructableGVs", "fracReconstructableGVs", nbins_ + 1, 0.0, 1.0 + 1.0 / ((float) nbins_));
+  histos1_["fracReconstructableGVsB"] = fs->make<TH1F>("fracReconstructableGVsB", "fracReconstructableGVsB", nbins_ + 1, 0.0, 1.0 + 1.0 / ((float) nbins_));
+  histos1_["fracReconstructableGVsD"] = fs->make<TH1F>("fracReconstructableGVsD", "fracReconstructableGVsD", nbins_ + 1, 0.0, 1.0 + 1.0 / ((float) nbins_));
   histos1_["fracReconstructableGVs"]->Sumw2();
   histos1_["fracReconstructableGVsB"]->Sumw2();
   histos1_["fracReconstructableGVsD"]->Sumw2();
+
+  histos1_["maxMatchEffInclusive"] = fs->make<TH1F>("maxMatchEffInclusive", "maxMatchEffInclusive", nbins_ + 1, 0.0, 1.0 + 1.0 / ((float) nbins_));
+  histos1_["maxMatchEffSlimmed"] = fs->make<TH1F>("maxMatchEffSlimmed", "maxMatchEffSlimmed", nbins_ + 1, 0.0, 1.0 + 1.0 / ((float) nbins_));
+  histos1_["maxMatchedWithInclusive"] = fs->make<TH1F>("maxMatchedWithInclusive", "maxMatchedWithInclusive", ngv_, 0, ngv_);
+  histos1_["maxMatchedWithSlimmed"] = fs->make<TH1F>("maxMatchedWithSlimmed", "maxMatchedWithSlimmed", ngv_, 0, ngv_);
   histos1_["maxMatchEffInclusive"]->Sumw2();
-  histos1_["maxMatchEffMerged"]->Sumw2();
   histos1_["maxMatchEffSlimmed"]->Sumw2();
-  histos1_["pfCandidate_bs_tval"]->Sumw2();
-  histos1_["pfCandidate_bs_terr"]->Sumw2();
-  histos1_["pfCandidate_bs_tsig"]->Sumw2();
-  // histos1_["pfCandidate_bs_tqual"]->Sumw2();
-  histos1_["pfCandidate_pv_tval"]->Sumw2();
-  histos1_["pfCandidate_pv_terr"]->Sumw2();
-  histos1_["pfCandidate_pv_tsig"]->Sumw2();
-  // histos1_["pfCandidate_pv_tqual"]->Sumw2();
+  histos1_["maxMatchedWithInclusive"]->Sumw2();
+  histos1_["maxMatchedWithSlimmed"]->Sumw2();
+
+  histos1_["pfCandidate_bs_tvalBTL"] = fs->make<TH1F>("pfCandidate_bs_tvalBTL", "pfCandidate_bs_tvalBTL", nbins_, -800.0, 1000.0); // in ps
+  histos1_["pfCandidate_bs_terrBTL"] = fs->make<TH1F>("pfCandidate_bs_terrBTL", "pfCandidate_bs_terrBTL", nbins_, 0.0, 80.0); // in ps
+  histos1_["pfCandidate_bs_tsigBTL"] = fs->make<TH1F>("pfCandidate_bs_tsigBTL", "pfCandidate_bs_tsigBTL", nbins_, -20.0, 20.0);
+  // histos1_["pfCandidate_bs_tqualBTL"] = fs->make<TH1F>("pfCandidate_bs_tqualBTL", "pfCandidate_bs_tqualBTL", nbins_, 0.0, 1.0);
+  histos1_["pfCandidate_bs_tvalETL"] = fs->make<TH1F>("pfCandidate_bs_tvalETL", "pfCandidate_bs_tvalETL", nbins_, -800.0, 1000.0); // in ps
+  histos1_["pfCandidate_bs_terrETL"] = fs->make<TH1F>("pfCandidate_bs_terrETL", "pfCandidate_bs_terrETL", nbins_, 0.0, 80.0); // in ps
+  histos1_["pfCandidate_bs_tsigETL"] = fs->make<TH1F>("pfCandidate_bs_tsigETL", "pfCandidate_bs_tsigETL", nbins_, -20.0, 20.0);
+  // histos1_["pfCandidate_bs_tqualETL"] = fs->make<TH1F>("pfCandidate_bs_tqualETL", "pfCandidate_bs_tqualETL", nbins_, 0.0, 1.0);
+  histos1_["pfCandidate_pv_tvalBTL"] = fs->make<TH1F>("pfCandidate_pv_tvalBTL", "pfCandidate_pv_tvalBTL", nbins_, -800.0, 1000.0); // in ps
+  histos1_["pfCandidate_pv_terrBTL"] = fs->make<TH1F>("pfCandidate_pv_terrBTL", "pfCandidate_pv_terrBTL", nbins_, 0.0, 80.0); // in ps
+  histos1_["pfCandidate_pv_tsigBTL"] = fs->make<TH1F>("pfCandidate_pv_tsigBTL", "pfCandidate_pv_tsigBTL", nbins_, -20.0, 20.0);
+  // histos1_["pfCandidate_pv_tqualBTL"] = fs->make<TH1F>("pfCandidate_pv_tqualBTL", "pfCandidate_pv_tqualBTL", nbins_, 0.0, 1.0);
+  histos1_["pfCandidate_pv_tvalETL"] = fs->make<TH1F>("pfCandidate_pv_tvalETL", "pfCandidate_pv_tvalETL", nbins_, -800.0, 1000.0); // in ps
+  histos1_["pfCandidate_pv_terrETL"] = fs->make<TH1F>("pfCandidate_pv_terrETL", "pfCandidate_pv_terrETL", nbins_, 0.0, 80.0); // in ps
+  histos1_["pfCandidate_pv_tsigETL"] = fs->make<TH1F>("pfCandidate_pv_tsigETL", "pfCandidate_pv_tsigETL", nbins_, -20.0, 20.0);
+  // histos1_["pfCandidate_pv_tqualETL"] = fs->make<TH1F>("pfCandidate_pv_tqualETL", "pfCandidate_pv_tqualETL", nbins_, 0.0, 1.0);
+  histos1_["pfCandidate_bs_tvalBTL"]->Sumw2();
+  histos1_["pfCandidate_bs_terrBTL"]->Sumw2();
+  histos1_["pfCandidate_bs_tsigBTL"]->Sumw2();
+  // histos1_["pfCandidate_bs_tqualBTL"]->Sumw2();
+  histos1_["pfCandidate_bs_tvalETL"]->Sumw2();
+  histos1_["pfCandidate_bs_terrETL"]->Sumw2();
+  histos1_["pfCandidate_bs_tsigETL"]->Sumw2();
+  // histos1_["pfCandidate_bs_tqualETL"]->Sumw2();
+  histos1_["pfCandidate_pv_tvalBTL"]->Sumw2();
+  histos1_["pfCandidate_pv_terrBTL"]->Sumw2();
+  histos1_["pfCandidate_pv_tsigBTL"]->Sumw2();
+  // histos1_["pfCandidate_pv_tqualBTL"]->Sumw2();
+  histos1_["pfCandidate_pv_tvalETL"]->Sumw2();
+  histos1_["pfCandidate_pv_terrETL"]->Sumw2();
+  histos1_["pfCandidate_pv_tsigETL"]->Sumw2();
+  // histos1_["pfCandidate_pv_tqualETL"]->Sumw2();
 
   // Count histograms
   for (TString gv_name : gv_names_) {
@@ -400,8 +426,8 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   }
   histos1_["nc"] = fs->make<TH1F>("nc", "nc", nclus_, 0, nclus_);
   histos1_["nc"]->Sumw2();
-  histos1_["ncmtdpv"] = fs->make<TH1F>("ncmtdpv", "ncmtdpv", nclus_, 0, nclus_);
-  histos1_["ncmtdpv"]->Sumw2();
+  // histos1_["ncmtdpv"] = fs->make<TH1F>("ncmtdpv", "ncmtdpv", nclus_, 0, nclus_);
+  // histos1_["ncmtdpv"]->Sumw2();
   for (TString sv_name : sv_names_) {
     TString name = "n" + sv_name;
     histos1_[name] = fs->make<TH1F>(name, name, nsv_, 0, nsv_);
@@ -481,10 +507,11 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   unsigned int nPassingGVs[3] = {0, 0, 0};
   gvc_->build(iEvent, genParticlesToken_, simTracksToken_, primaryVertex, matcher_, nPassingGVs);
   svc_->build(iEvent,
-      inclusiveSecondaryVerticesToken_, inclusiveSecondaryVerticesMTDPVToken_,
-      mergedSecondaryVerticesToken_, mergedSecondaryVerticesMTDPVToken_,
-      slimmedSecondaryVerticesToken_, slimmedSecondaryVerticesMTDPVToken_,
+      inclusiveSecondaryVerticesToken_, // inclusiveSecondaryVerticesMTDPVToken_,
+      mergedSecondaryVerticesToken_, // mergedSecondaryVerticesMTDPVToken_,
+      slimmedSecondaryVerticesToken_, // slimmedSecondaryVerticesMTDPVToken_,
       generalTracksToken_,
+      trackT0FromBSToken_, trackSigmaT0FromBSToken_, // trackQualityFromBSToken_,
       trackT0FromPVToken_, trackSigmaT0FromPVToken_, // trackQualityFromPVToken_,
       primaryVertex);
   rjc_->build(iEvent, jetsToken_, genJetsFlavourInfoToken_);
@@ -494,9 +521,9 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   GVCollections.push_back(gvc_->getGenVertices());
   GVCollections.push_back(gvc_->getGenVerticesB());
   GVCollections.push_back(gvc_->getGenVerticesD());
-  GVCollections.push_back(gvc_->getGenVerticesSimMatch());
-  GVCollections.push_back(gvc_->getGenVerticesSimMatchB());
-  GVCollections.push_back(gvc_->getGenVerticesSimMatchD());
+  // GVCollections.push_back(gvc_->getGenVerticesSimMatch());
+  // GVCollections.push_back(gvc_->getGenVerticesSimMatchB());
+  // GVCollections.push_back(gvc_->getGenVerticesSimMatchD());
   for (unsigned int iColl = 0; iColl < GVCollections.size(); iColl++) {
     histos1_["n" + gv_names_.at(iColl)]->Fill(GVCollections.at(iColl).size());
     for (GenVertex& gv : GVCollections.at(iColl)) {
@@ -505,16 +532,16 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   }
 
   unsigned int nC = iEvent.get(nIVFClustersToken_);
-  unsigned int nCMTDPV = iEvent.get(nIVFClustersMTDPVToken_);
+  // unsigned int nCMTDPV = iEvent.get(nIVFClustersMTDPVToken_);
   histos1_["nc"]->Fill(nC);
-  histos1_["ncmtdpv"]->Fill(nCMTDPV);
+  // histos1_["ncmtdpv"]->Fill(nCMTDPV);
 
   std::vector<SecondaryVertexCollection> SVCollections;
   SVCollections.push_back(svc_->getSecVerticesInclusive());
+  SVCollections.push_back(svc_->getSecVerticesInclusiveMTDBS());
   SVCollections.push_back(svc_->getSecVerticesInclusiveMTDPV());
-  SVCollections.push_back(svc_->getSecVerticesMerged());
-  SVCollections.push_back(svc_->getSecVerticesMergedMTDPV());
   SVCollections.push_back(svc_->getSecVerticesSlimmed());
+  SVCollections.push_back(svc_->getSecVerticesSlimmedMTDBS());
   SVCollections.push_back(svc_->getSecVerticesSlimmedMTDPV());
   for (unsigned int iColl = 0; iColl < SVCollections.size(); iColl++) {
     histos1_["n" + sv_names_.at(iColl)]->Fill(SVCollections.at(iColl).size());
@@ -576,31 +603,19 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   histos1_["nGPs"]->Fill(nPassingGVs[0]);
   histos1_["nGPsB"]->Fill(nPassingGVs[1]);
   histos1_["nGPsD"]->Fill(nPassingGVs[2]);
-  histos1_["fracReconstructableGVs"]->Fill(((float) gvc_->getGenVertices().size()) / ((float) nPassingGVs[0]));
-  histos1_["fracReconstructableGVsB"]->Fill(((float) gvc_->getGenVerticesB().size()) / ((float) nPassingGVs[1]));
-  histos1_["fracReconstructableGVsD"]->Fill(((float) gvc_->getGenVerticesD().size()) / ((float) nPassingGVs[2]));
-  // std::cout << gvc_->getGenVertices().size() << std::endl;
-  // std::cout << gvc_->getGenVerticesB().size() << std::endl;
-  // std::cout << gvc_->getGenVerticesD().size() << std::endl;
-  // std::cout << nPassingGVs[0] << std::endl;
-  // std::cout << nPassingGVs[1] << std::endl;
-  // std::cout << nPassingGVs[2] << std::endl;
-  // std::cout << ((float) gvc_->getGenVertices().size()) / ((float) nPassingGVs[0]) << std::endl;
-  // std::cout << ((float) gvc_->getGenVerticesB().size()) / ((float) nPassingGVs[1]) << std::endl;
-  // std::cout << ((float) gvc_->getGenVerticesD().size()) / ((float) nPassingGVs[2]) << std::endl;
-  // std::cout << "---" << std::endl;
-  float maxMatchEffInclusive = ((float) svc_->getSecVerticesInclusive().size()) / ((float) gvc_->getGenVertices().size());
-  float maxMatchEffMerged = ((float) svc_->getSecVerticesMerged().size()) / ((float) gvc_->getGenVertices().size());
-  float maxMatchEffSlimmed = ((float) svc_->getSecVerticesSlimmed().size()) / ((float) gvc_->getGenVertices().size());
-  histos1_["maxMatchEffInclusive"]->Fill(maxMatchEffInclusive > 1.0 ? 1.0 : maxMatchEffInclusive);
-  histos1_["maxMatchEffMerged"]->Fill(maxMatchEffMerged > 1.0 ? 1.0 : maxMatchEffMerged);
-  histos1_["maxMatchEffSlimmed"]->Fill(maxMatchEffSlimmed > 1.0 ? 1.0 : maxMatchEffSlimmed);
-  // std::cout << svc_->getSecVerticesInclusive().size() << std::endl;
-  // std::cout << svc_->getSecVerticesMerged().size() << std::endl;
-  // std::cout << svc_->getSecVerticesSlimmed().size() << std::endl;
-  // std::cout << maxMatchEffInclusive << " " << (maxMatchEffInclusive > 1.0 ? 1.0 : maxMatchEffInclusive) << std::endl;
-  // std::cout << maxMatchEffMerged << " " << (maxMatchEffMerged > 1.0 ? 1.0 : maxMatchEffMerged) << std::endl;
-  // std::cout << maxMatchEffSlimmed << " " << (maxMatchEffSlimmed > 1.0 ? 1.0 : maxMatchEffSlimmed) << std::endl;
+  histos1_["fracReconstructableGVs"]->Fill(((float) gvc_->getGenVertices().size()) / ((float) nPassingGVs[0])); // TODO: FIX THIS TOO
+  histos1_["fracReconstructableGVsB"]->Fill(((float) gvc_->getGenVerticesB().size()) / ((float) nPassingGVs[1])); // TODO: FIX THIS TOO
+  histos1_["fracReconstructableGVsD"]->Fill(((float) gvc_->getGenVerticesD().size()) / ((float) nPassingGVs[2])); // TODO: FIX THIS TOO
+
+  float maxMatchedWithInclusive = std::min(svc_->getSecVerticesInclusive().size(), gvc_->getGenVertices().size());
+  float maxMatchedWithSlimmed = std::min(svc_->getSecVerticesSlimmed().size(), gvc_->getGenVertices().size());
+  histos1_["maxMatchedWithInclusive"]->Fill(maxMatchedWithInclusive);
+  histos1_["maxMatchedWithSlimmed"]->Fill(maxMatchedWithSlimmed);
+
+  float maxMatchEffInclusive = maxMatchedWithInclusive / ((float) gvc_->getGenVertices().size());
+  float maxMatchEffSlimmed = maxMatchedWithSlimmed / ((float) gvc_->getGenVertices().size());
+  histos1_["maxMatchEffInclusive"]->Fill(maxMatchEffInclusive);
+  histos1_["maxMatchEffSlimmed"]->Fill(maxMatchEffSlimmed);
 
   const reco::PFCandidateCollection pfCandidates = iEvent.get(pfCandidatesToken_);
   edm::ValueMap<float> trackT0FromBS_ = iEvent.get(trackT0FromBSToken_);
@@ -612,17 +627,24 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   for (const reco::PFCandidate& pfc : pfCandidates) {
     const reco::TrackRef& trkRef = pfc.trackRef();
     if (!trkRef) continue;
+    if (trkRef->charge() == 0) continue;
     if (trackT0FromBS_[trkRef] != 0.0 && trackSigmaT0FromBS_[trkRef] != -1.0) {
-      histos1_["pfCandidate_bs_tval"]->Fill(trackT0FromBS_[trkRef]*1000.0);
-      histos1_["pfCandidate_bs_terr"]->Fill(trackSigmaT0FromBS_[trkRef]*1000.0);
-      histos1_["pfCandidate_bs_tsig"]->Fill(trackT0FromBS_[trkRef] / trackSigmaT0FromBS_[trkRef]);
-      // histos1_["pfCandidate_bs_tqual"]->Fill(trackQualityFromBS_[trkRef]);
+      TString suffix = "";
+      if (abs(trkRef->eta()) <= 1.5) suffix += "BTL";
+      else suffix += "ETL";
+      histos1_["pfCandidate_bs_tval" + suffix]->Fill(trackT0FromBS_[trkRef] * 1000.0);
+      histos1_["pfCandidate_bs_terr" + suffix]->Fill(trackSigmaT0FromBS_[trkRef] * 1000.0);
+      histos1_["pfCandidate_bs_tsig" + suffix]->Fill(trackT0FromBS_[trkRef] / trackSigmaT0FromBS_[trkRef]);
+      // histos1_["pfCandidate_bs_tqual" + suffix]->Fill(trackQualityFromBS_[trkRef]);
     }
     if (trackT0FromPV_[trkRef] != 0.0 && trackSigmaT0FromPV_[trkRef] != -1.0) {
-      histos1_["pfCandidate_pv_tval"]->Fill(trackT0FromPV_[trkRef]*1000.0);
-      histos1_["pfCandidate_pv_terr"]->Fill(trackSigmaT0FromPV_[trkRef]*1000.0);
-      histos1_["pfCandidate_pv_tsig"]->Fill(trackT0FromPV_[trkRef] / trackSigmaT0FromPV_[trkRef]);
-      // histos1_["pfCandidate_pv_tqual"]->Fill(trackQualityFromPV_[trkRef]);
+      TString suffix = "";
+      if (abs(trkRef->eta()) <= 1.5) suffix += "BTL";
+      else suffix += "ETL";
+      histos1_["pfCandidate_pv_tval" + suffix]->Fill(trackT0FromPV_[trkRef] * 1000.0);
+      histos1_["pfCandidate_pv_terr" + suffix]->Fill(trackSigmaT0FromPV_[trkRef] * 1000.0);
+      histos1_["pfCandidate_pv_tsig" + suffix]->Fill(trackT0FromPV_[trkRef] / trackSigmaT0FromPV_[trkRef]);
+      // histos1_["pfCandidate_pv_tqual" + suffix]->Fill(trackQualityFromPV_[trkRef]);
     }
   }
 }
@@ -669,15 +691,13 @@ void VertexNtuplizer::endJob() {
   std::cout << "mean number of GVs                              = " << histos1_["ngv"]->GetMean() << "+=" << histos1_["ngv"]->GetStdDev() << std::endl;
   std::cout << "mean number of GVs from B mother                = " << histos1_["ngvB"]->GetMean() << "+=" << histos1_["ngvB"]->GetStdDev() << std::endl;
   std::cout << "mean number of GVs from D mother                = " << histos1_["ngvD"]->GetMean() << "+=" << histos1_["ngvD"]->GetStdDev() << std::endl;
-  std::cout << "mean number of GVs with SIM match               = " << histos1_["ngvs"]->GetMean() << "+=" << histos1_["ngvs"]->GetStdDev() << std::endl;
-  std::cout << "mean number of GVs from B mother with SIM match = " << histos1_["ngvsB"]->GetMean() << "+=" << histos1_["ngvsB"]->GetStdDev() << std::endl;
-  std::cout << "mean number of GVs from D mother with SIM match = " << histos1_["ngvsD"]->GetMean() << "+=" << histos1_["ngvsD"]->GetStdDev() << std::endl;
+  // std::cout << "mean number of GVs with SIM match               = " << histos1_["ngvs"]->GetMean() << "+=" << histos1_["ngvs"]->GetStdDev() << std::endl;
+  // std::cout << "mean number of GVs from B mother with SIM match = " << histos1_["ngvsB"]->GetMean() << "+=" << histos1_["ngvsB"]->GetStdDev() << std::endl;
+  // std::cout << "mean number of GVs from D mother with SIM match = " << histos1_["ngvsD"]->GetMean() << "+=" << histos1_["ngvsD"]->GetStdDev() << std::endl;
 
   std::cout << std::endl;
   std::cout << "mean number of inclusive SVs        = " << histos1_["nsvInclusive"]->GetMean() << "+=" << histos1_["nsvInclusive"]->GetStdDev() << std::endl;
   std::cout << "mean number of inclusive SVs MTD PV = " << histos1_["nsvInclusiveMTDPV"]->GetMean() << "+=" << histos1_["nsvInclusiveMTDPV"]->GetStdDev() << std::endl;
-  std::cout << "mean number of merged SVs           = " << histos1_["nsvMerged"]->GetMean() << "+=" << histos1_["nsvMerged"]->GetStdDev() << std::endl;
-  std::cout << "mean number of merged SVs MTD PV    = " << histos1_["nsvMergedMTDPV"]->GetMean() << "+=" << histos1_["nsvMergedMTDPV"]->GetStdDev() << std::endl;
   std::cout << "mean number of slimmed SVs          = " << histos1_["nsvSlimmed"]->GetMean() << "+=" << histos1_["nsvSlimmed"]->GetStdDev() << std::endl;
   std::cout << "mean number of slimmed SVs MTD PV   = " << histos1_["nsvSlimmedMTDPV"]->GetMean() << "+=" << histos1_["nsvSlimmedMTDPV"]->GetStdDev() << std::endl;
 
@@ -686,18 +706,9 @@ void VertexNtuplizer::endJob() {
   std::cout << "Integrated efficiency for all GVs                              = " << histos1_["gv_svInclusive_pdgIdBin"]->GetEntries() / histos1_["gv_pdgIdBin"]->GetEntries() << std::endl;
   std::cout << "Integrated efficiency for all GVs from B mother                = " << histos1_["gvB_svInclusive_pdgIdBin"]->GetEntries() / histos1_["gvB_pdgIdBin"]->GetEntries() << std::endl;
   std::cout << "Integrated efficiency for all GVs from D mother                = " << histos1_["gvD_svInclusive_pdgIdBin"]->GetEntries() / histos1_["gvD_pdgIdBin"]->GetEntries() << std::endl;
-  std::cout << "Integrated efficiency for all GVs SimTrack match               = " << histos1_["gvs_svInclusive_pdgIdBin"]->GetEntries() / histos1_["gvs_pdgIdBin"]->GetEntries() << std::endl;
-  std::cout << "Integrated efficiency for all GVs from B mother SimTrack match = " << histos1_["gvsB_svInclusive_pdgIdBin"]->GetEntries() / histos1_["gvsB_pdgIdBin"]->GetEntries() << std::endl;
-  std::cout << "Integrated efficiency for all GVs from D mother SimTrack match = " << histos1_["gvsD_svInclusive_pdgIdBin"]->GetEntries() / histos1_["gvsD_pdgIdBin"]->GetEntries() << std::endl;
-
-  std::cout << std::endl;
-  std::cout << "merged SVs" << std::endl;
-  std::cout << "Integrated efficiency for all GVs                              = " << histos1_["gv_svMerged_pdgIdBin"]->GetEntries() / histos1_["gv_pdgIdBin"]->GetEntries() << std::endl;
-  std::cout << "Integrated efficiency for all GVs from B mother                = " << histos1_["gvB_svMerged_pdgIdBin"]->GetEntries() / histos1_["gvB_pdgIdBin"]->GetEntries() << std::endl;
-  std::cout << "Integrated efficiency for all GVs from D mother                = " << histos1_["gvD_svMerged_pdgIdBin"]->GetEntries() / histos1_["gvD_pdgIdBin"]->GetEntries() << std::endl;
-  std::cout << "Integrated efficiency for all GVs SimTrack match               = " << histos1_["gvs_svMerged_pdgIdBin"]->GetEntries() / histos1_["gvs_pdgIdBin"]->GetEntries() << std::endl;
-  std::cout << "Integrated efficiency for all GVs from B mother SimTrack match = " << histos1_["gvsB_svMerged_pdgIdBin"]->GetEntries() / histos1_["gvsB_pdgIdBin"]->GetEntries() << std::endl;
-  std::cout << "Integrated efficiency for all GVs from D mother SimTrack match = " << histos1_["gvsD_svMerged_pdgIdBin"]->GetEntries() / histos1_["gvsD_pdgIdBin"]->GetEntries() << std::endl;
+  // std::cout << "Integrated efficiency for all GVs SimTrack match               = " << histos1_["gvs_svInclusive_pdgIdBin"]->GetEntries() / histos1_["gvs_pdgIdBin"]->GetEntries() << std::endl;
+  // std::cout << "Integrated efficiency for all GVs from B mother SimTrack match = " << histos1_["gvsB_svInclusive_pdgIdBin"]->GetEntries() / histos1_["gvsB_pdgIdBin"]->GetEntries() << std::endl;
+  // std::cout << "Integrated efficiency for all GVs from D mother SimTrack match = " << histos1_["gvsD_svInclusive_pdgIdBin"]->GetEntries() / histos1_["gvsD_pdgIdBin"]->GetEntries() << std::endl;
 
   // Catch under and over flows -- messes with mean and stddev calculations...
   // for (auto iter : histos1_) {

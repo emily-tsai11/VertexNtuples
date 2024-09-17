@@ -9,6 +9,7 @@ SecondaryVertex::SecondaryVertex(const reco::VertexCompositePtrCandidate& sv,
 
 
 SecondaryVertex::SecondaryVertex(const reco::VertexCompositePtrCandidate& sv,
+    const reco::VertexCompositePtrCandidate& linkedSV,
     const reco::Vertex& primaryVertex,
     edm::Handle<reco::TrackCollection> generalTracksHandle,
     const edm::ValueMap<float>& trackT0,
@@ -17,8 +18,8 @@ SecondaryVertex::SecondaryVertex(const reco::VertexCompositePtrCandidate& sv,
     ) {
 
   initialize(sv, primaryVertex);
-  initializeTime(sv, generalTracksHandle, trackT0, trackSigmaT0);
-  // initializeTime(sv, trackT0, trackSigmaT0, trackQuality);
+  initializeTime(linkedSV, generalTracksHandle, trackT0, trackSigmaT0);
+  // initializeTime(linkedSV, generalTracksHandle, trackT0, trackSigmaT0, trackQuality);
 }
 
 
@@ -139,7 +140,7 @@ void SecondaryVertex::initializeTime(const reco::VertexCompositePtrCandidate& sv
       const reco::TrackCollection generalTracks = *generalTracksHandle;
       for (unsigned int iTrk = 0; iTrk < generalTracks.size(); iTrk++) {
         const reco::Track& trk = generalTracks.at(iTrk);
-        if (trk.pt() != bestTrk->pt() || trk.eta() != bestTrk->eta() || trk.eta() != bestTrk->eta()) continue;
+        if (trk.pt() != bestTrk->pt() || trk.eta() != bestTrk->eta() || trk.phi() != bestTrk->phi()) continue;
         matchIdx = iTrk;
       }
     }
@@ -181,10 +182,16 @@ void SecondaryVertex::fill(std::map<TString, TH1F*>& histos1,
     std::map<TString, TH2F*>& histos2, TString prefix) {
 
   for (unsigned int iTrk = 0; iTrk < nTracks(); iTrk++) {
-    histos1[prefix + "_trk_tval"]->Fill(trk_tval_->at(iTrk));
-    histos1[prefix + "_trk_terr"]->Fill(trk_terr_->at(iTrk));
-    histos1[prefix + "_trk_tsig"]->Fill(trk_tsig_->at(iTrk));
-    // histos1[prefix + "_trk_tqual"]->Fill(trk_tqual_->at(iTrk));
+    // MTD timing
+    TString suffix = "";
+    if (abs(trk_eta_->at(iTrk)) <= 1.5) suffix += "BTL";
+    else suffix += "ETL";
+    histos1[prefix + "_trk_tval" + suffix]->Fill(trk_tval_->at(iTrk));
+    histos1[prefix + "_trk_terr" + suffix]->Fill(trk_terr_->at(iTrk));
+    histos1[prefix + "_trk_tsig" + suffix]->Fill(trk_tsig_->at(iTrk));
+    // histos1[prefix + "_trk_tqual" + suffix]->Fill(trk_tqual_->at(iTrk));
+
+    // 1D histograms
     histos1[prefix + "_trk_pt"]->Fill(trk_pt_->at(iTrk));
     histos1[prefix + "_trk_pt2"]->Fill(trk_pt2_->at(iTrk));
     histos1[prefix + "_trk_eta"]->Fill(trk_eta_->at(iTrk));
@@ -203,6 +210,7 @@ void SecondaryVertex::fill(std::map<TString, TH1F*>& histos1,
     histos1[prefix + "_trk_ndof"]->Fill(trk_ndof_->at(iTrk));
     histos1[prefix + "_trk_chi2dof"]->Fill(trk_chi2dof_->at(iTrk));
 
+    // 2D histograms
     histos2[prefix + "_trk_pt_tval"]->Fill(trk_pt_->at(iTrk), trk_tval_->at(iTrk));
     histos2[prefix + "_trk_pt_terr"]->Fill(trk_pt_->at(iTrk), trk_terr_->at(iTrk));
     histos2[prefix + "_trk_pt_tsig"]->Fill(trk_pt_->at(iTrk), trk_tsig_->at(iTrk));

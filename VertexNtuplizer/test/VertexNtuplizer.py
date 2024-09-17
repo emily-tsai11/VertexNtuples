@@ -4,6 +4,7 @@ options = VarParsing.VarParsing()
 options.register("inputFiles",
   "file:/eos/user/e/etsai/workspace/CMSSW_13_1_0/src/RecoVertex/AdaptiveVertexFinder/test/TTToHadronic_noPU_slimmed.root",
   # "file:/eos/user/e/etsai/workspace/CMSSW_13_1_3/src/RecoVertex/AdaptiveVertexFinder/test/TTToHadronic_PU200_slimmed.root",
+  # "file:/eos/cms/store/group/phys_btag/etsai/TT_TuneCP5_14TeV-powheg-pythia8/TTToHadronic_noPU/240904_161331/0000/TTToHadronic_noPU_slimmed_100.root",
   # "file:/eos/cms/store/group/phys_btag/etsai/TT_TuneCP5_14TeV-powheg-pythia8/TTToHadronic_PU200/240904_161428/0000/TTToHadronic_PU200_slimmed_77.root",
   VarParsing.VarParsing.multiplicity.list, VarParsing.VarParsing.varType.string, "Input file(s) (default is ttbar no pileup)")
 options.register("outputFile",  "histo", VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.string, "Output file (w/o .root)")

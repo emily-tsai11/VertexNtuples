@@ -19,16 +19,20 @@ class SecondaryVertex {
 
   public:
 
-    SecondaryVertex(const reco::VertexCompositePtrCandidate& sv, const reco::Vertex& primaryVertex);
-    SecondaryVertex(const reco::VertexCompositePtrCandidate& sv, const reco::Vertex& primaryVertex,
-        edm::Handle<reco::TrackCollection> generalTracksHandle,
+    SecondaryVertex(const reco::VertexCompositePtrCandidate& sv,
+        const reco::Vertex& primaryVertex);
+    SecondaryVertex(const reco::VertexCompositePtrCandidate& sv,
+        const reco::VertexCompositePtrCandidate& linkedSV, // Solve linking issues of slimmed SVs to generalTracks
+        const reco::Vertex& primaryVertex,
+        edm::Handle<reco::TrackCollection> generalTracksHandle, // Used to get index in collection of SV track to make TrackRef
         const edm::ValueMap<float>& trackT0,
         const edm::ValueMap<float>& trackSigmaT0
         // , const edm::ValueMap<float>& trackQuality
     );
     // ~SecondaryVertex();
 
-    void initialize(const reco::VertexCompositePtrCandidate& sv, const reco::Vertex& primaryVertex,
+    void initialize(const reco::VertexCompositePtrCandidate& sv,
+        const reco::Vertex& primaryVertex,
         bool hasTime = true);
     void initializeTime(const reco::VertexCompositePtrCandidate& sv,
         edm::Handle<reco::TrackCollection> generalTracksHandle,

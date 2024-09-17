@@ -15,9 +15,9 @@ vtx_vars = [
   "zpull",
 ]
 vtx_var_labels = [
-  "x resolution [cm]",
-  "y resolution [cm]",
-  "z resolution [cm]",
+  "x residual [cm]",
+  "y residual [cm]",
+  "z residual [cm]",
   "x pull [cm]",
   "y pull [cm]",
   "z pull [cm]",

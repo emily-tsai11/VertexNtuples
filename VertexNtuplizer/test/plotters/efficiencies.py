@@ -9,7 +9,7 @@ efficiency_vars = [
   "x",
   "y",
   "z",
-  "dxy",
+  "dxy", # from PV
   "dz",
   "d3d",
   "dxysig",

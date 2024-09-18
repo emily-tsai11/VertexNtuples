@@ -1,10 +1,21 @@
-sv_names = ["svInclusive", "svMerged", "svSlimmed"]
+sv_names = [
+  # "svInclusive",
+  # "svSlimmed",
+  "svInclusiveMTDBS",
+  "svSlimmedMTDBS",
+  "svInclusiveMTDPV",
+  "svSlimmedMTDPV",
+]
 
 sv_vars = [
-  "trk_tval",
-  "trk_terr",
-  "trk_tsig",
-  # "trk_tqual",
+  "trk_tvalBTL",
+  "trk_terrBTL",
+  "trk_tsigBTL",
+  # "trk_tqualBTL",
+  "trk_tvalETL",
+  "trk_terrETL",
+  "trk_tsigETL",
+  # "trk_tqualETL",
   "trk_pt",
   "trk_pt2",
   "trk_eta",
@@ -53,6 +64,10 @@ sv_var_labels = [
   "Track time error [ps]",
   "Track time significance",
   # "Track time quality",
+  "Track time [ps]",
+  "Track time error [ps]",
+  "Track time significance",
+  # "Track time quality",
   "Track p_{T} [GeV]",
   "Track p_{T}^{2} [GeV^{2}]",
   "Track #eta",
@@ -97,28 +112,31 @@ sv_var_labels = [
   "# of tracks"
 ]
 
-sv_2d_names = [
-  "svInclusiveMTDPV",
-  "svMergedMTDPV",
-]
-
 sv_var2d = [
-  "trk_pt_tval",
-  "trk_pt_terr",
-  "trk_pt_tsig",
-  # "trk_pt_tqual",
   "trk_eta_tval",
   "trk_eta_terr",
   "trk_eta_tsig",
   # "trk_eta_tqual",
+  "trk_pt_tvalBTL",
+  "trk_pt_terrBTL",
+  "trk_pt_tsigBTL",
+  # "trk_pt_tqualBTL",
+  "trk_pt_tvalETL",
+  "trk_pt_terrETL",
+  "trk_pt_tsigETL",
+  # "trk_pt_tqualETL",
 ]
 sv_var2d_labels = [
-  ("p_{T} [GeV]", "Track time [ps]"),
-  ("p_{T} [GeV]", "Track time error [ps]"),
-  ("p_{T} [GeV]", "Track time significance"),
-  # ("p_{T} [GeV]", "Track time quality"),
   ("#eta", "Track time [ps]"),
   ("#eta", "Track time error [ps]"),
   ("#eta", "Track time significance"),
   # ("#eta", "Track time quality"),
+  ("p_{T} [GeV]", "Track time [ps]"),
+  ("p_{T} [GeV]", "Track time error [ps]"),
+  ("p_{T} [GeV]", "Track time significance"),
+  # ("p_{T} [GeV]", "Track time quality"),
+  ("p_{T} [GeV]", "Track time [ps]"),
+  ("p_{T} [GeV]", "Track time error [ps]"),
+  ("p_{T} [GeV]", "Track time significance"),
+  # ("p_{T} [GeV]", "Track time quality"),
 ]

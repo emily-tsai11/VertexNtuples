@@ -9,8 +9,10 @@ from efficiencies import *
 
 # fname_TTnoPU = "/eos/user/e/etsai/workspace/VertexNtuples_CMSSW_14_1_0_pre3/src/VertexNtuples/VertexNtuplizer/test/histo_TTToHadronicNoPU.root"
 # fname_TTPU200 = "/eos/user/e/etsai/workspace/VertexNtuples_CMSSW_14_1_0_pre3/src/VertexNtuples/VertexNtuplizer/test/histo_TTToHadronicPU200.root"
-fname_TTnoPU = "/eos/cms/store/group/phys_btag/etsai/VertexNtuples/TTToHadronic_noPU.root"
-fname_TTPU200 = "/eos/cms/store/group/phys_btag/etsai/VertexNtuples/TTToHadronic_PU200.root"
+# fname_TTnoPU = "/eos/cms/store/group/phys_btag/etsai/VertexNtuples/TTToHadronic_noPU.root"
+# fname_TTPU200 = "/eos/cms/store/group/phys_btag/etsai/VertexNtuples/TTToHadronic_PU200.root"
+fname_TTnoPU = "/eos/user/e/etsai/workspace/VertexNtuples_CMSSW_14_1_0_pre3/src/VertexNtuples/VertexNtuplizer/test/histo_TTToHadronicNoPU_NEW.root"
+fname_TTPU200 = "/eos/user/e/etsai/workspace/VertexNtuples_CMSSW_14_1_0_pre3/src/VertexNtuples/VertexNtuplizer/test/histo_TTToHadronicPU200_NEW.root"
 # savePath = "/eos/home-b/btvweb/www/Offline/Phase2/etsai/Phase2/"
 save_path = "/eos/home-b/btvweb/www/Offline/Phase2/etsai/Run2/"
 

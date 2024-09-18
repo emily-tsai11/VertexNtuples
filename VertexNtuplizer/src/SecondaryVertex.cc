@@ -149,7 +149,7 @@ void SecondaryVertex::initializeTime(const reco::VertexCompositePtrCandidate& sv
     bool filled = false;
     if (matchIdx >= 0) {
       const reco::TrackRef trkRef(generalTracksHandle, (unsigned int) matchIdx);
-      if (trackT0[trkRef] != 0.0 && trackSigmaT0[trkRef] != -1.0) {
+      if (trackSigmaT0[trkRef] > 0.0) {
         filled = true;
         tsum += trackT0[trkRef];
         tmin = std::min(tmin, trackT0[trkRef]);
@@ -181,17 +181,18 @@ void SecondaryVertex::initializeTime(const reco::VertexCompositePtrCandidate& sv
 void SecondaryVertex::fill(std::map<TString, TH1F*>& histos1,
     std::map<TString, TH2F*>& histos2, TString prefix) {
 
+  float nTrkWithMTDTime = 0;
   for (unsigned int iTrk = 0; iTrk < nTracks(); iTrk++) {
     // MTD timing
     TString suffix = "";
     if (abs(trk_eta_->at(iTrk)) <= 1.5) suffix += "BTL";
     else suffix += "ETL";
+
+    // 1D histograms
     histos1[prefix + "_trk_tval" + suffix]->Fill(trk_tval_->at(iTrk));
     histos1[prefix + "_trk_terr" + suffix]->Fill(trk_terr_->at(iTrk));
     histos1[prefix + "_trk_tsig" + suffix]->Fill(trk_tsig_->at(iTrk));
     // histos1[prefix + "_trk_tqual" + suffix]->Fill(trk_tqual_->at(iTrk));
-
-    // 1D histograms
     histos1[prefix + "_trk_pt"]->Fill(trk_pt_->at(iTrk));
     histos1[prefix + "_trk_pt2"]->Fill(trk_pt2_->at(iTrk));
     histos1[prefix + "_trk_eta"]->Fill(trk_eta_->at(iTrk));
@@ -211,14 +212,17 @@ void SecondaryVertex::fill(std::map<TString, TH1F*>& histos1,
     histos1[prefix + "_trk_chi2dof"]->Fill(trk_chi2dof_->at(iTrk));
 
     // 2D histograms
-    histos2[prefix + "_trk_pt_tval"]->Fill(trk_pt_->at(iTrk), trk_tval_->at(iTrk));
-    histos2[prefix + "_trk_pt_terr"]->Fill(trk_pt_->at(iTrk), trk_terr_->at(iTrk));
-    histos2[prefix + "_trk_pt_tsig"]->Fill(trk_pt_->at(iTrk), trk_tsig_->at(iTrk));
-    // histos2[prefix + "_trk_pt_tqual"]->Fill(trk_pt_->at(iTrk), trk_tqual_->at(iTrk));
-    histos2[prefix + "_trk_eta_tval"]->Fill(trk_eta_->at(iTrk), trk_tval_->at(iTrk));
-    histos2[prefix + "_trk_eta_terr"]->Fill(trk_eta_->at(iTrk), trk_terr_->at(iTrk));
-    histos2[prefix + "_trk_eta_tsig"]->Fill(trk_eta_->at(iTrk), trk_tsig_->at(iTrk));
-    // histos2[prefix + "_trk_eta_tqual"]->Fill(trk_eta_->at(iTrk), trk_tqual_->at(iTrk));
+    if (trk_terr_->at(iTrk) > 0.0) {
+      nTrkWithMTDTime++;
+      histos2[prefix + "_trk_pt_tval" + suffix]->Fill(trk_pt_->at(iTrk), trk_tval_->at(iTrk));
+      histos2[prefix + "_trk_pt_terr" + suffix]->Fill(trk_pt_->at(iTrk), trk_terr_->at(iTrk));
+      histos2[prefix + "_trk_pt_tsig" + suffix]->Fill(trk_pt_->at(iTrk), trk_tsig_->at(iTrk));
+      // histos2[prefix + "_trk_pt_tqual" + suffix]->Fill(trk_pt_->at(iTrk), trk_tqual_->at(iTrk));
+      histos2[prefix + "_trk_eta_tval"]->Fill(trk_eta_->at(iTrk), trk_tval_->at(iTrk));
+      histos2[prefix + "_trk_eta_terr"]->Fill(trk_eta_->at(iTrk), trk_terr_->at(iTrk));
+      histos2[prefix + "_trk_eta_tsig"]->Fill(trk_eta_->at(iTrk), trk_tsig_->at(iTrk));
+      // histos2[prefix + "_trk_eta_tqual"]->Fill(trk_eta_->at(iTrk), trk_tqual_->at(iTrk));
+    }
   }
 
   histos1[prefix + "_x"]->Fill(x_);
@@ -246,13 +250,20 @@ void SecondaryVertex::fill(std::map<TString, TH1F*>& histos1,
   histos1[prefix + "_ndof"]->Fill(ndof_);
   histos1[prefix + "_chi2dof"]->Fill(chi2dof_);
   histos1[prefix + "_ntrk"]->Fill(ntrk_);
+  histos1[prefix + "_mtdEff"]->Fill(nTrkWithMTDTime / (float) ntrk_);
 
+  // MTD timing
+  TString suffix = "";
+  if (abs(eta_) <= 1.5) suffix += "BTL";
+  else suffix += "ETL";
+
+  // 2D histograms
   histos2[prefix + "_eta_tavg"]->Fill(eta_, tavg_);
   histos2[prefix + "_eta_trange"]->Fill(eta_, trange_);
-  histos2[prefix + "_trange_pt"]->Fill(trange_, pt_);
-  histos2[prefix + "_trange_pt2"]->Fill(trange_, pt2_);
-  histos2[prefix + "_trange_dxy"]->Fill(trange_, dxy_);
-  histos2[prefix + "_trange_dxysig"]->Fill(trange_, dxysig_);
-  histos2[prefix + "_trange_d3d"]->Fill(trange_, d3d_);
-  histos2[prefix + "_trange_d3dsig"]->Fill(trange_, d3dsig_);
+  histos2[prefix + "_trange" + suffix + "_pt"]->Fill(trange_, pt_);
+  histos2[prefix + "_trange" + suffix + "_pt2"]->Fill(trange_, pt2_);
+  histos2[prefix + "_trange" + suffix + "_dxy"]->Fill(trange_, dxy_);
+  histos2[prefix + "_trange" + suffix + "_dxysig"]->Fill(trange_, dxysig_);
+  histos2[prefix + "_trange" + suffix + "_d3d"]->Fill(trange_, d3d_);
+  histos2[prefix + "_trange" + suffix + "_d3dsig"]->Fill(trange_, d3dsig_);
 }

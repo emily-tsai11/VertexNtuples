@@ -9,7 +9,7 @@ style1 = "hist"
 style2 = "p e x0"
 
 
-def plot(hists, labels, colors, styles, xlabel, ylabel, save_path, save_name, header="", log=False):
+def plot(hists, labels, colors, markers, styles, xlabel, ylabel, save_path, save_name, header="", log=False):
 
     CMS.SetLumi("")
     CMS.SetEnergy("14")
@@ -28,7 +28,6 @@ def plot(hists, labels, colors, styles, xlabel, ylabel, save_path, save_name, he
         right,
         0.01 if log else 0,
         50 * maxi if log else 1.6 * maxi,
-        # xlabel, "Normalized Events", square=CMS.kRectangular, extraSpace=0.01, iPos=0)
         xlabel, ylabel, square=CMS.kRectangular, extraSpace=0.03, iPos=0)
     canv.SetLogy(log)
     leg = CMS.cmsLeg(0.3, 0.89 - 0.036 * 7, 0.89, 0.89, textSize=0.034)
@@ -38,10 +37,10 @@ def plot(hists, labels, colors, styles, xlabel, ylabel, save_path, save_name, he
     for iHist, hist in enumerate(hists):
         h = hist.Clone()
         # h.Scale(1.0/h.Integral())
-        CMS.cmsDraw(h, style1, mcolor=colors[iHist], fstyle=0, lwidth=3, lstyle=styles[iHist])
+        CMS.cmsDraw(h, style1, mcolor=colors[iHist], fstyle=0, lwidth=3, lstyle=styles[iHist], marker=markers[iHist])
         final_hists.append(h)
         points = h.Clone()
-        CMS.cmsDraw(points, style2, mcolor=colors[iHist], fstyle=0, lwidth=3)
+        CMS.cmsDraw(points, style2, mcolor=colors[iHist], fstyle=0, lwidth=3, marker=markers[iHist])
         final_hists.append(points)
         hlabel = "%s, #mu=%.2f, #sigma=%.2f" % (labels[iHist], h.GetMean(), h.GetStdDev())
         if "pdgIdBin" in save_name:
@@ -70,8 +69,8 @@ def plot(hists, labels, colors, styles, xlabel, ylabel, save_path, save_name, he
     CMS.SaveCanvas(canv, save_path+"/"+save_name+".pdf")
 
 
-def plot_ratio(hists, labels, ratio_style, ratio_labels, colors, styles, xlabel, ylabel, ratiolabel, save_path, save_name,
-        header="", log=False):
+def plot_ratio(hists, labels, ratio_style, ratio_labels, colors, markers, styles,
+        xlabel, ylabel, ratiolabel, save_path, save_name, header="", log=False):
 
     CMS.SetLumi("")
     CMS.SetEnergy("14")
@@ -85,19 +84,24 @@ def plot_ratio(hists, labels, ratio_style, ratio_labels, colors, styles, xlabel,
         # temp.Scale(1.0/hist.Integral())
         maxi = max(maxi, temp.GetMaximum())
 
+    ratioMax = 2.0
+    if "SecondaryVertex" in save_path and "pt" in save_name:
+        ratioMax = 4.0
+        log = True
+    if "Track" in save_path and "terr" in save_name:
+        ratioMax = 8.0
     dicanv = CMS.cmsDiCanvas(
         save_name + "_ratio",
         left,
         right,
-        0.8 if log else 0,
+        5e-6 if log else 0,
         50 * maxi if log else 1.6 * maxi,
-        0.0, 2.0,
-        # xlabel, "Normalized Events",
+        0.0, ratioMax,
         xlabel, ylabel,
         ratiolabel,
         square=CMS.kRectangular, extraSpace=0.01, iPos=0)
     topcanv = dicanv.cd(1)
-    dicanv.SetLogy(log)
+    topcanv.SetLogy(log)
     leg = CMS.cmsLeg(0.3, 0.89 - 0.036 * 7, 0.89, 0.89, textSize=0.034)
     if len(header): CMS.cmsHeader(leg, header, textSize=0.034)
 
@@ -106,10 +110,10 @@ def plot_ratio(hists, labels, ratio_style, ratio_labels, colors, styles, xlabel,
     for iHist, hist in enumerate(hists):
         h = hist.Clone()
         # h.Scale(1.0/h.Integral())
-        CMS.cmsDraw(h, style1, mcolor=colors[iHist], fstyle=0, lwidth=3, lstyle=styles[iHist])
+        CMS.cmsDraw(h, style1, mcolor=colors[iHist], fstyle=0, lwidth=3, lstyle=styles[iHist], marker=markers[iHist])
         final_hists.append(h)
         points = h.Clone()
-        CMS.cmsDraw(points, style2, mcolor=colors[iHist], fstyle=0, lwidth=3)
+        CMS.cmsDraw(points, style2, mcolor=colors[iHist], fstyle=0, lwidth=3, marker=markers[iHist])
         final_points.append(points)
         hlabel = "%s, #mu=%.2f, #sigma=%.2f" % (labels[iHist], h.GetMean(), h.GetStdDev())
         if "pdgIdBin" in save_name:
@@ -120,7 +124,7 @@ def plot_ratio(hists, labels, ratio_style, ratio_labels, colors, styles, xlabel,
     CMS.GetcmsCanvasHist(topcanv).GetYaxis().SetLabelSize(0.05)
     CMS.GetcmsCanvasHist(topcanv).GetYaxis().SetTitleSize(0.06)
     CMS.GetcmsCanvasHist(topcanv).GetYaxis().SetMaxDigits(2)
-    if maxi < 100.0: CMS.GetcmsCanvasHist(topcanv).GetYaxis().SetNoExponent()
+    if maxi < 100.0 and not log: CMS.GetcmsCanvasHist(topcanv).GetYaxis().SetNoExponent()
     if maxi > 100.0: ROOT.TGaxis.SetExponentOffset(-0.055, 0.015, "Y")
 
     botcanv = dicanv.cd(2)
@@ -130,34 +134,34 @@ def plot_ratio(hists, labels, ratio_style, ratio_labels, colors, styles, xlabel,
             if iHist == 0: continue # Skip nominal case
             ratio = final_hists[iHist].Clone()
             ratio.Divide(final_hists[0])
-            CMS.cmsDraw(ratio, style1, mcolor=colors[iHist], fstyle=0, lwidth=3)
+            CMS.cmsDraw(ratio, style1, mcolor=colors[iHist], fstyle=0, lwidth=3, marker=markers[iHist])
             final_ratio.append(ratio)
     elif ratio_style == 1: # exactly 6 histograms
         legRatio = CMS.cmsLeg(0.89 - 0.25 * 3, 0.89 - 0.11, 0.89, 0.89, textSize=0.07, columns=3)
         # -------- #
         ratio = final_hists[0].Clone()
         ratio.Divide(final_hists[3])
-        CMS.cmsDraw(ratio, style1, mcolor=colors[0], fstyle=0, lwidth=3, lstyle=styles[0])
+        CMS.cmsDraw(ratio, style1, mcolor=colors[0], fstyle=0, lwidth=3, lstyle=styles[0], marker=markers[iHist])
         points = ratio.Clone()
-        CMS.cmsDraw(points, style2, mcolor=colors[0], fstyle=0, lwidth=3)
+        CMS.cmsDraw(points, style2, mcolor=colors[0], fstyle=0, lwidth=3, marker=markers[iHist])
         final_ratio.append(ratio)
         final_ratio.append(points)
         legRatio.AddEntry(ratio, ratio_labels[0], "PLE")
         # -------- #
         ratio = final_hists[1].Clone()
         ratio.Divide(final_hists[4])
-        CMS.cmsDraw(ratio, style1, mcolor=colors[1], fstyle=0, lwidth=3, lstyle=styles[1])
+        CMS.cmsDraw(ratio, style1, mcolor=colors[1], fstyle=0, lwidth=3, lstyle=styles[1], marker=markers[iHist])
         points = ratio.Clone()
-        CMS.cmsDraw(points, style2, mcolor=colors[1], fstyle=0, lwidth=3)
+        CMS.cmsDraw(points, style2, mcolor=colors[1], fstyle=0, lwidth=3, marker=markers[iHist])
         final_ratio.append(ratio)
         final_ratio.append(points)
         legRatio.AddEntry(ratio, ratio_labels[1], "PLE")
         # -------- #
         ratio = final_hists[2].Clone()
         ratio.Divide(final_hists[5])
-        CMS.cmsDraw(ratio, style1, mcolor=colors[2], fstyle=0, lwidth=3, lstyle=styles[2])
+        CMS.cmsDraw(ratio, style1, mcolor=colors[2], fstyle=0, lwidth=3, lstyle=styles[2], marker=markers[iHist])
         points = ratio.Clone()
-        CMS.cmsDraw(points, style2, mcolor=colors[2], fstyle=0, lwidth=3)
+        CMS.cmsDraw(points, style2, mcolor=colors[2], fstyle=0, lwidth=3, marker=markers[iHist])
         final_ratio.append(ratio)
         final_ratio.append(points)
         legRatio.AddEntry(ratio, ratio_labels[2], "PLE")
@@ -167,18 +171,18 @@ def plot_ratio(hists, labels, ratio_style, ratio_labels, colors, styles, xlabel,
         # -------- #
         ratio = final_hists[0].Clone()
         ratio.Divide(final_hists[2])
-        CMS.cmsDraw(ratio, style1, mcolor=colors[0], fstyle=0, lwidth=3, lstyle=styles[0])
+        CMS.cmsDraw(ratio, style1, mcolor=colors[0], fstyle=0, lwidth=3, lstyle=styles[0], marker=markers[iHist])
         points = ratio.Clone()
-        CMS.cmsDraw(points, style2, mcolor=colors[0], fstyle=0, lwidth=3)
+        CMS.cmsDraw(points, style2, mcolor=colors[0], fstyle=0, lwidth=3, marker=markers[iHist])
         final_ratio.append(ratio)
         final_ratio.append(points)
         legRatio.AddEntry(ratio, ratio_labels[0], "PLE")
         # -------- #
         ratio = final_hists[1].Clone()
         ratio.Divide(final_hists[3])
-        CMS.cmsDraw(ratio, style1, mcolor=colors[1], fstyle=0, lwidth=3, lstyle=styles[1])
+        CMS.cmsDraw(ratio, style1, mcolor=colors[1], fstyle=0, lwidth=3, lstyle=styles[1], marker=markers[iHist])
         points = ratio.Clone()
-        CMS.cmsDraw(points, style2, mcolor=colors[1], fstyle=0, lwidth=3)
+        CMS.cmsDraw(points, style2, mcolor=colors[1], fstyle=0, lwidth=3, marker=markers[iHist])
         final_ratio.append(ratio)
         final_ratio.append(points)
         legRatio.AddEntry(ratio, ratio_labels[1], "PLE")

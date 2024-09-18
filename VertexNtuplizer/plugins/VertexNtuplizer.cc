@@ -241,6 +241,7 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   std::map<TString, std::vector<float>> vars1_vtx_sv_;
   vars1_vtx_sv_["tavg"] = std::vector<float>{(float) nbins_, -800.0, 1000.0}; // in ps
   vars1_vtx_sv_["trange"] = std::vector<float>{(float) nbins_, 0.0, 1600.0}; // in ps
+  vars1_vtx_sv_["mtdEff"] = std::vector<float>{(float) nbins_, 0.0, 1.0};
 
   // -------- Jets only -------- //
   std::map<TString, std::vector<float>> vars1_jet_;
@@ -326,25 +327,35 @@ VertexNtuplizer::VertexNtuplizer(const edm::ParameterSet& iConfig) :
   // ----------------------------------------------------------------------- //
 
   // -------- Tracks only -------- //
-  vars2_trks_["pt_tval"] = std::vector<float>{(float) nbins_, trkPtMin_, trkPtMax, (float) nbins_, -800.0, 1000.0}; // in ps
-  vars2_trks_["pt_terr"] = std::vector<float>{(float) nbins_, trkPtMin_, trkPtMax, (float) nbins_, 0.0, 80.0}; // in ps
-  vars2_trks_["pt_tsig"] = std::vector<float>{(float) nbins_, trkPtMin_, trkPtMax, (float) nbins_, -20.0, 20.0};
-  // vars2_trks_["pt_tqual"] = std::vector<float>{(float) nbins_, trkPtMin_, trkPtMax, (float) nbins_, 0.0, 1.0};
   vars2_trks_["eta_tval"] = std::vector<float>{(float) nbins_, -absEtaMax_, absEtaMax_, (float) nbins_, -800.0, 1000.0}; // in ps
   vars2_trks_["eta_terr"] = std::vector<float>{(float) nbins_, -absEtaMax_, absEtaMax_, (float) nbins_, 0.0, 80.0}; // in ps
   vars2_trks_["eta_tsig"] = std::vector<float>{(float) nbins_, -absEtaMax_, absEtaMax_, (float) nbins_, -20.0, 20.0};
   // vars2_trks_["eta_tqual"] = std::vector<float>{(float) nbins_, -absEtaMax_, absEtaMax_, (float) nbins_, 0.0, 1.0};
+  vars2_trks_["pt_tvalBTL"] = std::vector<float>{(float) nbins_, trkPtMin_, trkPtMax, (float) nbins_, -800.0, 1000.0}; // in ps
+  vars2_trks_["pt_terrBTL"] = std::vector<float>{(float) nbins_, trkPtMin_, trkPtMax, (float) nbins_, 0.0, 80.0}; // in ps
+  vars2_trks_["pt_tsigBTL"] = std::vector<float>{(float) nbins_, trkPtMin_, trkPtMax, (float) nbins_, -20.0, 20.0};
+  // vars2_trks_["pt_tqualBTL"] = std::vector<float>{(float) nbins_, trkPtMin_, trkPtMax, (float) nbins_, 0.0, 1.0};
+  vars2_trks_["pt_tvalETL"] = std::vector<float>{(float) nbins_, trkPtMin_, trkPtMax, (float) nbins_, -800.0, 1000.0}; // in ps
+  vars2_trks_["pt_terrETL"] = std::vector<float>{(float) nbins_, trkPtMin_, trkPtMax, (float) nbins_, 0.0, 80.0}; // in ps
+  vars2_trks_["pt_tsigETL"] = std::vector<float>{(float) nbins_, trkPtMin_, trkPtMax, (float) nbins_, -20.0, 20.0};
+  // vars2_trks_["pt_tqualETL"] = std::vector<float>{(float) nbins_, trkPtMin_, trkPtMax, (float) nbins_, 0.0, 1.0};
 
   // -------- Vertices only -------- //
   vars2_vtxs_["eta_tavg"] = std::vector<float>{(float) nbins_, -absEtaMax_, absEtaMax_, (float) nbins_, -800.0, 1000.0}; // in ps
   vars2_vtxs_["eta_trange"] = std::vector<float>{(float) nbins_, -absEtaMax_, absEtaMax_, (float) nbins_, 0.0, 1600.0}; // in ps
-  vars2_vtxs_["trange_pt"] = std::vector<float>{(float) nbins_, 0.0, 1600.0, (float) nbins_, vtxPtMin, vtxPtMax};
-  vars2_vtxs_["trange_pt2"] = std::vector<float>{(float) nbins_, 0.0, 1600.0, (float) nbins_, vtxPtMin*vtxPtMin, vtxPtMax*vtxPtMax};
+  vars2_vtxs_["trangeBTL_pt"] = std::vector<float>{(float) nbins_, 0.0, 1600.0, (float) nbins_, vtxPtMin, vtxPtMax};
+  vars2_vtxs_["trangeBTL_pt2"] = std::vector<float>{(float) nbins_, 0.0, 1600.0, (float) nbins_, vtxPtMin*vtxPtMin, vtxPtMax*vtxPtMax};
+  vars2_vtxs_["trangeETL_pt"] = std::vector<float>{(float) nbins_, 0.0, 1600.0, (float) nbins_, vtxPtMin, vtxPtMax};
+  vars2_vtxs_["trangeETL_pt2"] = std::vector<float>{(float) nbins_, 0.0, 1600.0, (float) nbins_, vtxPtMin*vtxPtMin, vtxPtMax*vtxPtMax};
   // From primary vertex (in cm)
-  vars2_vtxs_["trange_dxy"] = std::vector<float>{(float) nbins_, 0.0, 1600.0, (float) nbins_, 0.0, 4.0};
-  vars2_vtxs_["trange_dxysig"] = std::vector<float>{(float) nbins_, 0.0, 1600.0, (float) nbins_, 0.0, 80.0};
-  vars2_vtxs_["trange_d3d"] = std::vector<float>{(float) nbins_, 0.0, 1600.0, (float) nbins_, 0.0, 20.0};
-  vars2_vtxs_["trange_d3dsig"] = std::vector<float>{(float) nbins_, 0.0, 1600.0, (float) nbins_, 0.0, 200.0};
+  vars2_vtxs_["trangeBTL_dxy"] = std::vector<float>{(float) nbins_, 0.0, 1600.0, (float) nbins_, 0.0, 4.0};
+  vars2_vtxs_["trangeBTL_dxysig"] = std::vector<float>{(float) nbins_, 0.0, 1600.0, (float) nbins_, 0.0, 80.0};
+  vars2_vtxs_["trangeBTL_d3d"] = std::vector<float>{(float) nbins_, 0.0, 1600.0, (float) nbins_, 0.0, 20.0};
+  vars2_vtxs_["trangeBTL_d3dsig"] = std::vector<float>{(float) nbins_, 0.0, 1600.0, (float) nbins_, 0.0, 200.0};
+  vars2_vtxs_["trangeETL_dxy"] = std::vector<float>{(float) nbins_, 0.0, 1600.0, (float) nbins_, 0.0, 4.0};
+  vars2_vtxs_["trangeETL_dxysig"] = std::vector<float>{(float) nbins_, 0.0, 1600.0, (float) nbins_, 0.0, 80.0};
+  vars2_vtxs_["trangeETL_d3d"] = std::vector<float>{(float) nbins_, 0.0, 1600.0, (float) nbins_, 0.0, 20.0};
+  vars2_vtxs_["trangeETL_d3dsig"] = std::vector<float>{(float) nbins_, 0.0, 1600.0, (float) nbins_, 0.0, 200.0};
 
   // -------- Tracks & vertices -------- //
   // Between matched GenVertex/SecondaryVertex or daughter/pfcandidate (in cm)
@@ -628,7 +639,7 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     const reco::TrackRef& trkRef = pfc.trackRef();
     if (!trkRef) continue;
     if (trkRef->charge() == 0) continue;
-    if (trackT0FromBS_[trkRef] != 0.0 && trackSigmaT0FromBS_[trkRef] != -1.0) {
+    if (trackSigmaT0FromBS_[trkRef] > 0.0) {
       TString suffix = "";
       if (abs(trkRef->eta()) <= 1.5) suffix += "BTL";
       else suffix += "ETL";
@@ -637,7 +648,7 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
       histos1_["pfCandidate_bs_tsig" + suffix]->Fill(trackT0FromBS_[trkRef] / trackSigmaT0FromBS_[trkRef]);
       // histos1_["pfCandidate_bs_tqual" + suffix]->Fill(trackQualityFromBS_[trkRef]);
     }
-    if (trackT0FromPV_[trkRef] != 0.0 && trackSigmaT0FromPV_[trkRef] != -1.0) {
+    if (trackSigmaT0FromPV_[trkRef] > 0.0) {
       TString suffix = "";
       if (abs(trkRef->eta()) <= 1.5) suffix += "BTL";
       else suffix += "ETL";

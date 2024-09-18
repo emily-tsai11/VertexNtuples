@@ -1,4 +1,8 @@
-gv_names = ["gv", "gvB", "gvD"]
+gv_names = [
+  "gv",
+  "gvB",
+  "gvD"
+]
 
 gv_vars = [
   "trk_pt",

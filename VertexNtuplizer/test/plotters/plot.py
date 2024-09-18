@@ -21,45 +21,83 @@ nevents_TTPU200 = dir_TTPU200.Get(refHist).GetEntries()
 ratio = nevents_TTnoPU / nevents_TTPU200
 print("There are %d TTnoPU events and %d TTPU200 events. The ratio is %.2f." % (nevents_TTnoPU, nevents_TTPU200, ratio))
 
+# Maximum matching efficiencies
+histMaxMatchedWithInclusiveNoPU = dir_TTnoPU.Get("maxMatchedWithInclusive")
+histMaxMatchedWithSlimmedNoPU = dir_TTnoPU.Get("maxMatchedWithSlimmed")
+histMaxMatchedWithInclusivePU200 = dir_TTPU200.Get("maxMatchedWithInclusive")
+histMaxMatchedWithSlimmedPU200 = dir_TTPU200.Get("maxMatchedWithSlimmed")
+histnGVNoPU = dir_TTnoPU.Get("ngv")
+histnGVPU200 = dir_TTPU200.Get("ngv")
+
+maxMatchedWithInclusiveNoPU = 0.0
+maxMatchedWithSlimmedNoPU = 0.0
+maxMatchedWithInclusivePU200 = 0.0
+maxMatchedWithSlimmedPU200 = 0.0
+nGVNoPU = 0.0
+nGVPU200 = 0.0
+for i in range(1, histMaxMatchedWithInclusiveNoPU.GetNbinsX()):
+  maxMatchedWithInclusiveNoPU += histMaxMatchedWithInclusiveNoPU.GetBinContent(i)*(i-1)
+for i in range(1, histMaxMatchedWithSlimmedNoPU.GetNbinsX()):
+  maxMatchedWithSlimmedNoPU += histMaxMatchedWithSlimmedNoPU.GetBinContent(i)*(i-1)
+for i in range(1, histMaxMatchedWithInclusivePU200.GetNbinsX()):
+  maxMatchedWithInclusivePU200 += histMaxMatchedWithInclusivePU200.GetBinContent(i)*(i-1)
+for i in range(1, histMaxMatchedWithSlimmedPU200.GetNbinsX()):
+  maxMatchedWithSlimmedPU200 += histMaxMatchedWithSlimmedPU200.GetBinContent(i)*(i-1)
+for i in range(1, histnGVNoPU.GetNbinsX()):
+  nGVNoPU += histnGVNoPU.GetBinContent(i)*(i-1)
+for i in range(1, histnGVPU200.GetNbinsX()):
+  nGVPU200 += histnGVPU200.GetBinContent(i)*(i-1)
+maxMatchedWithInclusiveNoPU /= nGVNoPU
+maxMatchedWithSlimmedNoPU /= nGVNoPU
+maxMatchedWithInclusivePU200 /= nGVPU200
+maxMatchedWithSlimmedPU200 /= nGVPU200
+
+print("Maximum possible matching efficiency with inclusive collection with no PU  = %.2f percent" % (maxMatchedWithInclusiveNoPU*100.0))
+print("Maximum possible matching efficiency with slimmed collection with no PU    = %.2f percent" % (maxMatchedWithSlimmedNoPU*100.0))
+print("Maximum possible matching efficiency with inclusive collection with PU 200 = %.2f percent" % (maxMatchedWithInclusivePU200*100.0))
+print("Maximum possible matching efficiency with slimmed collection with PU 200   = %.2f percent" % (maxMatchedWithSlimmedPU200*100.0))
+
 # Plot PF candidate times
 start = time.time()
-h1 = dir_TTnoPU.Get("pfCandidate_bs_tval").Clone()
-h2 = dir_TTnoPU.Get("pfCandidate_bs_terr").Clone()
-h3 = dir_TTnoPU.Get("pfCandidate_bs_tsig").Clone()
-h4 = dir_TTnoPU.Get("pfCandidate_pv_tval").Clone()
-h5 = dir_TTnoPU.Get("pfCandidate_pv_terr").Clone()
-h6 = dir_TTnoPU.Get("pfCandidate_pv_tsig").Clone()
-h7 = dir_TTPU200.Get("pfCandidate_bs_tval").Clone()
-h8 = dir_TTPU200.Get("pfCandidate_bs_terr").Clone()
-h9 = dir_TTPU200.Get("pfCandidate_bs_tsig").Clone()
-h10 = dir_TTPU200.Get("pfCandidate_pv_tval").Clone()
-h11 = dir_TTPU200.Get("pfCandidate_pv_terr").Clone()
-h12 = dir_TTPU200.Get("pfCandidate_pv_tsig").Clone()
-h1.Scale(1.0 / h1.Integral())
-h2.Scale(1.0 / h2.Integral())
-h3.Scale(1.0 / h3.Integral())
-h4.Scale(1.0 / h4.Integral())
-h5.Scale(1.0 / h5.Integral())
-h6.Scale(1.0 / h6.Integral())
-h7.Scale(1.0 / h7.Integral())
-h8.Scale(1.0 / h8.Integral())
-h9.Scale(1.0 / h9.Integral())
-h10.Scale(1.0 / h10.Integral())
-h11.Scale(1.0 / h11.Integral())
-h12.Scale(1.0 / h12.Integral())
-labels = [ttnoPU+", BS extrapolation", ttnoPU+", PV extrapolation", ttPU200+", BS extrapolation", ttPU200+", PV extrapolation"]
-ratio_labels = ["BS extrapolation", "PV extrapolation"]
-colors = [COLORS[0], COLORS[2], COLORS[0], COLORS[2]]
-styles = [ROOT.kSolid, ROOT.kSolid, ROOT.kDashed, ROOT.kDashed]
-hists = [h1, h4, h7, h10]
-plot(hists, labels, colors, styles, "Time [ps]", "Normalized PF candidates", save_path+"Tracks", "tval")
-plot_ratio(hists, labels, 2, ratio_labels, colors, styles, "Time [ps]", "Normalized PF candidates", "PU0/PU200", save_path+"Tracks", "tval")
-hists = [h2, h5, h8, h11]
-plot(hists, labels, colors, styles, "Time error [ps]", "Normalized PF candidates", save_path+"Tracks", "terr")
-plot_ratio(hists, labels, 2, ratio_labels, colors, styles, "Time error [ps]", "Normalized PF candidates", "PU0/PU200", save_path+"Tracks", "terr")
-hists = [h3, h6, h9, h12]
-plot(hists, labels, colors, styles, "Time significance", "Normalized PF candidates", save_path+"Tracks", "tsig")
-plot_ratio(hists, labels, 2, ratio_labels, colors, styles, "Time significance", "Normalized PF candidates", "PU0/PU200", save_path+"Tracks", "tsig")
+for mtdRegion in ["BTL", "ETL"]:
+  h1 = dir_TTnoPU.Get("pfCandidate_bs_tval"+mtdRegion).Clone()
+  h2 = dir_TTnoPU.Get("pfCandidate_bs_terr"+mtdRegion).Clone()
+  h3 = dir_TTnoPU.Get("pfCandidate_bs_tsig"+mtdRegion).Clone()
+  h4 = dir_TTnoPU.Get("pfCandidate_pv_tval"+mtdRegion).Clone()
+  h5 = dir_TTnoPU.Get("pfCandidate_pv_terr"+mtdRegion).Clone()
+  h6 = dir_TTnoPU.Get("pfCandidate_pv_tsig"+mtdRegion).Clone()
+  h7 = dir_TTPU200.Get("pfCandidate_bs_tval"+mtdRegion).Clone()
+  h8 = dir_TTPU200.Get("pfCandidate_bs_terr"+mtdRegion).Clone()
+  h9 = dir_TTPU200.Get("pfCandidate_bs_tsig"+mtdRegion).Clone()
+  h10 = dir_TTPU200.Get("pfCandidate_pv_tval"+mtdRegion).Clone()
+  h11 = dir_TTPU200.Get("pfCandidate_pv_terr"+mtdRegion).Clone()
+  h12 = dir_TTPU200.Get("pfCandidate_pv_tsig"+mtdRegion).Clone()
+  h1.Scale(1.0 / h1.Integral())
+  h2.Scale(1.0 / h2.Integral())
+  h3.Scale(1.0 / h3.Integral())
+  h4.Scale(1.0 / h4.Integral())
+  h5.Scale(1.0 / h5.Integral())
+  h6.Scale(1.0 / h6.Integral())
+  h7.Scale(1.0 / h7.Integral())
+  h8.Scale(1.0 / h8.Integral())
+  h9.Scale(1.0 / h9.Integral())
+  h10.Scale(1.0 / h10.Integral())
+  h11.Scale(1.0 / h11.Integral())
+  h12.Scale(1.0 / h12.Integral())
+  labels = [ttnoPU+", BS extrapolation", ttnoPU+", PV extrapolation", ttPU200+", BS extrapolation", ttPU200+", PV extrapolation"]
+  ratio_labels = ["BS extrapolation", "PV extrapolation"]
+  colors = [CMS.p8.kOrange, CMS.p8.kBlue, CMS.p8.kOrange, CMS.p8.kBlue]
+  styles = [ROOT.kSolid, ROOT.kSolid, ROOT.kDashed, ROOT.kDashed]
+  markers = [26, 26, 32, 32]
+  hists = [h1, h4, h7, h10]
+  plot(hists, labels, colors, markers, styles, "Time [ps]", "Normalized PF candidates", save_path+"Tracks", "tval"+mtdRegion)
+  plot_ratio(hists, labels, 2, ratio_labels, colors, markers, styles, "Time [ps]", "Normalized PF candidates", "PU0/PU200", save_path+"Tracks", "tval"+mtdRegion)
+  hists = [h2, h5, h8, h11]
+  plot(hists, labels, colors, markers, styles, "Time error [ps]", "Normalized PF candidates", save_path+"Tracks", "terr"+mtdRegion)
+  plot_ratio(hists, labels, 2, ratio_labels, colors, markers, styles, "Time error [ps]", "Normalized PF candidates", "PU0/PU200", save_path+"Tracks", "terr"+mtdRegion)
+  hists = [h3, h6, h9, h12]
+  plot(hists, labels, colors, markers, styles, "Time significance", "Normalized PF candidates", save_path+"Tracks", "tsig"+mtdRegion)
+  plot_ratio(hists, labels, 2, ratio_labels, colors, markers, styles, "Time significance", "Normalized PF candidates", "PU0/PU200", save_path+"Tracks", "tsig"+mtdRegion)
 end = time.time()
 print("PF candidate plotting time = %.2fs" % (end-start))
 
@@ -74,15 +112,16 @@ for name in gv_names:
 start = time.time()
 for iVar, var in enumerate(gv_vars):
   suffix = "_" + var
-  hists = [n["gv"+suffix], n["gvB"+suffix], n["gvD"+suffix], p["gv"+suffix], p["gvB"+suffix], p["gvD"+suffix]]
-  labels = [ttnoPU+", B & D mother", ttnoPU+", B mother", ttnoPU+", D mother", ttPU200+", B & D mother", ttPU200+", B mother", ttPU200+", D mother"]
-  ratio_labels = ["B & D mother", "B mother", "D mother"]
-  colors = [COLORS[0], COLORS[1], COLORS[2], COLORS[0], COLORS[1], COLORS[2]]
-  styles = [ROOT.kSolid, ROOT.kSolid, ROOT.kSolid, ROOT.kDashed, ROOT.kDashed, ROOT.kDashed]
+  hists = [n["gvB"+suffix], n["gvD"+suffix], p["gvB"+suffix], p["gvD"+suffix]]
+  labels = [ttnoPU+", B mother", ttnoPU+", D mother", ttPU200+", B mother", ttPU200+", D mother"]
+  ratio_labels = ["B mother", "D mother"]
+  colors = [COLORS[4], COLORS[3], COLORS[4], COLORS[3]]
+  styles = [ROOT.kSolid, ROOT.kSolid, ROOT.kDashed, ROOT.kDashed]
+  markers = [26, 26, 32, 32]
   ylabel = "Gen Vertices"
   if "trk_" in var: ylabel = "Gen Vertex Daughters"
-  plot(hists, labels, colors, styles, gv_var_labels[iVar], ylabel, save_path+"GenVertex", var)
-  plot_ratio(hists, labels, 1, ratio_labels, colors, styles, gv_var_labels[iVar], ylabel, "PU0/PU200", save_path+"GenVertex", var)
+  plot(hists, labels, colors, markers, styles, gv_var_labels[iVar], ylabel, save_path+"GenVertex", var)
+  plot_ratio(hists, labels, 2, ratio_labels, colors, markers, styles, gv_var_labels[iVar], ylabel, "PU0/PU200", save_path+"GenVertex", var)
 end = time.time()
 print("GenVertex plotting time = %.2fs" % (end-start))
 
@@ -90,11 +129,8 @@ print("GenVertex plotting time = %.2fs" % (end-start))
 for name in sv_names:
   for var in sv_vars:
     histName = name + "_" + var
-    getName = histName
-    if "tval" in var or "terr" in var or "tsig" in var:
-      getName = name + "MTDPV_" + var
-    n[histName] = dir_TTnoPU.Get(getName).Clone()
-    p[histName] = dir_TTPU200.Get(getName).Clone()
+    n[histName] = dir_TTnoPU.Get(histName).Clone()
+    p[histName] = dir_TTPU200.Get(histName).Clone()
     if n[histName].Integral() != 0:
       n[histName].Scale(1.0 / n[histName].Integral())
     if p[histName].Integral() != 0:
@@ -102,26 +138,29 @@ for name in sv_names:
     # p[histName].Scale(ratio)
     # p[histName].SetEntries(p[histName].GetEntries() * ratio)
 start = time.time()
-for iVar, var in enumerate(sv_vars):
-  suffix = "_" + var
-  hists = [n["svInclusive"+suffix], n["svSlimmed"+suffix], p["svInclusive"+suffix], p["svSlimmed"+suffix]]
-  labels = [ttnoPU+", inclusive", ttnoPU+", slimmed", ttPU200+", inclusive", ttPU200+", slimmed"]
-  ratio_labels = ["inclusive", "slimmed"]
-  colors = [COLORS[0], COLORS[2], COLORS[0], COLORS[2]]
-  styles = [ROOT.kSolid, ROOT.kSolid, ROOT.kDashed, ROOT.kDashed]
-  ylabel = "Normalized Secondary Vertices"
-  if "trk_" in var: ylabel = "Normalized Secondary Vertex Tracks"
-  if "tval" in var or "terr" in var or "tsig" in var:
-    hists = [n["svInclusive"+suffix], n["svMerged"+suffix], p["svInclusive"+suffix], p["svMerged"+suffix]]
-  plot(hists, labels, colors, styles, sv_var_labels[iVar], ylabel, save_path+"SecondaryVertex", var)
-  plot_ratio(hists, labels, 2, ratio_labels, colors, styles, sv_var_labels[iVar], ylabel, "PU0/PU200", save_path+"SecondaryVertex", var)
-for name in sv_2d_names:
-  for iVar, var in enumerate(sv_var2d):
-    hist2DnoPU = dir_TTnoPU.Get(name+"_"+var).Clone()
-    hist2DPU200 = dir_TTPU200.Get(name+"_"+var).Clone()
-    hist2DPU200.Scale(ratio)
-    plot_2D(hist2DnoPU, sv_var2d_labels[iVar][0], sv_var2d_labels[iVar][1], "Secondary Vertex Tracks", save_path+"SecondaryVertex", name+"_"+var+"_noPU")
-    plot_2D(hist2DPU200, sv_var2d_labels[iVar][0], sv_var2d_labels[iVar][1], "Secondary Vertex Tracks", save_path+"SecondaryVertex", name+"_"+var+"_PU200")
+for refPoint in ["BS", "PV"]:
+  for iVar, var in enumerate(sv_vars):
+    suffix = "MTD" + refPoint + "_" + var
+    hists = [n["svInclusive"+suffix], n["svSlimmed"+suffix], p["svInclusive"+suffix], p["svSlimmed"+suffix]]
+    labels = [ttnoPU+", inclusive", ttnoPU+", slimmed", ttPU200+", inclusive", ttPU200+", slimmed"]
+    ratio_labels = ["inclusive", "slimmed"]
+    colors = [COLORS[0], COLORS[2], COLORS[0], COLORS[2]]
+    styles = [ROOT.kSolid, ROOT.kSolid, ROOT.kDashed, ROOT.kDashed]
+    markers = [26, 26, 32, 32]
+    ylabel = "Normalized Secondary Vertices"
+    if "trk_" in var: ylabel = "Normalized Secondary Vertex Tracks"
+    if "tval" in var or "terr" in var or "tsig" in var:
+      hists = [n["svInclusive"+suffix], n["svSlimmed"+suffix], p["svInclusive"+suffix], p["svSlimmed"+suffix]]
+    plot(hists, labels, colors, markers, styles, sv_var_labels[iVar], ylabel, save_path+"SecondaryVertex", refPoint+"_"+var)
+    plot_ratio(hists, labels, 2, ratio_labels, colors, markers, styles, sv_var_labels[iVar], ylabel, "PU0/PU200", save_path+"SecondaryVertex", refPoint+"_"+var)
+  for name in sv_names:
+    for iVar, var in enumerate(sv_var2d):
+      print(name+"_"+var)
+      hist2DnoPU = dir_TTnoPU.Get(name+"_"+var).Clone()
+      hist2DPU200 = dir_TTPU200.Get(name+"_"+var).Clone()
+      hist2DPU200.Scale(ratio)
+      plot_2D(hist2DnoPU, sv_var2d_labels[iVar][0], sv_var2d_labels[iVar][1], "Secondary Vertex Tracks", save_path+"SecondaryVertex", refPoint+"_"+name+"_"+var+"_noPU")
+      plot_2D(hist2DPU200, sv_var2d_labels[iVar][0], sv_var2d_labels[iVar][1], "Secondary Vertex Tracks", save_path+"SecondaryVertex", refPoint+"_"+name+"_"+var+"_PU200")
 end = time.time()
 print("SecondaryVertex plotting time = %.2fs" % (end-start))
 
@@ -136,24 +175,26 @@ for iVar, var in enumerate(vtx_vars):
   h4.Scale(ratio)
   hists = [h1, h2, h3, h4]
   labels = [ttnoPU+", inclusive", ttnoPU+", slimmed", ttPU200+", inclusive", ttPU200+", slimmed"]
+  ratio_labels = ["inclusive", "slimmed"]
   colors = [COLORS[0], COLORS[2], COLORS[0], COLORS[2]]
   styles = [ROOT.kSolid, ROOT.kSolid, ROOT.kDashed, ROOT.kDashed]
-  plot(hists, labels, colors, styles, vtx_var_labels[iVar], "Gen Vertices", save_path+"GenVertex", var)
+  markers = [26, 26, 32, 32]
+  plot(hists, labels, colors, markers, styles, vtx_var_labels[iVar], "Gen Vertices", save_path+"GenVertex", var)
+  plot_ratio(hists, labels, 2, ratio_labels, colors, markers, styles, vtx_var_labels[iVar], "Gen Vertices", "PU0/PU200", save_path+"GenVertex", var)
 
-  h1 = dir_TTnoPU.Get("gv_svSlimmed_"+var).Clone()
-  h2 = dir_TTnoPU.Get("gvB_svSlimmed_"+var).Clone()
-  h3 = dir_TTnoPU.Get("gvD_svSlimmed_"+var).Clone()
-  h4 = dir_TTPU200.Get("gv_svSlimmed_"+var).Clone()
-  h5 = dir_TTPU200.Get("gvB_svSlimmed_"+var).Clone()
-  h6 = dir_TTPU200.Get("gvD_svSlimmed_"+var).Clone()
+  h1 = dir_TTnoPU.Get("gvB_svSlimmed_"+var).Clone()
+  h2 = dir_TTnoPU.Get("gvD_svSlimmed_"+var).Clone()
+  h3 = dir_TTPU200.Get("gvB_svSlimmed_"+var).Clone()
+  h4 = dir_TTPU200.Get("gvD_svSlimmed_"+var).Clone()
+  h3.Scale(ratio)
   h4.Scale(ratio)
-  h5.Scale(ratio)
-  h6.Scale(ratio)
-  hists = [h1, h2, h3, h4, h5, h6]
-  labels = [ttnoPU+", B & D mother", ttnoPU+", B mother", ttnoPU+", D mother", ttPU200+", B & D mother", ttPU200+", B mother", ttPU200+", D mother"]
-  colors = [COLORS[0], COLORS[1], COLORS[2], COLORS[0], COLORS[1], COLORS[2]]
-  styles = [ROOT.kSolid, ROOT.kSolid, ROOT.kSolid, ROOT.kDashed, ROOT.kDashed, ROOT.kDashed]
-  plot(hists, labels, colors, styles, vtx_var_labels[iVar], "Gen Vertices", save_path+"GenVertex", var+"_slimmed")
+  hists = [h1, h2, h3, h4]
+  labels = [ttnoPU+", B mother", ttnoPU+", D mother", ttPU200+", B mother", ttPU200+", D mother"]
+  colors = [COLORS[4], COLORS[3], COLORS[4], COLORS[3]]
+  styles = [ROOT.kSolid, ROOT.kSolid, ROOT.kDashed, ROOT.kDashed]
+  markers = [26, 26, 32, 32]
+  plot(hists, labels, colors, markers, styles, vtx_var_labels[iVar], "Gen Vertices", save_path+"GenVertex", var+"_slimmed")
+  plot_ratio(hists, labels, 2, ratio_labels, colors, markers, styles, vtx_var_labels[iVar], "Gen Vertices", "PU0/PU200", save_path+"GenVertex", var+"_slimmed")
 end = time.time()
 print("Match quality plotting time = %.2fs" % (end-start))
 
@@ -172,7 +213,8 @@ for iVar, var in enumerate(efficiency_vars):
   labels = [ttnoPU+", inclusive", ttnoPU+", slimmed", ttPU200+", inclusive", ttPU200+", slimmed"]
   colors = [COLORS[0], COLORS[2], COLORS[0], COLORS[2]]
   styles = [ROOT.kSolid, ROOT.kSolid, ROOT.kDashed, ROOT.kDashed]
-  plot(hists, labels, colors, styles, eff_var_labels[iVar], "Efficiency", save_path+"Efficiency", var)
+  markers = [26, 26, 32, 32]
+  plot(hists, labels, colors, markers, styles, eff_var_labels[iVar], "Efficiency", save_path+"Efficiency", var)
 
   gvB_svSlimmed_eff_noPU = dir_TTnoPU.Get("gvB_svSlimmed_"+var).Clone()
   gvB_svSlimmed_eff_noPU.Divide(dir_TTnoPU.Get("gvB_"+var).Clone())
@@ -182,11 +224,12 @@ for iVar, var in enumerate(efficiency_vars):
   gvB_svSlimmed_eff_PU200.Divide(dir_TTPU200.Get("gvB_"+var).Clone())
   gvD_svSlimmed_eff_PU200 = dir_TTPU200.Get("gvD_svSlimmed_"+var).Clone()
   gvD_svSlimmed_eff_PU200.Divide(dir_TTPU200.Get("gvD_"+var).Clone())
-  hists = [gv_svSlimmed_eff_noPU, gvB_svSlimmed_eff_noPU, gvD_svSlimmed_eff_noPU, gv_svSlimmed_eff_PU200, gvB_svSlimmed_eff_PU200, gvD_svSlimmed_eff_PU200]
-  labels = [ttnoPU+", B & D mother", ttnoPU+", B mother", ttnoPU+", D mother", ttPU200+", B & D mother", ttPU200+", B mother", ttPU200+", D mother"]
-  colors = [COLORS[0], COLORS[1], COLORS[2], COLORS[0], COLORS[1], COLORS[2]]
-  styles = [ROOT.kSolid, ROOT.kSolid, ROOT.kSolid, ROOT.kDashed, ROOT.kDashed, ROOT.kDashed]
-  plot(hists, labels, colors, styles, eff_var_labels[iVar], "Efficiency", save_path+"Efficiency", var+"_slimmed")
+  hists = [gvB_svSlimmed_eff_noPU, gvD_svSlimmed_eff_noPU, gvB_svSlimmed_eff_PU200, gvD_svSlimmed_eff_PU200]
+  labels = [ttnoPU+", B mother", ttnoPU+", D mother", ttPU200+", B mother", ttPU200+", D mother"]
+  colors = [COLORS[4], COLORS[3], COLORS[4], COLORS[3]]
+  styles = [ROOT.kSolid, ROOT.kSolid, ROOT.kDashed, ROOT.kDashed]
+  markers = [26, 26, 32, 32]
+  plot(hists, labels, colors, markers, styles, eff_var_labels[iVar], "Efficiency", save_path+"Efficiency", var+"_slimmed")
 end = time.time()
 print("Efficiency plotting time = %.2fs" % (end-start))
 

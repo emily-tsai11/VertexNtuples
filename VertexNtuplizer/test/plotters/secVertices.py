@@ -57,7 +57,8 @@ sv_vars = [
   "chi2",
   "ndof",
   "chi2dof",
-  "ntrk"
+  "ntrk",
+  "mtdEff"
 ]
 sv_var_labels = [
   "Track time [ps]",
@@ -109,7 +110,8 @@ sv_var_labels = [
   "#chi^{2}",
   "N.D.O.F.",
   "#chi^{2} / N.D.O.F.",
-  "# of tracks"
+  "# of tracks",
+  "MTD efficiency"
 ]
 
 sv_var2d = [

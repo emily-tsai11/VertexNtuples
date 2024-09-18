@@ -88,7 +88,7 @@ for mtdRegion in ["BTL", "ETL"]:
   ratio_labels = ["BS extrapolation", "PV extrapolation"]
   colors = [CMS.p8.kOrange, CMS.p8.kBlue, CMS.p8.kOrange, CMS.p8.kBlue]
   styles = [ROOT.kSolid, ROOT.kSolid, ROOT.kDashed, ROOT.kDashed]
-  markers = [26, 26, 32, 32]
+  markers = [26, 32, 26, 32]
   hists = [h1, h4, h7, h10]
   plot(hists, labels, colors, markers, styles, "Time [ps]", "Normalized PF candidates", save_path+"Tracks", "tval"+mtdRegion)
   plot_ratio(hists, labels, 2, ratio_labels, colors, markers, styles, "Time [ps]", "Normalized PF candidates", "PU0/PU200", save_path+"Tracks", "tval"+mtdRegion)
@@ -98,6 +98,15 @@ for mtdRegion in ["BTL", "ETL"]:
   hists = [h3, h6, h9, h12]
   plot(hists, labels, colors, markers, styles, "Time significance", "Normalized PF candidates", save_path+"Tracks", "tsig"+mtdRegion)
   plot_ratio(hists, labels, 2, ratio_labels, colors, markers, styles, "Time significance", "Normalized PF candidates", "PU0/PU200", save_path+"Tracks", "tsig"+mtdRegion)
+  # -------- #
+  labels = [ttnoPU+", BS extrapolation", ttPU200+", BS extrapolation", ttnoPU+", PV extrapolation", ttPU200+", PV extrapolation"]
+  ratio_labels = ["PU0", "PU200"]
+  hists = [h1, h7, h4, h10]
+  plot_ratio(hists, labels, 2, ratio_labels, colors, markers, styles, "Time [ps]", "Normalized PF candidates", "BS/PV", save_path+"Tracks", "tval"+mtdRegion+"_2")
+  hists = [h2, h8, h5, h11]
+  plot_ratio(hists, labels, 2, ratio_labels, colors, markers, styles, "Time error [ps]", "Normalized PF candidates", "BS/PV", save_path+"Tracks", "terr"+mtdRegion+"_2")
+  hists = [h3, h9, h6, h12]
+  plot_ratio(hists, labels, 2, ratio_labels, colors, markers, styles, "Time significance", "Normalized PF candidates", "BS/PV", save_path+"Tracks", "tsig"+mtdRegion+"_2")
 end = time.time()
 print("PF candidate plotting time = %.2fs" % (end-start))
 
@@ -117,7 +126,7 @@ for iVar, var in enumerate(gv_vars):
   ratio_labels = ["B mother", "D mother"]
   colors = [COLORS[4], COLORS[3], COLORS[4], COLORS[3]]
   styles = [ROOT.kSolid, ROOT.kSolid, ROOT.kDashed, ROOT.kDashed]
-  markers = [26, 26, 32, 32]
+  markers = [26, 32, 26, 32]
   ylabel = "Gen Vertices"
   if "trk_" in var: ylabel = "Gen Vertex Daughters"
   plot(hists, labels, colors, markers, styles, gv_var_labels[iVar], ylabel, save_path+"GenVertex", var)
@@ -146,7 +155,7 @@ for refPoint in ["BS", "PV"]:
     ratio_labels = ["inclusive", "slimmed"]
     colors = [COLORS[0], COLORS[2], COLORS[0], COLORS[2]]
     styles = [ROOT.kSolid, ROOT.kSolid, ROOT.kDashed, ROOT.kDashed]
-    markers = [26, 26, 32, 32]
+    markers = [26, 32, 26, 32]
     ylabel = "Normalized Secondary Vertices"
     if "trk_" in var: ylabel = "Normalized Secondary Vertex Tracks"
     if "tval" in var or "terr" in var or "tsig" in var:
@@ -155,7 +164,6 @@ for refPoint in ["BS", "PV"]:
     plot_ratio(hists, labels, 2, ratio_labels, colors, markers, styles, sv_var_labels[iVar], ylabel, "PU0/PU200", save_path+"SecondaryVertex", refPoint+"_"+var)
   for name in sv_names:
     for iVar, var in enumerate(sv_var2d):
-      print(name+"_"+var)
       hist2DnoPU = dir_TTnoPU.Get(name+"_"+var).Clone()
       hist2DPU200 = dir_TTPU200.Get(name+"_"+var).Clone()
       hist2DPU200.Scale(ratio)
@@ -178,7 +186,7 @@ for iVar, var in enumerate(vtx_vars):
   ratio_labels = ["inclusive", "slimmed"]
   colors = [COLORS[0], COLORS[2], COLORS[0], COLORS[2]]
   styles = [ROOT.kSolid, ROOT.kSolid, ROOT.kDashed, ROOT.kDashed]
-  markers = [26, 26, 32, 32]
+  markers = [26, 32, 26, 32]
   plot(hists, labels, colors, markers, styles, vtx_var_labels[iVar], "Gen Vertices", save_path+"GenVertex", var)
   plot_ratio(hists, labels, 2, ratio_labels, colors, markers, styles, vtx_var_labels[iVar], "Gen Vertices", "PU0/PU200", save_path+"GenVertex", var)
 
@@ -192,7 +200,7 @@ for iVar, var in enumerate(vtx_vars):
   labels = [ttnoPU+", B mother", ttnoPU+", D mother", ttPU200+", B mother", ttPU200+", D mother"]
   colors = [COLORS[4], COLORS[3], COLORS[4], COLORS[3]]
   styles = [ROOT.kSolid, ROOT.kSolid, ROOT.kDashed, ROOT.kDashed]
-  markers = [26, 26, 32, 32]
+  markers = [26, 32, 26, 32]
   plot(hists, labels, colors, markers, styles, vtx_var_labels[iVar], "Gen Vertices", save_path+"GenVertex", var+"_slimmed")
   plot_ratio(hists, labels, 2, ratio_labels, colors, markers, styles, vtx_var_labels[iVar], "Gen Vertices", "PU0/PU200", save_path+"GenVertex", var+"_slimmed")
 end = time.time()
@@ -213,7 +221,7 @@ for iVar, var in enumerate(efficiency_vars):
   labels = [ttnoPU+", inclusive", ttnoPU+", slimmed", ttPU200+", inclusive", ttPU200+", slimmed"]
   colors = [COLORS[0], COLORS[2], COLORS[0], COLORS[2]]
   styles = [ROOT.kSolid, ROOT.kSolid, ROOT.kDashed, ROOT.kDashed]
-  markers = [26, 26, 32, 32]
+  markers = [26, 32, 26, 32]
   plot(hists, labels, colors, markers, styles, eff_var_labels[iVar], "Efficiency", save_path+"Efficiency", var)
 
   gvB_svSlimmed_eff_noPU = dir_TTnoPU.Get("gvB_svSlimmed_"+var).Clone()
@@ -228,7 +236,7 @@ for iVar, var in enumerate(efficiency_vars):
   labels = [ttnoPU+", B mother", ttnoPU+", D mother", ttPU200+", B mother", ttPU200+", D mother"]
   colors = [COLORS[4], COLORS[3], COLORS[4], COLORS[3]]
   styles = [ROOT.kSolid, ROOT.kSolid, ROOT.kDashed, ROOT.kDashed]
-  markers = [26, 26, 32, 32]
+  markers = [26, 32, 26, 32]
   plot(hists, labels, colors, markers, styles, eff_var_labels[iVar], "Efficiency", save_path+"Efficiency", var+"_slimmed")
 end = time.time()
 print("Efficiency plotting time = %.2fs" % (end-start))

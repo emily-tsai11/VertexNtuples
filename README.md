@@ -44,16 +44,7 @@ crab submit crabSubmitter.py
 ```
 
 ### Plotting
-The main plotting script, `VertexNtuplizer/test/plotter.ipynb`, is meant to be run on SWAN.
-
-### Cut scan on GenVertex and SecondaryVertex matching via tracks
-One method of matching a GenVertex to a SecondaryVertex is via track matching. The two cuts used in this case are
-$$\Delta R(\eta, \phi) \text{ between the GV daughter and SV track}$$
-and
-$$\frac{|\text{GV daughter }p_T - \text{SV track }p_T|}{\text{GV daughter }p_T + \text{SV track }p_T}$$
-To find two matching vertices, we require that
-$$\frac{\text{number of matched GV daughters}}{\text{total number of GV daughters}} > 0.66$$
-To perform a scan on the two cuts, set `scanCuts` in `VertexNtuplizer/test/VertexNtuplizer.py` to `True`. You can then plot the effect of varying these cuts using `VertexNtuplizer/test/CutScan/trkDrPtCutScan_eff.py`.
+The main plotting script is `VertexNtuplizer/test/plotters/plot.py`.
 
 ### To update submodules
 ```

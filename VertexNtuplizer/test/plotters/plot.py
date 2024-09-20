@@ -84,6 +84,12 @@ for mtdRegion in ["BTL", "ETL"]:
   h10.Scale(1.0 / h10.Integral())
   h11.Scale(1.0 / h11.Integral())
   h12.Scale(1.0 / h12.Integral())
+  # h7.Scale(ratio)
+  # h8.Scale(ratio)
+  # h9.Scale(ratio)
+  # h10.Scale(ratio)
+  # h11.Scale(ratio)
+  # h12.Scale(ratio)
   labels = [ttnoPU+", BS extrapolation", ttnoPU+", PV extrapolation", ttPU200+", BS extrapolation", ttPU200+", PV extrapolation"]
   ratio_labels = ["BS extrapolation", "PV extrapolation"]
   colors = [CMS.p8.kOrange, CMS.p8.kBlue, CMS.p8.kOrange, CMS.p8.kBlue]
@@ -158,8 +164,6 @@ for refPoint in ["BS", "PV"]:
     markers = [26, 32, 26, 32]
     ylabel = "Normalized Secondary Vertices"
     if "trk_" in var: ylabel = "Normalized Secondary Vertex Tracks"
-    if "tval" in var or "terr" in var or "tsig" in var:
-      hists = [n["svInclusive"+suffix], n["svSlimmed"+suffix], p["svInclusive"+suffix], p["svSlimmed"+suffix]]
     plot(hists, labels, colors, markers, styles, sv_var_labels[iVar], ylabel, save_path+"SecondaryVertex", refPoint+"_"+var)
     plot_ratio(hists, labels, 2, ratio_labels, colors, markers, styles, sv_var_labels[iVar], ylabel, "PU0/PU200", save_path+"SecondaryVertex", refPoint+"_"+var)
   for name in sv_names:
@@ -238,6 +242,13 @@ for iVar, var in enumerate(efficiency_vars):
   styles = [ROOT.kSolid, ROOT.kSolid, ROOT.kDashed, ROOT.kDashed]
   markers = [26, 32, 26, 32]
   plot(hists, labels, colors, markers, styles, eff_var_labels[iVar], "Efficiency", save_path+"Efficiency", var+"_slimmed")
+
+  hists = [gv_svSlimmed_eff_noPU, gv_svSlimmed_eff_PU200]
+  labels = [ttnoPU, ttPU200]
+  colors = [COLORS[0], COLORS[2]]
+  styles = [ROOT.kSolid, ROOT.kSolid]
+  markers = [26, 32]
+  plot(hists, labels, colors, markers, styles, eff_var_labels[iVar], "Efficiency", save_path+"Efficiency", var+"_slimmedNoFlav")
 end = time.time()
 print("Efficiency plotting time = %.2fs" % (end-start))
 

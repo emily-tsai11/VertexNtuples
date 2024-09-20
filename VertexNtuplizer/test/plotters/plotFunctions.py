@@ -95,18 +95,16 @@ def plot_ratio(hists, labels, ratio_style, ratio_labels, colors, markers, styles
             ratioMax = 80.0
             ratioLog = True
     if "Tracks" in save_path:
-        if "terrBTL" in save_name:
-            ratioMax = 2.5
         if "terrETL" in save_name:
             ratioMin = 0.8e-1
-            ratioMax = 80.0
+            ratioMax = 20.0
             ratioLog = True
     dicanv = CMS.cmsDiCanvas(
         save_name + "_ratio",
         left,
         right,
-        5e-6 if log else 0,
-        50 * maxi if log else 1.6 * maxi,
+        0.5 if log else 0,
+        2500 * maxi if log else 1.6 * maxi,
         ratioMin, ratioMax,
         xlabel, ylabel,
         ratiolabel,

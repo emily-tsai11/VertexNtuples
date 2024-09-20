@@ -636,12 +636,14 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   edm::ValueMap<float> trackSigmaT0FromPV_ = iEvent.get(trackSigmaT0FromPVToken_);
   // edm::ValueMap<float> trackQualityFromPV_ = iEvent.get(trackQualityFromPVToken_);
   for (const reco::PFCandidate& pfc : pfCandidates) {
+    if (pfc.pt() < 0.8) continue;
+    if (abs(pfc.eta()) > 3.0) continue;
+    if (pfc.charge() == 0) continue;
     const reco::TrackRef& trkRef = pfc.trackRef();
     if (!trkRef) continue;
-    if (trkRef->charge() == 0) continue;
     if (trackSigmaT0FromBS_[trkRef] > 0.0) {
       TString suffix = "";
-      if (abs(trkRef->eta()) <= 1.5) suffix += "BTL";
+      if (abs(pfc.eta()) < 1.5) suffix += "BTL";
       else suffix += "ETL";
       histos1_["pfCandidate_bs_tval" + suffix]->Fill(trackT0FromBS_[trkRef] * 1000.0);
       histos1_["pfCandidate_bs_terr" + suffix]->Fill(trackSigmaT0FromBS_[trkRef] * 1000.0);
@@ -650,7 +652,7 @@ void VertexNtuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     }
     if (trackSigmaT0FromPV_[trkRef] > 0.0) {
       TString suffix = "";
-      if (abs(trkRef->eta()) <= 1.5) suffix += "BTL";
+      if (abs(pfc.eta()) < 1.5) suffix += "BTL";
       else suffix += "ETL";
       histos1_["pfCandidate_pv_tval" + suffix]->Fill(trackT0FromPV_[trkRef] * 1000.0);
       histos1_["pfCandidate_pv_terr" + suffix]->Fill(trackSigmaT0FromPV_[trkRef] * 1000.0);

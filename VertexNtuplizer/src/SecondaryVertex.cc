@@ -185,7 +185,7 @@ void SecondaryVertex::fill(std::map<TString, TH1F*>& histos1,
   for (unsigned int iTrk = 0; iTrk < nTracks(); iTrk++) {
     // MTD timing
     TString suffix = "";
-    if (abs(trk_eta_->at(iTrk)) <= 1.5) suffix += "BTL";
+    if (abs(trk_eta_->at(iTrk)) < 1.5) suffix += "BTL";
     else suffix += "ETL";
 
     // 1D histograms
@@ -254,7 +254,7 @@ void SecondaryVertex::fill(std::map<TString, TH1F*>& histos1,
 
   // MTD timing
   TString suffix = "";
-  if (abs(eta_) <= 1.5) suffix += "BTL";
+  if (abs(eta_) < 1.5) suffix += "BTL";
   else suffix += "ETL";
 
   // 2D histograms
